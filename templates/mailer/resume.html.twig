@@ -1,0 +1,20 @@
+{% apply inline_css(source("@styles/bootstrap.min.css"),source("@styles/icons.min.css")
+    ,source("@styles/app.min.css"),source("@styles/custom.min.css")) %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10">
+                <p>Bonjour Monsieur/Madame {{ requerent }}.</p>
+                <p> Votre recours a été bien enregistré par la Cour suprême du Bénin avec le numéro de suivi :  <span class="badge bg-success-subtle text-success"> {{ codeSuivi }}</span></p>
+
+                <p>
+                    Veuillez garder ce numéro afin de l'utiliser pour vérifier l'état de votre recours
+                    ultérieurement
+                </p>
+                <p>
+                    Cliquez sur ce lien <a href="{{ lien }}"><strong style="color:blue;">Vérifier Statut</strong></a> en utilisant le code suivi : <span class="badge bg-success-subtle text-success"> {{ codeSuivi }}</span> de votre recours pour vérifier le statut.
+                </p>
+{#                <p>L'audience du  dossier : {{ dossier.intituleObjet }} a été programmé le {{ audience.dateAudience ? audience.dateAudience|date('Y-m-d') : '' }} à {{ audience.dateAudience ? audience.heureAudience|date('H:i') : '' }}.</p>#}
+            </div>
+        </div>
+    </div>
+{% endapply %}

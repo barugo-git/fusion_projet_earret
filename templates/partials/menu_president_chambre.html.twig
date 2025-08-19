@@ -1,0 +1,100 @@
+<li class="nav-item">
+    <a href="{{ path('app_president_chambre') }}" class="nav-link" data-key="t-analytics">
+        <i class="ri-folder-add-fill"></i>
+        Les recours
+
+    </a>
+</li>
+<li class="nav-item">
+    <a href="{{ path('app_recours_autorisation') }}" class="nav-link" data-key="t-analytics">
+        <i class="ri-folder-add-fill"></i>
+       Recours autorises
+
+    </a>
+</li>
+<li class="nav-item">
+    <a href="{{ path('pc_dossier_ouverture') }}" class="nav-link" data-key="t-analytics">
+        <i class="ri-folder-add-fill"></i>
+        Dossiers ouverts
+
+    </a>
+</li>
+<li class="nav-item">
+    <a href="{{ path('pc_conclusion_parquet') }}" class="nav-link" data-key="t-analytics">
+        <i class="ri-folder-add-fill"></i>
+        Conclusions du parquet
+
+    </a>
+</li>
+<li class="nav-item">
+    <a href="{{ path('rapport_index') }}" class="nav-link" data-key="t-analytics">
+        <i class="ri-folder-add-fill"></i>
+        Rapport générés
+
+    </a>
+</li>
+<li class="nav-item">
+{#    {{ path('app_dossier_affectations_list') }}#}
+    <a class="nav-link menu-link" href="#t-crypto" data-key="t-crypto" data-bs-toggle="collapse" role="button">
+        <i class="ri-folder-add-fill"></i> <span data-key="t-dashboards">Affectation</span> </a>
+    <div class="collapse menu-dropdown" id="t-crypto">
+        <ul class="nav nav-sm flex-column">
+            <li class="nav-item">
+                <a href="{{ path('pc_dossier_affectations_list') }}" class="nav-link" data-key="t-crypto"> Affectation au parquet </a>
+            </li>
+{#            <li class="nav-item">#}
+{#                <a href="{{ path('app_dossier_affectations_list') }}" class="nav-link" data-key="t-crypto"> Nouvelle Affectation </a>#}
+{#            </li>#}
+            <li class="nav-item">
+                <a href="{{ path('admin_affectation_all') }}" class="nav-link" data-key="t-crypto"> Toutes les affectaions</a>
+            </li>
+
+
+        </ul>
+    </div>
+</li>
+
+{#<li class="nav-item">#}
+{#    <a href="{{ path('admin_arret_list') }}" class="nav-link" data-key="t-analytics">#}
+{#        <i class="ri-folder-add-fill"></i>#}
+{#        Les arrêts#}
+
+{#    </a>#}
+{#</li>#}
+
+{#<li class="nav-item">#}
+{#    <a href="{{ path('app_audience_liste') }}" class="nav-link" data-key="t-analytics">#}
+{#        <i class="ri-folder-add-fill"></i>#}
+{#        Les audiences Programmées#}
+
+{#    </a>#}
+{#</li>#}
+{#<li class="nav-item">#}
+{#    <a href="#" class="nav-link" data-key="t-analytics">#}
+{#        <i class="ri-folder-add-fill"></i>#}
+{#        Liste des mesures d'instruction#}
+
+{#    </a>#}
+{#</li>#}
+
+{#<li class="nav-item">#}
+{#    <a href="#" class="nav-link" data-key="t-analytics">#}
+{#        <i class="ri-folder-add-fill"></i>#}
+{#        dossier en attente d'arrêts#}
+
+{#    </a>#}
+{#</li>#}
+{#<li class="nav-item">#}
+{#    <a href="#" class="nav-link" data-key="t-analytics">#}
+{#        <i class="ri-folder-add-fill"></i>#}
+{#        Dossier en attente de délibération#}
+
+{#    </a>#}
+{#</li>#}
+{#<li class="nav-item">#}
+{#    <a href="#" class="nav-link" data-key="t-analytics">#}
+{#        <i class="ri-folder-add-fill"></i>#}
+{#       Dossier Vide#}
+
+{#    </a>#}
+{#</li>#}

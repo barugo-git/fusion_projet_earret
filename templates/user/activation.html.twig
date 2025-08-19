@@ -1,0 +1,17 @@
+{#{% apply inline_css(source("@styles/bootstrap.min.css"),source("@styles/icons.min.css")#}
+{#    ,source("@styles/app.min.css"),source("@styles/custom.min.css")) %}#}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion à la plateforme e-Arrêt</title>
+</head>
+<body>
+<p>
+    Bonjour/Bonsoir Monsieur(Madame) <strong>{{ user.fullname }}</strong>, <br> Votre compte a été activé. <br>
+    Cliquez sur ce lien pour se connecter.
+    {# pour que le lien fonctionne, il est indispensable que le lien soit absolu. #}
+    <a href="{{absolute_url(path('app_login'))}}"> Se Connecter</a>
+</p>
+</body>
+</html>

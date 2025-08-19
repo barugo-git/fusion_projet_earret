@@ -1,0 +1,193 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Liste des dossiers ouverts</h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+
+
+                    <div class="data_table mt-3 mb-1">
+                        {% if dossiers|length > 0 %}
+                            <table class="table align-middle table-nowrap" id="customerTable">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="sort"></th>
+                                    <th class="sort" data-sort="customer_name">N°enreg</th>
+                                    <th class="sort" data-sort="customer_name">N° Dossier</th>
+                                    <th class="sort" data-sort="customer_name">N° reference</th>
+                                    <th class="sort" data-sort="email">Date enreg</th>
+                                    <th class="sort" data-sort="phone">Réquerant</th>
+
+                                    <th class="sort" data-sort="date">Defendeur</th>
+
+                                    <th class="sort" data-sort="action">Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for dossier in dossiers %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td class="customer_name">{{ dossier.referenceEnregistrement }}</td>
+                                        <td class="customer_name">{{ dossier.referenceDossier }}</td>
+                                        <td class="customer_name">{{ dossier.referenceDossierComplet }}</td>
+                                        <td class="email">{{ dossier.dateEnregistrement ? dossier.dateEnregistrement|date('Y-m-d') : '' }}</td>
+                                        <td class="email">
+                                            {% if dossier.requerant.type =='moral' %}
+
+                                                {{ dossier.requerant.intitule }}
+                                            {% else %}
+
+                                                {{ dossier.requerant.nom ~" "~ dossier.requerant.prenoms }}
+                                            {% endif %}
+                                            {#                                            {{ dossier.requerant.nom ~" "~ dossier.requerant.prenoms }}#}
+                                            ({{ dossier.requerant.Telephone }})
+                                        </td>
+
+                                        <td class="email">{{ dossier.defendeur.nom ~" "~ dossier.defendeur.prenoms }}
+                                            ({{ dossier.defendeur.telephone }})
+                                        </td>
+                                        <td>
+                                            {% if is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_AGENT_DE_SAISIE') %}
+
+
+                                            {#                                            {% elseif  is_granted('ROLE_AGENT_DE_SAISIE') %}#}
+                                            {#                                                <a href="{{ path('admin_dossier_details',{'id':dossier.id}) }}" title="Voir les details du dossier">#}
+                                            {#                                                    <i class="ri-eye-fill"></i>#}
+                                            {#                                                </a>#}
+                                            {#                                                <div class="dropdown">#}
+                                            {#                                                    <a href="#" role="button" id="dropdownMenuLink5" data-bs-toggle="dropdown" aria-expanded="false">#}
+                                            {#                                                        <i class="ri-more-2-fill"></i>#}
+                                            {#                                                       #}
+                                            {#                                                    </a>#}
+
+                                            {#                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink5">#}
+                                            {#                                                        <li><a class="dropdown-item" href="#">View</a></li>#}
+                                            {#                                                        <li><a class="dropdown-item" href="#">Edit</a></li>#}
+                                            {#                                                        <li><a class="dropdown-item" href="#">Delete</a></li>#}
+                                            {#                                                    </ul>#}
+                                            {#                                                </div>#}
+
+                                            <div class="dropdown">
+                                                <a href="#" role="button" id="dropdownMenuLink1"
+                                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="ri-more-2-fill"></i>
+                                                </a>
+
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink1">
+                                                    <li><a class="dropdown-item"
+                                                           href="{{ path('admin_affecter_dossier_structure_new',{'id': dossier.id}) }}">A
+                                                            une structure</a></li>
+
+
+                                                    <li><a class="dropdown-item"
+                                                           href="{{ path('admin_dossier_affections',{'id': dossier.id}) }}">Voir
+                                                            les affections</a></li>
+                                                    <li><a class="dropdown-item"
+                                                           href="{{ path('admin_dossier_details',{'id':dossier.id}) }}">Details
+                                                            du dossier</a></li>
+
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        {% endif %}
+
+
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div class="noresult">
+                                <div class="text-center">
+                                    <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
+                                               colors="primary:#121331,secondary:#08a88a"
+                                               style="width:75px;height:75px">
+                                    </lord-icon>
+                                    <h5 class="mt-2">Aucune donnée pour l'instant</h5>
+                                    {#                                       <p class="text-muted mb-0">We've searched more than 150+ Orders We did not find any#}
+                                    {#                                           orders for you search.</p>#}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {#    <table class="table">#}
+    {#        <thead>#}
+    {#            <tr>#}
+    {#                <th>Id</th>#}
+    {#                <th>ReferenceEnregistrement</th>#}
+    {#                <th>DateEnregistrement</th>#}
+    {#                <th>TypeDossier</th>#}
+    {#                <th>NomRequerant</th>#}
+    {#                <th>PrenomsRequerant</th>#}
+    {#                <th>SexeRequerant</th>#}
+    {#                <th>ContactRequerant</th>#}
+    {#                <th>AdresseRequerant</th>#}
+    {#                <th>NomContact</th>#}
+    {#                <th>PrenomsContact</th>#}
+    {#                <th>AdresseContact</th>#}
+    {#                <th>ReferenceDossier</th>#}
+    {#                <th>IntituleObjet</th>#}
+    {#                <th>ReferenceDossierComplet</th>#}
+    {#                <th>EtatDossier</th>#}
+    {#                <th>TelephoneRequerant</th>#}
+    {#                <th>MailRequerant</th>#}
+    {#                <th>TelephoneContact</th>#}
+    {#                <th>MailContact</th>#}
+    {#                <th>CreatedAt</th>#}
+    {#                <th>UpdatedAt</th>#}
+    {#                <th>actions</th>#}
+    {#            </tr>#}
+    {#        </thead>#}
+    {#        <tbody>#}
+    {#        {% for dossier in dossiers %}#}
+    {#            <tr>#}
+    {#                <td>{{ dossier.id }}</td>#}
+    {#                <td>{{ dossier.referenceEnregistrement }}</td>#}
+    {#                <td>{{ dossier.dateEnregistrement ? dossier.dateEnregistrement|date('Y-m-d H:i:s') : '' }}</td>#}
+    {#                <td>{{ dossier.typeDossier }}</td>#}
+    {#                <td>{{ dossier.nomRequerant }}</td>#}
+    {#                <td>{{ dossier.prenomsRequerant }}</td>#}
+    {#                <td>{{ dossier.sexeRequerant }}</td>#}
+    {#                <td>{{ dossier.contactRequerant }}</td>#}
+    {#                <td>{{ dossier.adresseRequerant }}</td>#}
+    {#                <td>{{ dossier.nomContact }}</td>#}
+    {#                <td>{{ dossier.prenomsContact }}</td>#}
+    {#                <td>{{ dossier.adresseContact }}</td>#}
+    {#                <td>{{ dossier.referenceDossier }}</td>#}
+    {#                <td>{{ dossier.intituleObjet }}</td>#}
+    {#                <td>{{ dossier.referenceDossierComplet }}</td>#}
+    {#                <td>{{ dossier.etatDossier }}</td>#}
+    {#                <td>{{ dossier.telephoneRequerant }}</td>#}
+    {#                <td>{{ dossier.mailRequerant }}</td>#}
+    {#                <td>{{ dossier.telephoneContact }}</td>#}
+    {#                <td>{{ dossier.mailContact }}</td>#}
+    {#                <td>{{ dossier.createdAt ? dossier.createdAt|date('Y-m-d H:i:s') : '' }}</td>#}
+    {#                <td>{{ dossier.updatedAt ? dossier.updatedAt|date('Y-m-d H:i:s') : '' }}</td>#}
+    {#                <td>#}
+    {#                    <a href="{{ path('app_dossier_show', {'id': dossier.id}) }}">show</a>#}
+    {#                    <a href="{{ path('app_dossier_edit', {'id': dossier.id}) }}">edit</a>#}
+    {#                </td>#}
+    {#            </tr>#}
+    {#        {% else %}#}
+    {#            <tr>#}
+    {#                <td colspan="23">no records found</td>#}
+    {#            </tr>#}
+    {#        {% endfor %}#}
+    {#        </tbody>#}
+    {#    </table>#}
+
+    <!-- end row -->
+{% endblock %}

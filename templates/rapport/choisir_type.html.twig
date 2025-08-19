@@ -1,0 +1,163 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Choix du type de rapport{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .card-option {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 3px solid transparent;
+            height: 180px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+        .card-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            background-color: rgba(13, 110, 253, 0.1);
+        }
+        .card-option.active {
+            border-color: #198754; /* Vert Bootstrap */
+            background-color: rgba(25, 135, 84, 0.1);
+        }
+        .card-option.active::after {
+            content: "\2713"; /* Unicode checkmark */
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #198754;
+            font-size: 1.5rem;
+            background: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .radio-hidden {
+            position: absolute;
+            opacity: 0;
+        }
+        .option-content {
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        .option-title {
+            color: #ffffff !important;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        .option-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+        .option-card {
+            background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
+            border-radius: 10px;
+            border: none;
+        }
+        .no-model-alert {
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-8">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="card-header bg-primary text-white">
+                        <i class="fas fa-file-alt me-2"></i>Choix du type de rapport
+                    </h1>
+                </div>
+                
+                <div class="card-body">
+                    {# Vérification des messages flash au lieu de la variable error #}
+                    {% for message in app.flashes('error') %}
+                        <div class="alert alert-danger no-model-alert mb-4">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+
+                    <form method="post">
+                        <p class="text-muted mb-4">
+                            Ce dossier nécessite un rapport spécifique. Veuillez sélectionner le type approprié :
+                        </p>
+
+                        <div class="row g-4 mb-4">
+                            {% for type in typesRapport %}
+                            <div class="col-md-6">
+                                <label class="w-100 h-100">
+                                    <input type="radio" name="type_rapport" 
+                                           value="{{ type }}" 
+                                           class="radio-hidden" 
+                                           {% if selectedType is defined and selectedType == type %}checked{% endif %}
+                                           required>
+                                    <div class="card card-option option-card {% if selectedType is defined and selectedType == type %}active{% endif %}">
+                                        <div class="option-content">
+                                            <i class="fas fa-file-word option-icon"></i>
+                                            <h5 class="option-title">{{ type }}</h5>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ path('admin_dossier_details', {'id': dossierId}) }}" 
+                               class="btn btn-outline-secondary px-4">
+                                <i class="fas fa-arrow-left me-2"></i>Retour au dossier
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-check me-2"></i>Valider la sélection
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ajout de l'effet de sélection sur les cartes
+            const cards = document.querySelectorAll('.card-option');
+            cards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // Retire la classe active de toutes les cartes
+                    cards.forEach(c => c.classList.remove('active'));
+                    // Ajoute la classe active à la carte cliquée
+                    this.classList.add('active');
+                    // Coche la radio associée
+                    this.closest('label').querySelector('input[type="radio"]').checked = true;
+                });
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,24 @@
+<div class="alert bg-dark text-white  alert-border-left alert-dismissible fade show material-shadow" role="alert">
+    AFFAIRE :
+    {% if dossier.requerant.type =='moral' %}
+        {{ dossier.requerant.intitule }}
+    {% else %}
+        {{ dossier.requerant.nom ~ " " ~ dossier.requerant.prenoms }}
+    {% endif %}
+    {% if dossier.requerant.conseiller %}
+        {% for conseilRequerant in dossier.requerant.conseiller %}
+            ( ME {{ conseilRequerant.fullName }} )
+        {% endfor %}
+    {% endif %}
+    CONTRE
+    {% if dossier.defendeur.type =='moral' %}
+        {{ dossier.defendeur.intitule }}
+    {% else %}
+        {{ dossier.defendeur.nom ~ " " ~ dossier.defendeur.prenoms }}
+    {% endif %}
+    {% if dossier.defendeur.conseiller %}
+        {% for conseilRequerant in dossier.defendeur.conseiller %}
+            ( ME {{ conseilRequerant.fullName }} )
+        {% endfor %}
+    {% endif %}
+</div>

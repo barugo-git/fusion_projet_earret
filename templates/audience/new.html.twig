@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+                <div class="alert alert-danger mb-xl-0" role="alert">
+                    <strong> Les parties doivent être informées de l'audience au <b>moins 15 jours</b>  à l'avance </strong>
+                </div>
+                <div class="card-header">
+                    <h4 class="card-title mb-0"> Programmation d'audience</h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+
+                    {{ include('audience/_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

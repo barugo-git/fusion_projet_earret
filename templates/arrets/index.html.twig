@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Arrets index{% endblock %}
+
+{% block body %}
+    <h1>Arrets index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>DateArret</th>
+                <th>Titrage</th>
+                <th>Resume</th>
+                <th>Commentaire</th>
+                <th>Arret</th>
+                <th>NumArret</th>
+                <th>Forclusion</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for arret in arrets %}
+            <tr>
+                <td>{{ arret.id }}</td>
+                <td>{{ arret.dateArret ? arret.dateArret|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ arret.titrage }}</td>
+                <td>{{ arret.resume }}</td>
+                <td>{{ arret.commentaire }}</td>
+                <td>{{ arret.arret }}</td>
+                <td>{{ arret.numArret }}</td>
+                <td>{{ arret.forclusion }}</td>
+                <td>
+                    <a href="{{ path('app_arrets_show', {'id': arret.id}) }}">show</a>
+                    <a href="{{ path('app_arrets_edit', {'id': arret.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_arrets_new') }}">Create new</a>
+{% endblock %}

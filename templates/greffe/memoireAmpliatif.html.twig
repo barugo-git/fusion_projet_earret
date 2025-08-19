@@ -1,0 +1,31 @@
+{% extends template_parent %}
+
+{% block title %}Dossier index{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-12 offset-lg-1">
+            <div class="card">
+                <div class="card-header">
+
+                    {% include 'partials/_intitule_dossier.html.twig' %} <br>
+
+                    <h4 class="card-title mb-0">Production du mémoire ampliatif du dossier</h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    {{ form_errors(form) }} {# Affiche les erreurs globales du formulaire #}
+                    {{ form_row(form.document) }} {# Affiche les erreurs spécifiques au champ document #}
+                    <div class="d-flex justify-content-center">
+                        <button class="btn btn-success">
+                            {{ button_label|default('Enregistrer le mémoire ampliatif') }}
+                        </button>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

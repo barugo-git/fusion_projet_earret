@@ -1,0 +1,8 @@
+{% if dossier.etatDossier =='NOUVEAU' %}
+<div class="col-sm-auto">
+    <div class="d-flex gap-1 flex-wrap">
+        <a class="btn btn-success" href="{{ path('greffier_valide_demande',{'id': dossier.id}) }}"><i class="ri-check-double-line"></i> Valider</a>
+        <a class="btn btn-danger  waves-effect waves-light" href="{{ path('greffier_rejet_demande',{'id': dossier.id}) }}"> <i class="ri-delete-bin-5-line"></i> Rejeter</a>
+    </div>
+</div>
+{% endif %}

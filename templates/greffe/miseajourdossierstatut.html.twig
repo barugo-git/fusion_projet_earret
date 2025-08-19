@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mise à jour Dossier{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+                <div class="card-header">
+
+                    {% include 'partials/_intitule_dossier.html.twig' %} <br>
+
+                    <h4 class="card-title mb-0">Mise à jour du Dossier{{ dossier.referenceDossier }}</h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    {{ form_row(form.Statut) }}
+                    {{ form_row(form.dateMouvement) }}
+                    <button class="btn  btn-success la-pull-right">{{ button_label|default('Mise à jour statut') }}</button>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

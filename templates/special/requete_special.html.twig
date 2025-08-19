@@ -1,0 +1,275 @@
+{% extends 'base.html.twig' %}
+
+        {% block stylesheets %}
+            <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+
+        {% endblock %}
+
+{% form_theme form 'form_theme/_form_collection_dossier.html.twig' %}
+
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-12">
+
+            {{ include('special/_form.html.twig') }}
+
+        </div>
+    </div>
+
+
+    {#    <a href="{{ path('app_dossier_index') }}">back to list</a>#}
+{% endblock %}
+{% block javascripts %}
+    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    {#    <script src="{{ asset('bundles/fosjsrouting/js/router.min.js') }}"></script>#}
+    {#    <script src="{{ path('fos_js_routing_js', { callback: 'fos.Router.setData' }) }}"></script>#}
+    <!-- form wizard init -->
+
+    <script src="{{ asset('js/pages/form-wizard.init.js') }}"></script>
+
+    <script>
+
+        jQuery(document).ready(function () {
+
+            $('#dossier_objet').select2({
+                // theme: "classic"
+                width: 'resolve'
+            });
+
+            $('.morale').hide()
+            $('#dossier_defendeur_intitule').hide()
+
+            $('#dossier_requerant_type').val()
+
+            if($('#dossier_requerant_type').val() == "moral") {
+                $('.morale').show()
+                $('.physique').hide()
+
+            } else if ($('#dossier_requerant_type').val() == "physique"){
+                $('.morale').hide()
+                $('.physique').show()
+            }
+        })
+        var $typerequerent = $('#dossier_requerant_type')
+        var $typedefendeur = $('#dossier_defendeur_type')
+        $typerequerent.change(function () {
+            console.log($typerequerent.val())
+            if($typerequerent.val() == "moral") {
+                $('.morale').show()
+                $('.physique').hide()
+
+            } else if ($typerequerent.val() == "physique"){
+                $('.morale').hide()
+                $('.physique').show()
+            }
+
+        })
+        $typedefendeur.change(function () {
+            console.log($typerequerent.val())
+            if($typedefendeur.val() == "moral") {
+                $('#dossier_defendeur_intitule').show()
+                $('.physique_defendeur').hide()
+
+            } else if ($typedefendeur.val() == "physique"){
+                $('#dossier_defendeur_intitule').hide()
+                $('.physique_defendeur').show()
+            }
+
+        })
+
+        class LinkedSelect {
+
+            /**
+             * @param {HTMLSelectElement} $select
+             */
+            constructor($select) {
+                this.$select = $select
+                this.$target = document.querySelector(this.$select.dataset.target)
+                this.$placeholder = this.$target.firstElementChild
+                //  this.onChange = debounce(this.onChange.bind(this), 500)
+                this.onChange = this.onChange.bind(this)
+                this.$loader = null
+                this.cache = {}
+                this.$select.addEventListener('change', this.onChange)
+
+            }
+
+            /**
+             * Se déclenche au changement de valeur d'un select
+             * @param {Event} e
+             */
+            onChange(e) {
+                if (e.target.value === '0') {
+
+                    return
+                }
+
+                this.loadOptions(e.target.value, (options) => {
+                    this.$target.innerHTML = options
+                    this.$target.insertBefore(this.$placeholder, this.$target.firstChild)
+                    this.$target.selectedIndex = 0
+                    this.$target.style.display = null
+
+                })
+            }
+
+            /**
+             * Charge les options à partir du serveur (ou du cache)
+             * @param {string} id
+             * @param callback
+             */
+            loadOptions(id, callback) {
+                if (this.cache[id]) {
+                    callback(this.cache[id])
+                    return
+                }
+                this.showLoader()
+                let request = new XMLHttpRequest()
+                request.open('GET', this.$select.dataset.source.replace('id', id), true)
+                request.onload = () => {
+                    if (request.status >= 200 && request.status < 400) {
+                        let data = JSON.parse(request.responseText)
+                        let options = data.reduce(function (acc, option) {
+                            return acc + '<option value="' + option.value + '">' + option.label + '</option>'
+                        }, '')
+                        this.cache[id] = options
+                        this.hideLoader()
+                        callback(options)
+                    } else {
+                        alert('Impossible de charger la liste')
+                    }
+                }
+                request.onerror = function () {
+                    alert('Impossible de charger la liste')
+                }
+                request.send()
+            }
+
+            showLoader() {
+                this.$loader = document.createTextNode('Chargement...')
+                this.$target.parentNode.appendChild(this.$loader)
+            }
+
+            hideLoader() {
+                if (this.$loader !== null) {
+                    this.$loader.parentNode.removeChild(this.$loader)
+                    this.$loader = null
+                }
+            }
+
+        }
+        let $selects = document.querySelectorAll('.linked-select')
+        $selects.forEach(function ($select) {
+            new LinkedSelect($select)
+
+        })
+        let $selects2 = document.querySelectorAll('.linked-select2')
+        $selects2.forEach(function ($select) {
+            new LinkedSelect($select)
+
+        })
+    </script>
+    <script>
+        $('#add-image').click(function(){
+            // Je récupère le numéo des futurs champs que je vais créer
+            const index = +$('#widgets-counter').val();
+
+            console.log(index);
+
+            // Je récupère le prototype des entrées (remplace /__name__/(g veut dire qu'on peut le faire plusieurs fois) par index)
+            const tmpl = $('#dossier_pieces').data('prototype').replace(/__name__/g, index);
+
+            // J'injecte ce code au sein de la div
+            $('#dossier_pieces').append(tmpl);
+
+            $('#widgets-counter').val(index+1);
+
+            // Je gère le bouton supprimer
+            handleDeleteButtons();
+        })
+
+        function handleDeleteButtons() {
+            $('button[data-action="delete"]').click(function(){
+                const target = this.dataset.target;
+
+                $(target).remove();
+            })
+        }
+
+        function updateCounter() {
+            const count = +$('#dossier_pieces div.form-group').length;
+
+            $('#widgets-counter').val(count);
+        }
+
+        updateCounter();
+
+        handleDeleteButtons();
+
+    </script>
+
+
+    <script>
+        $("#dossier_requerant_Telephone" ).blur(function() {
+            // e.preventDefault();
+            var $tel = $(this).val();
+
+            {#var route = "{{ path('ajax_client_mail', {'mail': tel})|escape('js') }}";#}
+            var route = "/ajax/requerant/"+ $tel;
+            $.ajax({
+                type: 'get',
+                // url: Routing.generate('ajax_client_mail', {mail: tel}),
+                url: route,
+                dataType: "json",
+                // data: {
+                //     term: request.term
+                // },
+                success: function (data) {
+                    // parent.find('.vente_prix').val(data.prix);
+                    $('#dossier_requerant_nom').val(data.nom);
+                    $('#dossier_requerant_prenoms').val(data.prenoms);
+                    $('#dossier_requerant_email').val(data.email);
+                    $('#dossier_requerant_Telephone').val(data.telephone);
+                    $('#dossier_requerant_sexe').val(data.sexe);
+                    $('#dossier_requerant_adresse').val(data.adresse);
+                    $('#arrondissement').val(data.localite);
+                }
+
+            } );
+        });
+
+        $("#dossier_defendeur_telephone" ).blur(function() {
+            // e.preventDefault();
+            var $tel = $(this).val();
+
+            {#var route = "{{ path('ajax_client_mail', {'mail': tel})|escape('js') }}";#}
+            var route = "/ajax/defendeur/"+ $tel;
+            $.ajax({
+                type: 'get',
+                // url: Routing.generate('ajax_client_mail', {mail: tel}),
+                url: route,
+                dataType: "json",
+                // data: {
+                //     term: request.term
+                // },
+                success: function (data) {
+                    // parent.find('.vente_prix').val(data.prix);
+                    $('#dossier_defendeur_nom').val(data.nom);
+                    $('#dossier_defendeur_prenoms').val(data.prenoms);
+                    $('#dossier_defendeur_email').val(data.email);
+                    $('#dossier_defendeur_Telephone').val(data.telephone);
+                    $('#dossier_defendeur_sexe').val(data.sexe);
+                    $('#dossier_defendeur_adresse').val(data.adresse);
+                    $('#arrondissement2').val(data.localite);
+                }
+
+            } );
+        });
+
+
+    </script>
+{% endblock%}

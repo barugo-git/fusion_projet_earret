@@ -1,0 +1,106 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dossier index{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Mesures d'instruction </h4>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                            <th> Demandeur</th>
+                        </tr>
+                        <tr>
+                            <td>
+
+                                {% if mesures.dossier.requerant.type =='moral' %}
+
+                                    {{ mesures.dossier.requerant.intitule }}
+                                {% else %}
+
+                                    {{ mesures.dossier.requerant.nom ~" "~ mesures.dossier.requerant.prenoms }}
+                                {% endif %}
+                                <p><strong>Les conseils</strong></p>
+                                <ul>
+                                    {% if mesures.dossier.requerant.conseiller %}
+                                        {% for conseil in mesures.dossier.requerant.conseiller %}
+                                            <li> {{ conseil.infosIdentite }}</li>
+
+                                        {% endfor %}
+                                    {% endif %}
+
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> Défendeur</th>
+                        </tr>
+                        <tr>
+                            <td>
+
+                                {% if mesures.dossier.defendeur.type =='moral' %}
+
+                                    {{ mesures.dossier.defendeur.intitule }}
+                                {% else %}
+
+                                    {{ mesures.dossier.defendeur.nom ~" "~ mesures.dossier.defendeur.prenoms }}
+                                {% endif %}
+
+
+                                {% if mesures.dossier.defendeur.conseiller %}
+                                    <p> Les conseils</p>
+                                    <ul>
+                                        {% for conseil in mesures.dossier.defendeur.conseiller %}
+                                            <li> {{ conseil.infosIdentite }}</li>
+
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> Détails de la mesure d'instruction</th>
+                        </tr>
+                        <tr>
+                            <td> {{ mesures.instruction }} </td>
+                        </tr>
+                        <tr>
+                            <th> Délais d'execution de la mesure</th>
+                        </tr>
+                        <tr>
+                            <td>{{ mesures.delais ? mesures.delais : '' }} jours</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Note du greffier à l'adresse du president ou le juge-rapporteur </h4>
+                </div><!-- end card header -->
+                {% if mesures.reponses %}
+                    <div class="card-body">
+                        {{ mesures.reponses.reponse }}
+                        <hr>
+                        {% if mesures.reponses.dateNotification %}
+                            Notifé a la partie concernée le {{ mesures.reponses.dateNotification | date('d-m-Y') }} <br>
+                            Date limite : {{ mesures.reponses.dateNotification|date_modify("+"~ mesures.delais ~"day") | date('d-m-Y') }}
+                        {% else %}
+                            non notifé a la partie concernée
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <h3> Aucune action menée pour l'instant</h3>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

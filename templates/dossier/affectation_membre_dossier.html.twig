@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Les membres du dossier: {{ dossier.referenceDossier }}
+                        / {{ dossier.intituleObjet }}</h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+
+                    <div class="data_table">
+                        <table class="table align-middle table-nowrap table-striped" id="customerTable">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Membres</th>
+                                <th>Poste</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for membre in membres %}
+                            <tr>
+                                {#                                <td>{{ audience.dossiers.referenceDossier }}</td>#}
+                                <td>{{ membre.user.nom ~ ' '~ membre.user.prenoms }}</td>
+                                <td>{{ membre.profil }}</td>
+                                <td>
+                                    <i class="ri-edit-2-fill"> </i>
+                                    <i class="ri-delete-bin-3-line"> </i>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

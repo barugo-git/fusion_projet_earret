@@ -1,0 +1,38 @@
+{# templates/user/update_photo.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Changer ma photo de profil</h4>
+                </div>
+                <div class="card-body text-center">
+                    {# Affiche la photo actuelle ou une photo par défaut #}
+                    <img src="{{ user.photo ? asset('uploads/profile_photos/' ~ user.photo) : asset('images/default-profile.png') }}" 
+                         class="rounded-circle mb-4" 
+                         width="150" 
+                         height="150"
+                         alt="Photo de profil">
+
+                    {{ form_start(form) }}
+                    
+                    <div class="form-group">
+                        {{ form_label(form.newPhoto) }}
+                        {{ form_widget(form.newPhoto, {'attr': {'class': 'form-control-file'}}) }}
+                        {{ form_errors(form.newPhoto) }}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary mt-3">
+                        <i class="fas fa-upload"></i> Mettre à jour
+                    </button>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

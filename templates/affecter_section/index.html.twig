@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}AffecterSection index{% endblock %}
+
+{% block body %}
+    <h1>AffecterSection index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>DateAffectation</th>
+                <th>Motif</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for affecter_section in affecter_sections %}
+            <tr>
+                <td>{{ affecter_section.id }}</td>
+                <td>{{ affecter_section.dateAffectation ? affecter_section.dateAffectation|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ affecter_section.Motif }}</td>
+                <td>
+                    <a href="{{ path('app_affecter_section_show', {'id': affecter_section.id}) }}">show</a>
+                    <a href="{{ path('app_affecter_section_edit', {'id': affecter_section.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_affecter_section_new') }}">Create new</a>
+{% endblock %}

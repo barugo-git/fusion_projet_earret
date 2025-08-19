@@ -1,0 +1,607 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de Bord des Rapports{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --border-radius: 12px;
+        }
+        
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-left: 4px solid var(--primary-color);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+        
+        .stat-label {
+            font-size: 0.95rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .filter-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .filter-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #212529;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+            height: 400px;
+            position: relative;
+        }
+        
+        .chart-container.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8fafc;
+        }
+        
+        .chart-container.empty::after {
+            content: "Aucune donnée disponible pour les critères sélectionnés";
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .badge-type {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            padding: 0.5em 0.8em;
+            border-radius: 8px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-view {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .btn-view:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .select2-container--bootstrap-5 .select2-selection {
+            min-height: 42px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+        }
+        
+        .empty-message {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #6c757d;
+        }
+        
+        .empty-message i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #dee2e6;
+        }
+        
+        .summary-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+        
+        .summary-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            line-height: 1;
+        }
+        
+        .summary-label {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        
+        .filter-badge {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .table-container {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        overflow: hidden; /* Pour que le border-radius s'applique aussi au tableau */
+    }
+
+    .table-responsive {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+
+    #rapportsTable {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 0.95rem;
+    }
+
+    #rapportsTable thead th {
+        background-color: #f8f9fa;
+        color: #495057;
+        font-weight: 600;
+        padding: 1rem 1.25rem;
+        border-bottom: 2px solid #e9ecef;
+        position: relative;
+    }
+
+    #rapportsTable thead th:first-child {
+        border-top-left-radius: var(--border-radius);
+    }
+
+    #rapportsTable thead th:last-child {
+        border-top-right-radius: var(--border-radius);
+    }
+
+    #rapportsTable tbody tr {
+        transition: all 0.25s ease;
+        background-color: white;
+    }
+
+    #rapportsTable tbody tr:hover {
+        background-color: #f8fafd;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.1);
+    }
+
+    #rapportsTable tbody td {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #e9ecef;
+        vertical-align: middle;
+        transition: all 0.2s ease;
+    }
+
+    #rapportsTable tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    #rapportsTable tbody tr:last-child td:first-child {
+        border-bottom-left-radius: var(--border-radius);
+    }
+
+    #rapportsTable tbody tr:last-child td:last-child {
+        border-bottom-right-radius: var(--border-radius);
+    }
+
+    /* Style pour les cellules spécifiques */
+    #rapportsTable td .badge-type {
+        transition: all 0.2s ease;
+    }
+
+    #rapportsTable tbody tr:hover td .badge-type {
+        background-color: rgba(67, 97, 238, 0.2);
+        transform: scale(1.02);
+    }
+
+    /* Style pour les boutons d'action */
+    .action-btn {
+        transition: all 0.2s ease;
+        opacity: 0.8;
+    }
+
+    .action-btn:hover {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    /* Style pour les liens dans le tableau */
+    #rapportsTable a {
+        text-decoration: none;
+        transition: all 0.2s ease;
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+
+    #rapportsTable a:hover {
+        color: var(--secondary-color);
+        text-decoration: underline;
+    }
+
+    /* Style pour les badges de statut */
+    #rapportsTable .badge {
+        padding: 0.5em 0.75em;
+        font-size: 0.75em;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border-radius: 50px;
+        min-width: 80px;
+        display: inline-block;
+        text-align: center;
+        transition: all 0.2s ease;
+    }
+
+    #rapportsTable tbody tr:hover .badge {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Animation pour l'apparition des lignes */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    #rapportsTable tbody tr {
+        animation: fadeIn 0.3s ease forwards;
+        opacity: 0;
+    }
+
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    {# En-tête #}
+    <div class="dashboard-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h3 class="mb-2 text-white"><i class="bi bi-file-earmark-text me-2"></i>Tableau de Bord des Rapports</h3>
+                <p class="mb-2 text-white-50">Visualisation et analyse des rapports générés</p>
+            </div>
+            <div class="col-md-15 text-md-end">
+                <span class="filter-badge text-white">
+                    <i class="bi bi-funnel"></i>
+                    {{ current_type == 'all' ? 'Tous types' : current_type }} | 
+                    {{ period_labels[current_filter] ?? 'Toutes périodes' }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    {# Cartes de statistiques - Conditionnelles #}
+    {% if show_period_stats %}
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card">
+                <div class="stat-value">{{ total }}</div>
+                <div class="stat-label">Total Rapports</div>
+                <div class="text-muted mt-auto"><small>Toutes périodes confondues</small></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats['1h'] }}</div>
+                <div class="stat-label">Dernière heure</div>
+                <div class="text-muted mt-auto"><small>Générés il y a moins d'1h</small></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats['24h'] }}</div>
+                <div class="stat-label">24 dernières heures</div>
+                <div class="text-muted mt-auto"><small>Générés aujourd'hui</small></div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats['30j'] }}</div>
+                <div class="stat-label">30 derniers jours</div>
+                <div class="text-muted mt-auto"><small>Activité récente</small></div>
+            </div>
+        </div>
+    </div>
+    {% elseif current_type != 'all' %}
+    <div class="row mb-4">
+        <div class="col-md-6 offset-md-3">
+            <div class="stat-card summary-card">
+                <div class="summary-value">{{ total }}</div>
+                <div class="summary-label">Total {{ current_type }}</div>
+                <div class="text-muted mt-2"><small>Toutes périodes confondues</small></div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Filtres #}
+    <div class="filter-container">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">Type de rapport</label>
+                <select class="form-select" id="typeSelect">
+                    <option value="all">Tous les types</option>
+                    {% for type in types %}
+                        <option value="{{ type }}" {{ current_type == type ? 'selected' }}>{{ type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Période</label>
+                <select class="form-select" id="periodSelect">
+                    {% for period, label in period_labels %}
+                        <option value="{{ period }}" {{ current_filter == period ? 'selected' }}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    {# Graphique #}
+    <div class="chart-container {% if total == 0 %}empty{% endif %}">
+        {% if total > 0 %}
+            <canvas id="statsChart"></canvas>
+        {% endif %}
+    </div>
+
+    {# Tableau #}
+    <div class="table-container">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h5 class="mb-0"><i class="bi bi-table me-2"></i>Liste des Rapports</h5>
+            <span class="badge bg-primary rounded-pill">
+                Total : {{ total }}
+            </span>
+        </div>
+        
+        {% if rapports|length > 0 %}
+            <div class="table-responsive">
+                <table id="rapportsTable" class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Rapport</th>
+                            <th>Date du recour</th>
+                            <th>Référence</th>
+                            <th>Type Rapport</th>
+                            <th>Généré le</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rapport in rapports %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                 <td>{{ rapport.dossier.dateEnregistrement|date('d/m/Y') }}</td>
+                                <td>
+                                    <a href="{{ path('admin_dossier_details', {'id': rapport.dossier.id}) }}" class="text-primary fw-bold">
+                                        {{ rapport.dossier.referenceDossier }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge-type">
+                                        {{ rapport.typeRapport }}
+                                    </span>
+                                </td>
+                                <td>{{ rapport.createdAt|date('d/m/Y H:i') }}</td>
+                                <td>
+                                    <span class="badge bg-{{ rapport.statut == 'finalise' ? 'success' : 'warning' }}">
+                                        {{ rapport.statut|capitalize }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ path('rapport_show', {'id': rapport.id}) }}" 
+                                       class="action-btn btn-view" 
+                                       title="Voir le rapport">
+                                       <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-message">
+                <i class="bi bi-file-earmark-x"></i>
+                <h5>Aucun rapport trouvé</h5>
+                <p class="text-muted">Modifiez vos critères de recherche</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    
+    <script>
+    $(document).ready(function() {
+        // Initialisation du DataTable avec configuration améliorée
+        const table = $('#rapportsTable').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json'
+            },
+            dom: '<"top"<"d-flex justify-content-between align-items-center"f<"ms-3"l>>>rt<"bottom"<"d-flex justify-content-between align-items-center"ip>>',
+            responsive: true,
+            initComplete: function() {
+                // Animation des lignes après chargement
+                $('#rapportsTable tbody tr').each(function(i) {
+                    $(this).css('opacity', 0)
+                           .delay(i * 100)
+                           .animate({opacity: 1}, 200);
+                });
+            }
+        });
+
+        // Initialisation des select2 avec meilleure configuration
+        $('#typeSelect, #periodSelect').select2({
+            placeholder: "Sélectionnez une option",
+            allowClear: false,
+            width: '100%',
+            minimumResultsForSearch: 5
+        });
+
+        // Gestion améliorée du changement de filtre
+        function updateFilters() {
+            const type = $('#typeSelect').val();
+            const period = $('#periodSelect').val();
+            const params = new URLSearchParams(window.location.search);
+            
+            if (type && type !== 'all') {
+                params.set('type_rapport', type);
+            } else {
+                params.delete('type_rapport');
+            }
+            
+            if (period && period !== 'all') {
+                params.set('date_filter', period);
+            } else {
+                params.delete('date_filter');
+            }
+            
+            // Rechargement sans scintillement
+            window.history.replaceState({}, '', '?' + params.toString());
+            window.location.reload();
+        }
+        
+        // Délai pour éviter les déclenchements multiples
+        let filterTimeout;
+        $('#typeSelect, #periodSelect').on('change', function() {
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(updateFilters, 300);
+        });
+
+        // Configuration avancée du graphique
+        {% if total > 0 %}
+        const ctx = document.getElementById('statsChart');
+        const chartConfig = {
+            type: '{{ chart_type }}',
+            data: {
+                labels: {{ chart_data.labels|json_encode|raw }},
+                datasets: [{
+                    label: 'Nombre de rapports',
+                    data: {{ chart_data.data|json_encode|raw }},
+                    {% if chart_type == 'pie' or chart_type == 'doughnut' %}
+                    backgroundColor: {{ chart_data.backgroundColor|json_encode|raw }},
+                    borderWidth: 1,
+                    hoverOffset: 10
+                    {% else %}
+                    backgroundColor: '#4361ee',
+                    borderColor: '#3a7bd5',
+                    borderWidth: 1,
+                    borderRadius: 4,
+                    hoverBackgroundColor: '#3f37c9'
+                    {% endif %}
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: {{ is_pie_chart ? "'right'" : "'top'" }},
+                        display: {{ is_pie_chart ? 'true' : 'false' }},
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.formattedValue + ' rapport(s)';
+                            },
+                            title: function(context) {
+                                return {{ is_pie_chart ? 'context[0].label' : 'context[0].label + " :"' }};
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        
+        new Chart(ctx, chartConfig);
+    {% endif %}
+
+        // Animation au survol des lignes du tableau
+        $('#rapportsTable tbody').on('mouseenter', 'tr', function() {
+            $(this).css('transform', 'translateY(-2px)')
+                   .find('td').css('border-color', '#e0e0ff');
+        }).on('mouseleave', 'tr', function() {
+            $(this).css('transform', 'none')
+                   .find('td').css('border-color', '');
+        });
+    });
+    </script>
+{% endblock %}

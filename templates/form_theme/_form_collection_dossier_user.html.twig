@@ -1,0 +1,46 @@
+{% block _user_dossier_userDossiers_widget %}
+    <p>Affecter un membre</p>
+    <hr>
+    {{ form_widget(form) }}
+
+    <input type="hidden" id="widgets-counter" value="0">
+
+    <div type="button" id="add-image" class="btn btn-primary">Ajouter un membre</div>
+
+{% endblock %}
+
+{% block _user_dossier_userDossiers_entry_row %}
+
+    {{ form_widget(form) }}
+    <hr>
+{% endblock %}
+
+ {# {% block _circuits_touristiques_pointsArrets_entry_widget %}
+    <div class="form-group" id="block_{{id}}">
+        <div class="row">
+            <div class="col-10">
+                <div class="row">
+                    <div class="col">
+                        {{ form_widget(form.name) }}
+                        {{ form_errors(form.name) }}
+                    </div>
+                    <div class="col">
+                        {{ form_widget(form.lieuInteret) }}
+                        {{ form_errors(form.lieuInteret) }}
+                    </div>
+                    <div class="col">
+                        {{ form_widget(form.description) }}
+                        {{ form_errors(form.description) }}
+                    </div>
+                    <div class="col">
+                    {{ form_widget(form.courteDescription) }}
+                    {{ form_errors(form.courteDescription) }}
+                </div>
+                </div>
+            </div>
+            <div class="col">
+                <button type="button" data-action="delete" data-target="#block_{{id}}" class="btn btn-danger">X</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}  #}

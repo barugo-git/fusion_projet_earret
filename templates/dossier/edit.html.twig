@@ -1,0 +1,218 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Dossier{% endblock %}
+
+{% block body %}
+    <h1>Edit Dossier</h1>
+
+    {{ include('dossier/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_dossier_index') }}">back to list</a>
+
+{#    {{ include('dossier/_delete_form.html.twig') }}#}
+{% endblock %}
+
+{# {% block javascripts %}
+<script src="{{ asset('js/pages/plugins/jquery/jquery.min.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+        integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        const form = document.getElementById('dossier_requerant');
+        const form_select_sport = document.getElementById('dossier_modif_requerant_type');
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const choixSelect = document.querySelector('#dossier_modif_requerant_type');
+            $('.morale').hide()
+            $('.physique').hide()
+
+
+        });
+
+        var $typerequerent = $('#dossier_modif_requerant_type')
+        $typerequerent.change(function () {
+            console.log($typerequerent.val())
+            if ($typerequerent.val() == "moral") {
+                $('.morale').show()
+                $('.physique').hide()
+
+            } else if ($typerequerent.val() == "physique") {
+                $('.morale').hide()
+                $('.physique').show()
+            }
+
+        })
+    </script>
+
+
+{% endblock %} #}
+
+{% block javascripts %}
+<script src="{{ asset('js/pages/plugins/jquery/jquery.min.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+        integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        const form = document.getElementById('dossier_requerant');
+        const form_select_sport = document.getElementById('dossier_modif_requerant_type');
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const choixSelect = document.querySelector('#dossier_modif_requerant_type');
+            $('.morale').hide()
+            $('.physique').hide()
+
+
+        });
+
+        var $typerequerent = $('#dossier_modif_requerant_type')
+        $typerequerent.change(function () {
+            console.log($typerequerent.val())
+            if ($typerequerent.val() == "moral") {
+                $('.morale').show()
+                $('.physique').hide()
+
+            } else if ($typerequerent.val() == "physique") {
+                $('.morale').hide()
+                $('.physique').show()
+            }
+
+        })
+    </script>
+
+
+
+
+    <script>
+
+
+
+        class LinkedSelect {
+
+            /**
+             * @param {HTMLSelectElement} $select
+             */
+            constructor($select) {
+                this.$select = $select
+                this.$target = document.querySelector(this.$select.dataset.target)
+                this.$placeholder = this.$target.firstElementChild
+                //  this.onChange = debounce(this.onChange.bind(this), 500)
+                this.onChange = this.onChange.bind(this)
+                this.$loader = null
+                this.cache = {}
+                this.$select.addEventListener('change', this.onChange)
+            }
+
+            /**
+             * Se déclenche au changement de valeur d'un select
+             * @param {Event} e
+             */
+            onChange(e) {
+                if (e.target.value === '0') {
+
+                    return
+                }
+
+                this.loadOptions(e.target.value, (options) => {
+                    this.$target.innerHTML = options
+                    this.$target.insertBefore(this.$placeholder, this.$target.firstChild)
+                    this.$target.selectedIndex = 0
+                    this.$target.style.display = null
+
+                })
+            }
+
+            /**
+             * Charge les options à partir du serveur (ou du cache)
+             * @param {string} id
+             * @param callback
+             */
+            loadOptions(id, callback) {
+                if (this.cache[id]) {
+                    callback(this.cache[id])
+                    return
+                }
+                this.showLoader()
+                let request = new XMLHttpRequest()
+                request.open('GET', this.$select.dataset.source.replace('id', id), true)
+                request.onload = () => {
+                    if (request.status >= 200 && request.status < 400) {
+                        let data = JSON.parse(request.responseText)
+                        let options = data.reduce(function (acc, option) {
+                            return acc + '<option value="' + option.value + '">' + option.label + '</option>'
+                        }, '')
+                        this.cache[id] = options
+                        this.hideLoader()
+                        callback(options)
+                    } else {
+                        alert('Impossible de charger la liste')
+                    }
+                }
+                request.onerror = function () {
+                    alert('Impossible de charger la liste')
+                }
+                request.send()
+            }
+
+            showLoader() {
+                this.$loader = document.createTextNode('Chargement...')
+                this.$target.parentNode.appendChild(this.$loader)
+            }
+
+            hideLoader() {
+                if (this.$loader !== null) {
+                    this.$loader.parentNode.removeChild(this.$loader)
+                    this.$loader = null
+                }
+            }
+
+        }
+
+
+
+        let $selects = document.querySelectorAll('.linked-select')
+        $selects.forEach(function ($select) {
+            new LinkedSelect($select)
+
+        })
+
+        // conseil requerant
+
+        $('#add-conseil-requerent').click(function () {
+            // Je récupère le numéo des futurs champs que je vais créer
+            const index = +$('#widgets-counter-requerent').val();
+
+            console.log(index);
+
+            // Je récupère le prototype des entrées (remplace /__name__/(g veut dire qu'on peut le faire plusieurs fois) par index)
+            const tmpl = $('#dossier_requerant_requerant_conseiller').data('prototype').replace(/__name__/g, index);
+
+            // J'injecte ce code au sein de la div
+            $('#dossier_requerant_requerant_conseiller').append(tmpl);
+
+            $('#widgets-counter-requerent').val(index + 1);
+
+            // Je gère le bouton supprimer
+            handleDeleteButtonsRequerent();
+        })
+
+        function updateCounterRequerent() {
+            const count = +$('#dossier_requerant_requerant_conseiller div.form-group').length;
+
+            $('#widgets-counter-requerent').val(count);
+        }
+
+        function handleDeleteButtonsRequerent() {
+            $('button[data-action="delete"]').click(function () {
+                const target = this.dataset.target;
+
+                $(target).remove();
+            })
+        }
+
+        updateCounterRequerent();
+
+        handleDeleteButtonsRequerent();
+    </script>
+
+
+{% endblock %}

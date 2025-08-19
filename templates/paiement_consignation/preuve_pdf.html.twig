@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Preuve de consignation</title>
+    <style>
+        body { font-family: DejaVu Sans, Arial, sans-serif; }
+        h1 { color: #333; text-align: center; }
+        .header { margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .footer { margin-top: 30px; font-size: 0.8em; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Preuve de consignation</h1>
+        <p>Date d'émission: {{ 'now'|date('d/m/Y H:i') }}</p>
+    </div>
+    
+    <h2>Informations du dossier</h2>
+    <table>
+        <tr>
+            <th>Référence dossier</th>
+            <td>{{ dossier.codeSuivi }}</td>
+        </tr>
+        <tr>
+            <th>Date de consignation</th>
+            <td>
+                    {% if transaction.date is defined %}
+                        {{ transaction.date|date('d/m/Y H:i') }}
+                    {% else %}
+                        {{ 'now'|date('d/m/Y H:i') }}
+                    {% endif %}
+                </td>
+        </tr>
+    </table>
+
+    <h2>Détails de la transaction</h2>
+    <table>
+        <tr>
+            <th>Transaction ID</th>
+            <td>{{ transaction.id }}</td>
+        </tr>
+        <tr>
+            <th>Montant</th>
+            <td>{{ transaction.amount|number_format(0, ',', ' ') }} FCFA</td>
+        </tr>
+        <tr>
+            <th>Mode de paiement</th>
+            <td>{{ transaction.mode ?? 'Non spécifié' }}</td>
+        </tr>
+        <tr>
+            <th>Date transaction</th>
+            <td>
+                {% if transaction.date is defined %}
+                    {{ transaction.date|date('d/m/Y H:i') }}
+                {% else %}
+                    {{ 'now'|date('d/m/Y H:i') }}
+                {% endif %}
+            </td>
+        </tr>
+        {% if transaction.mode == 'Sandbox' %}
+        <tr>
+            <td colspan="2" style="background-color: #fffde7; text-align: center;">
+                <strong>SIMULATION SANDBOX</strong>
+            </td>
+        </tr>
+        {% endif %}
+    </table>
+
+    <h2>Informations du requérant</h2>
+    <table>
+        <tr>
+            <th>Nom complet</th>
+            <td>{{ dossier.requerant.nom }} {{ dossier.requerant.prenoms }}</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>{{ dossier.requerant.email }}</td>
+        </tr>
+        <tr>
+            <th>Téléphone</th>
+            <td>{{ dossier.requerant.telephone ?? 'Non renseigné' }}</td>
+        </tr>
+        <tr>
+            <th>Adresse</th>
+            <td>{{ dossier.requerant.adresse ?? 'Non renseignée' }}</td>
+        </tr>
+    </table>
+
+    <div class="footer">
+        <p>Document généré automatiquement - Merci de ne pas répondre</p>
+    </div>
+</body>
+</html>

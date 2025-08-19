@@ -1,0 +1,202 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Prévisualisation des données du rapport - {{ dossier.referenceDossier }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary-blue: #e6f2ff;
+            --secondary-blue: #cce5ff;
+            --accent-blue: #007bff;
+            --text-dark: #2c3e50;
+            --text-medium: #4a5568;
+            --text-light: #718096;
+        }
+        
+        .preview-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid #e0e6ed;
+        }
+        
+        .preview-field {
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: var(--primary-blue);
+            border-left: 4px solid var(--accent-blue);
+        }
+        
+        .preview-field:hover {
+            background: var(--secondary-blue);
+            transform: translateX(5px);
+        }
+        
+        .preview-label {
+            font-weight: 700;
+            color: var(--accent-blue);
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+        }
+        
+        .preview-label:after {
+            content: "";
+            flex: 1;
+            margin-left: 1rem;
+            height: 1px;
+            background: linear-gradient(to right, var(--accent-blue), transparent);
+        }
+        
+        .preview-value {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            font-weight: 500;
+            padding-left: 0.5rem;
+        }
+        
+        .alert-modification {
+            border-left: 4px solid #ffc107;
+            background: #fff9e6;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #007bff 0%, #0062cc 100%);
+            border-radius: 10px 10px 0 0 !important;
+            padding: 1.5rem;
+        }
+        
+        .badge-custom {
+            padding: 0.4em 0.7em;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .btn-outline-primary {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--accent-blue);
+            color: white;
+        }
+        
+        .header-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        /* Style spécifique pour les moyens */
+        .moyen-field {
+            border-left-color: #3a7bd5;
+        }
+        
+        .moyen-field .preview-label {
+            color: #3a7bd5;
+        }
+        
+        .moyen-field .preview-label:after {
+            background: linear-gradient(to right, #3a7bd5, transparent);
+        }
+        
+        .moyen-field .preview-label i {
+            color: #3a7bd5;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="card shadow-sm border-0 overflow-hidden">
+        <div class="card-header text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="card-header text-white">
+                        <i class="fas fa-eye me-2"></i>
+                        Prévisualisation du rapport
+                    </h1>
+                    <div class="header-info">
+                        <span class="me-3"><i class="fas fa-file-alt me-1"></i> {{ dossier.referenceDossier }}</span>
+                        <span><i class="fas fa-tag me-1"></i> {{ modele.nomFichier }}</span>
+                    </div>
+                </div>
+                <span class="badge bg-white text-primary">
+                    <i class="fas fa-check-circle me-1"></i> Prévisualisation
+                </span>
+            </div>
+        </div>
+        
+        <div class="card-body">
+            <div class="preview-container">
+                <div id="fieldsContainer">
+                    {# Affichage des champs normaux #}
+                    {% for key, value in donnees %}
+                        {% if key != 'moyens' %}
+                        <div class="preview-field" data-field-name="{{ key|lower }}">
+                            <div class="preview-label">
+                                <i class="far fa-file-alt me-2"></i>
+                                {{ key|replace({'_': ' '})|title }}
+                            </div>
+                            <div class="preview-value">
+                                {% if value is same as(true) %}
+                                    <span class="badge bg-success badge-custom">Oui</span>
+                                {% elseif value is same as(false) %}
+                                    <span class="badge bg-danger badge-custom">Non</span>
+                                {% elseif value is iterable %}
+                                    {{ value|join(', ') }}
+                                {% else %}
+                                    {{ value|default('<span class="text-muted">Non renseigné</span>')|raw }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {# Affichage des moyens un par un avec numérotation correcte #}
+                    {% if moyens is defined and moyens is not empty %}
+                        {% set moyen_numero = 1 %}
+                        {% for moyen in moyens %}
+                            {% if moyen.texte is not empty %}
+                                <div class="preview-field moyen-field" data-field-name="moyen-{{ moyen_numero }}">
+                                    <div class="preview-label">
+                                        <i class="fas fa-gavel me-2"></i>
+                                        Moyen {{ moyen_numero }}
+                                    </div>
+                                    <div class="preview-value">
+                                        {{ moyen.texte|replace({'&apos;': "'", '&quot;': '"', '&amp;': '&'})|nl2br|raw }}
+                                    </div>
+                                </div>
+                                {% set moyen_numero = moyen_numero + 1 %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4 pt-4 border-top">
+                <a href="{{ path('rapport_generer', {'dossierId': dossier_id, 'from_preview': true}) }}" 
+                    class="btn btn-lg btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i> Retour à l'édition
+                </a>
+                
+                <form method="post" action="{{ path('rapport_save', {'dossierId': dossier_id}) }}">
+                    <button type="submit" class="btn btn-lg btn-primary">
+                        <i class="fas fa-save me-2"></i> Générer le rapport
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

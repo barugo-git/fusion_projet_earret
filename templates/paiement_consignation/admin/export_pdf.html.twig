@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+        /* Police et reset */
+        body { font-family: 'Helvetica', Arial, sans-serif; font-size: 10pt; margin: 0; padding: 0; }
+        * { box-sizing: border-box; }
+        
+        /* En-tête */
+        .header { 
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2c3e50;
+        }
+        .logo { 
+            height: 70px;
+            margin-right: 20px;
+        }
+        .header-text { flex-grow: 1; }
+        .title { 
+            color: #2c3e50; 
+            font-size: 16pt; 
+            font-weight: bold;
+            margin: 0 0 5px 0;
+        }
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 11pt;
+            margin: 0;
+        }
+        
+        /* Métadonnées */
+        .metadata {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 9pt;
+            color: #555;
+        }
+        
+        /* Tableau */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            padding: 8px 5px;
+            text-align: left;
+            font-size: 9pt;
+            font-weight: bold;
+        }
+        td {
+            padding: 6px 5px;
+            border: 2px solid #ddd;
+            font-size: 9pt;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        /* Pied de page */
+        .footer {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            font-size: 8pt;
+            color: #7f8c8d;
+            text-align: right;
+        }
+        .total {
+            font-weight: bold;
+            color: #2c3e50;
+            text-align: center;
+            padding: 5px;
+            font-size: 25px;
+            background-color: #ecf0f1;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- En-tête avec logo -->
+    <div class="header">
+        {# Méthode base64 (la plus fiable) #}
+        {% if logo_base64 %}
+            <img src="{{ logo_base64 }}" class="logo" style="height: 80px;">
+        
+        {# Méthode URL normale (fallback) #}
+        {% elseif logo_url %}
+            <img src="{{ logo_url }}" class="logo" style="height: 80px;"
+                onerror="this.style.display='none'">
+        
+        {# Message d'erreur si les deux échouent #}
+        {% else %}
+            <div style="color: red; border: 1px solid red; padding: 5px;">
+                LOGO NON CHARGÉ - Vérifiez le fichier public/uploads/logo.jpg
+            </div>
+        {% endif %}
+
+        <div class="header-text">
+            <h1 class="title">{{ title }}</h1>
+            <p class="subtitle">Cour suprême - GEC</p>
+        </div>
+    </div>
+    
+    <!-- Métadonnées -->
+    <div class="metadata">
+        <div>
+            <strong>Période :</strong> {{ period }}<br>
+            <strong>Filtres appliqués :</strong> 
+            {% if filters.mode is defined and filters.mode %}
+                Mode de paiement: {{ filters.mode|capitalize }}
+            {% else %}
+                Tous modes
+            {% endif %}
+        </div>
+        <div>
+            <strong>Date d'export :</strong> {{ "now"|date("d/m/Y à H:i") }}<br>
+            <strong>Nombre d'enregistrements :</strong> {{ paiements|length }}
+        </div>
+    </div>
+    
+    <!-- Tableau des paiements -->
+    <table>
+        <thead>
+            <tr>
+                <th>ID Transaction</th>
+                <th>Date recour</th>
+                <th>Code Suivi</th>
+                <th>Référence Dossier</th>
+                <th>Requérant</th>
+                <th>Date Paiement</th>
+                <th>Mode</th>
+                <th>Montant</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for paiement in paiements %}
+                <tr>
+                    <td>{{ paiement.idTransaction }}</td>
+                    <td>{{ paiement.dossier.dateEnregistrement|date('d/m/Y') }}</td>
+                    <td>{{ paiement.dossier.codeSuivi }}</td>
+                     <td>{{ paiement.dossier.referenceDossier }}</td>
+                    <td>{{ paiement.dossier.requerant.nomComplet }}</td>
+                    <td>{{ paiement.datePaiement|date('d/m/Y H:i') }}</td>
+                    <td>{{ paiement.modePaiement }}</td>
+                    <td style="text-align: right;">{{ paiement.montant|number_format(0, ',', ' ') }} FCFA</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">Aucun paiement trouvé</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Total -->
+    <div class="total">
+        MONTANT TOTAL : {{ total_amount|number_format(0, ',', ' ') }} FCFA
+    </div>
+    
+    <!-- Pied de page -->
+    <div class="footer">
+        Page <pdf:pagenumber> sur <pdf:pagecount> | 
+        Export généré par {{ app.user.fullName ?? 'Système' }} |
+        © {{ "now"|date("Y") }} La cour suprême du Bénin
+    </div>
+</body>
+</html>

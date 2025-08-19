@@ -1,0 +1,303 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Liste des dossiers prêts pour instructions</h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+
+
+                    <div class="data_table mt-3 mb-1">
+                        {% if dossiers|length > 0 %}
+                            <table class="table align-middle" id="customerTable">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="sort"></th>
+                                    <th class="sort" data-sort="customer_name">N° Dossier</th>
+
+                                    <th class="sort" data-sort="phone">Affaire</th>
+                                    <th class="sort" data-sort="phone">Greffier</th>
+
+                                    <th class="sort" data-sort="date">Statuts</th>
+
+                                    <th class="sort" data-sort="action">Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for dossier in dossiers %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+
+                                        <td class="customer_name">{{ dossier.referenceDossier }}</td>
+
+                                        <td>
+                                            <strong>
+                                                {% if dossier %}
+
+                                                    {% if dossier.requerant.type =='moral' %}
+                                                        {{ dossier.requerant.intitule }}
+                                                    {% else %}
+                                                        {{ dossier.requerant.nom ~ " " ~ dossier.requerant.prenoms }}
+                                                    {% endif %}
+                                                    {% if dossier.requerant.conseiller %}
+                                                        {% for conseilRequerant in dossier.requerant.conseiller %}
+                                                            ( ME {{ conseilRequerant.fullName }} )
+                                                        {% endfor %}
+                                                    {% endif %} <br/>
+                                                    CONTRE
+                                                    {% if dossier.defendeur.type =='moral' %}
+                                                        {{ dossier.defendeur.intitule }}
+                                                    {% else %}
+                                                        {{ dossier.defendeur.nom ~ " " ~ dossier.defendeur.prenoms }}
+                                                    {% endif %}
+                                                    {% if dossier.defendeur.conseiller %}
+                                                        {% for conseilRequerant in dossier.defendeur.conseiller %}
+                                                            ( ME {{ conseilRequerant.fullName }} )
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                {% endif %}
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            {#                                           {{ dump(dossier.UserDossiers) }} #}
+                                            Greffe
+                                        </td>
+                                        <td>
+                                            {% if dossier.mesuresInstructions|length > 0 %}
+                                                {% if dossier.finMesuresInstruction %}
+                                                    <span class="badge bg-success-subtle text-success text-uppercase">Terminées</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning-subtle text-warning text-uppercase">En cours</span>
+                                                {% endif %}
+
+                                            {% else %}
+                                                <span class="badge bg-danger-subtle text-danger text-uppercase">Non débutées</span>
+
+                                            {% endif %}
+                                        </td>
+
+                                        <td>
+                                            <span>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-soft-secondary btn-sm dropdown" type="button"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="ri-more-fill"></i></button>
+                                                    <ul class="dropdown-menu dropdown-menu-end">
+                                                        <li>
+                                                            <a class="dropdown-item"
+                                                               href="{{ path('admin_dossier_details',{'id':dossier.id}) }}">
+                                                                <i class="ri-eye-fill align-bottom me-2 text-muted"></i> Details du dossier</a>
+                                                        </li>
+														 <li>
+														<a class="dropdown-item edit-list" data-edit-id="5"
+                                                           href="{{ path('app_conseiller_rapporteur_nouvelle_mesure_instruction',{'id':dossier.id}) }}">
+                                                                <i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Nouvelles mesures d'instructions
+                                                            </a>
+ </li>
+                                                           {% if dossier.mesuresInstructions|length > 0 %}
+                                                               <li>
+                                                            <a class="dropdown-item remove-list"
+                                                               href="{{ path('greffier_mesures_instructions_dossier_list',{'id':dossier.id}) }}">
+                                                                <i class="ri-search-eye-fill align-bottom me-2 text-muted"></i>  Voir les mesures d'instructions
+                                                            </a>
+                                                               </li>
+
+                                                                   {% if dossier.finMesuresInstruction == false %}
+                                                               <li>
+
+                                                               <a class="dropdown-item edit-list" data-edit-id="1"
+                                                                  href="{{ path('app_conseiller_rapporteur_nouvelle_mesure_instruction',{'id':dossier.id}) }}">
+                                                                <i class="ri-pencil-fill align-bottom me-2 text-muted"></i> Nouvelles mesures d'instructions
+                                                            </a>
+                                                                </li>
+                                                           {% endif %}
+
+
+
+                                                               <li class="dropdown-divider"> </li>
+                                                               <li>
+                                                            <a class="dropdown-item edit-list" data-edit-id="1"
+                                                               href="{{ path('app_conseiller_rapporteur_rapport',{'id':dossier.id}) }}">
+                                                                <i class="ri-download-2-fill align-bottom me-2 text-muted"></i> Téléverser le rapport
+                                                            </a>
+                                                               </li>
+
+
+                                                           {% endif %}
+
+                                                    </ul>
+                                                </div>
+
+                                            </span>
+
+                                            {% if dossier.mesuresInstructions|length > 0 %}
+
+                                                {#                                                <a href="{{ path('greffier_mesures_instructions_dossier_list',{'id':dossier.id}) }}" #}
+                                                {#                                                   title="Voir les details du dossier"> #}
+                                                {#                                                    Voir les mesures d'instructions #}
+
+                                                {#                                                </a> #}
+
+                                                {#                                                <a href="{{ path('app_conseiller_rapporteur_mesures_instructions_fin',{'id':dossier.id}) }}" #}
+                                                {#                                                   title="Voir les details du dossier"> #}
+                                                {#                                                    Mettre fin aux mesures d'instructions #}
+
+                                                {#                                                </a> #}
+
+                                            {% endif %}
+                                            {#                                            <a class="dropdown-item" #}
+                                            {#                                               href="{{ path('admin_dossier_details',{'id':dossier.id}) }}">Details #}
+                                            {#                                                du dossier</a> #}
+                                            {#                                            {% if is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_AGENT_DE_SAISIE') %} #}
+
+
+                                            {#                                            #}{#                                            {% elseif  is_granted('ROLE_AGENT_DE_SAISIE') %} #}
+                                            {#                                            #}{#                                                <a href="{{ path('admin_dossier_details',{'id':dossier.id}) }}" title="Voir les details du dossier"> #}
+                                            {#                                            #}{#                                                    <i class="ri-eye-fill"></i> #}
+                                            {#                                            #}{#                                                </a> #}
+                                            {#                                            #}{#                                                <div class="dropdown"> #}
+                                            {#                                            #}{#                                                    <a href="#" role="button" id="dropdownMenuLink5" data-bs-toggle="dropdown" aria-expanded="false"> #}
+                                            {#                                            #}{#                                                        <i class="ri-more-2-fill"></i> #}
+                                            {#                                            #}{#                                                       #}
+                                            {#                                            #}{#                                                    </a> #}
+
+                                            {#                                            #}{#                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink5"> #}
+                                            {#                                            #}{#                                                        <li><a class="dropdown-item" href="#">View</a></li> #}
+                                            {#                                            #}{#                                                        <li><a class="dropdown-item" href="#">Edit</a></li> #}
+                                            {#                                            #}{#                                                        <li><a class="dropdown-item" href="#">Delete</a></li> #}
+                                            {#                                            #}{#                                                    </ul> #}
+                                            {#                                            #}{#                                                </div> #}
+
+                                            {#                                            <div class="dropdown"> #}
+                                            {#                                                <a href="#" role="button" id="dropdownMenuLink1" #}
+                                            {#                                                   data-bs-toggle="dropdown" aria-expanded="false"> #}
+                                            {#                                                    <i class="ri-more-2-fill"></i> #}
+                                            {#                                                </a> #}
+
+                                            {#                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink1"> #}
+                                            {#                                                    #}{#                                                        <li><a class="dropdown-item" href="{{ path('admin_affecter_dossier_structure_new',{'id': dossier.id}) }}">A une structure</a></li> #}
+                                            {#                                                    <li><a class="dropdown-item" #}
+                                            {#                                                           href="{{ path('admin_affectr_dossier_section_new',{'id': dossier.id}) }}">Affecter #}
+                                            {#                                                            à une section</a></li> #}
+                                            {#                                                    <li> #}
+                                            {#                                                        {% if dossier.userDossiers %} #}
+                                            {#                                                            <a class="dropdown-item" #}
+                                            {#                                                               href="{{ path('admin_dossier_affections_user',{'id': dossier.id}) }}">Voir les membres affecte</a> #}
+                                            {#                                                        {% else %} #}
+                                            {#                                                            <a class="dropdown-item" #}
+                                            {#                                                               href="{{ path('admin_dossier_affections_user',{'id': dossier.id}) }}">Ajouter #}
+                                            {#                                                                un membre</a> #}
+                                            {#                                                        {% endif %} #}
+
+                                            {#                                                    </li> #}
+                                            {#                                                    <li><a class="dropdown-item" #}
+                                            {#                                                           href="{{ path('admin_dossier_affections',{'id': dossier.id}) }}">Voir #}
+                                            {#                                                            les affections</a></li> #}
+                                            {#                                                    <li><a class="dropdown-item" #}
+                                            {#                                                           href="{{ path('admin_dossier_details',{'id':dossier.id}) }}">Details #}
+                                            {#                                                            du dossier</a></li> #}
+
+                                            {#                                                </ul> #}
+                                            {#                                            </div> #}
+                                            {#                                        </td> #}
+                                            {#                                        {% endif %} #}
+
+
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div class="noresult">
+                                <div class="text-center">
+                                    <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
+                                               colors="primary:#121331,secondary:#08a88a"
+                                               style="width:75px;height:75px">
+                                    </lord-icon>
+                                    <h5 class="mt-2">Aucune donnée pour l'instant</h5>
+                                    {#                                       <p class="text-muted mb-0">We've searched more than 150+ Orders We did not find any #}
+                                    {#                                           orders for you search.</p> #}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {#    <table class="table"> #}
+    {#        <thead> #}
+    {#            <tr> #}
+    {#                <th>Id</th> #}
+    {#                <th>ReferenceEnregistrement</th> #}
+    {#                <th>DateEnregistrement</th> #}
+    {#                <th>TypeDossier</th> #}
+    {#                <th>NomRequerant</th> #}
+    {#                <th>PrenomsRequerant</th> #}
+    {#                <th>SexeRequerant</th> #}
+    {#                <th>ContactRequerant</th> #}
+    {#                <th>AdresseRequerant</th> #}
+    {#                <th>NomContact</th> #}
+    {#                <th>PrenomsContact</th> #}
+    {#                <th>AdresseContact</th> #}
+    {#                <th>ReferenceDossier</th> #}
+    {#                <th>IntituleObjet</th> #}
+    {#                <th>ReferenceDossierComplet</th> #}
+    {#                <th>EtatDossier</th> #}
+    {#                <th>TelephoneRequerant</th> #}
+    {#                <th>MailRequerant</th> #}
+    {#                <th>TelephoneContact</th> #}
+    {#                <th>MailContact</th> #}
+    {#                <th>CreatedAt</th> #}
+    {#                <th>UpdatedAt</th> #}
+    {#                <th>actions</th> #}
+    {#            </tr> #}
+    {#        </thead> #}
+    {#        <tbody> #}
+    {#        {% for dossier in dossiers %} #}
+    {#            <tr> #}
+    {#                <td>{{ dossier.id }}</td> #}
+    {#                <td>{{ dossier.referenceEnregistrement }}</td> #}
+    {#                <td>{{ dossier.dateEnregistrement ? dossier.dateEnregistrement|date('Y-m-d H:i:s') : '' }}</td> #}
+    {#                <td>{{ dossier.typeDossier }}</td> #}
+    {#                <td>{{ dossier.nomRequerant }}</td> #}
+    {#                <td>{{ dossier.prenomsRequerant }}</td> #}
+    {#                <td>{{ dossier.sexeRequerant }}</td> #}
+    {#                <td>{{ dossier.contactRequerant }}</td> #}
+    {#                <td>{{ dossier.adresseRequerant }}</td> #}
+    {#                <td>{{ dossier.nomContact }}</td> #}
+    {#                <td>{{ dossier.prenomsContact }}</td> #}
+    {#                <td>{{ dossier.adresseContact }}</td> #}
+    {#                <td>{{ dossier.referenceDossier }}</td> #}
+    {#                <td>{{ dossier.intituleObjet }}</td> #}
+    {#                <td>{{ dossier.referenceDossierComplet }}</td> #}
+    {#                <td>{{ dossier.etatDossier }}</td> #}
+    {#                <td>{{ dossier.telephoneRequerant }}</td> #}
+    {#                <td>{{ dossier.mailRequerant }}</td> #}
+    {#                <td>{{ dossier.telephoneContact }}</td> #}
+    {#                <td>{{ dossier.mailContact }}</td> #}
+    {#                <td>{{ dossier.createdAt ? dossier.createdAt|date('Y-m-d H:i:s') : '' }}</td> #}
+    {#                <td>{{ dossier.updatedAt ? dossier.updatedAt|date('Y-m-d H:i:s') : '' }}</td> #}
+    {#                <td> #}
+    {#                    <a href="{{ path('app_dossier_show', {'id': dossier.id}) }}">show</a> #}
+    {#                    <a href="{{ path('app_dossier_edit', {'id': dossier.id}) }}">edit</a> #}
+    {#                </td> #}
+    {#            </tr> #}
+    {#        {% else %} #}
+    {#            <tr> #}
+    {#                <td colspan="23">no records found</td> #}
+    {#            </tr> #}
+    {#        {% endfor %} #}
+    {#        </tbody> #}
+    {#    </table> #}
+
+    <!-- end row -->
+{% endblock %}

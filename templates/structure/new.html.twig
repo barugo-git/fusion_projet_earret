@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-6 offset-lg-3">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Ajouter une structure </h4>
+                </div><!-- end card header -->
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    {{ form_widget(form) }}
+                    <button type="submit" class="btn btn-success" id="add-btn">Ajouter</button>
+                    {{ form_end(form) }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- end col -->
+
+    </div>
+{% endblock %}

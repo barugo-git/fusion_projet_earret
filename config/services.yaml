@@ -1,0 +1,99 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+    # Define the sms gateway parameters
+    sms_gateway.baseurl: '%env(resolve:SMSGATEWAY_BASEURL)%'
+    sms_gateway.apikey: '%env(resolve:SMSGATEWAY_APIKEY)%'
+    sms_gateway.apikeyprefix: '%env(resolve:SMSGATEWAY_APIKEYPREFIX)%'
+    upload_directory: '%kernel.project_dir%/public/uploads'
+    upload_models: '%upload_directory%/models'
+    upload_rapports: '%upload_directory%/rapports'
+    upload_piece_jointes: '%upload_directory%/piecesJointes'
+    upload_consignation: '%upload_directory%/consignations'
+    upload_calendrier: '%upload_directory%/calendrier'
+    profile_photos_directory: '%kernel.project_dir%/public/uploads/profile_photos'
+    
+    
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+    App\Service\FileUploader:
+        arguments:
+            $uploadDirectory: '%upload_directory%'
+            $uploadModels: '%upload_models%'
+            $uploadRapports: '%upload_rapports%'
+            $uploadPieceJointes: '%upload_piece_jointes%'
+            $uploadConsignation: '%upload_consignation%'
+            $uploadCalendrier: '%upload_calendrier%'
+            $logger: '@logger'
+
+    App\Controller\PaiementConsignationController:
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@mailer.mailer'
+            - '@logger'
+            - '@parameter_bag'
+        tags: ['controller.service_arguments']
+
+    App\Service\ReportGenerator:
+        arguments:
+            $uploadDirectory: '%upload_directory%'
+        
+    App\Service\PdfGenerator:
+        arguments:
+            $uploadDirectory: '%upload_directory%'
+            $filesystem: '@filesystem'
+
+    App\Service\OnlyOfficeService:
+        arguments:
+            $documentServerUrl: '%onlyoffice_document_server_url%'
+            $secretKey: '%onlyoffice_secret_key%'
+            $urlGenerator: '@router.default'
+
+            
+    App\Twig\AppExtension:
+        tags: ['twig.extension']
+        
+
+    App\Controller\RapportController:
+        arguments:
+            $logger: '@logger'
+            $uploadDirectory: '%upload_directory%'
+            $rapportsDirectory: '%upload_rapports%'  # Ajout de ce paramètre
+        tags: ['controller.service_arguments']
+
+    monolog.dbhandler:
+        class: App\Utility\DbHandler
+
+#    App\Controller\SecurityController:
+#        arguments: ['@monolog.logger.db']
+    monolog.dbprocessor:
+        class: App\Utility\DbProcessor
+        tags:
+            - {name: monolog.processor,handler: dbhandler }
+    doctrine.doctrinesubscriber:
+        class: App\EventListener\DoctrineSubscriber
+        tags:
+            -   {name: doctrine.event_subscriber}
+    App\Service\CustomLoginLinkHandler:
+        arguments:
+            $urlGenerator: '@router'
+            $userProvider: '@security.user_providers' # Assurez-vous de remplacer par votre provider utilisateur
+        tags: [ 'security.login_link_handler' ]

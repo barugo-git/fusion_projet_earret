@@ -1,0 +1,42 @@
+
+{% extends 'base.html.twig' %}
+   {% block body %}
+
+       <div class="row" >
+           <div class="col-md-8 col-4">
+               <div class="card">
+                   <div class="card-header">
+                       <h4 class="card-title mb-0">Création d'un statut d'un Dossier</h4>
+                   </div><!-- end card header -->
+
+                   <div class="card-body">
+
+                       {{ form_start(form) }}
+                       <div class="row">
+
+                           <div class="col-md-12">{{ form_row(form.libelle) }}</div>
+
+                           <div class="hstack gap-2 justify-content-center">
+                               <input type="reset" value="Annuler" class="btn btn-light"/>
+                               {#                               <button type="reset" class="btn btn-light" data-bs-dismiss="modal">Fermer</button> #}
+                               <button type="submit" class="btn btn-success" id="add-btn">Ajouter</button>
+                               {#                                   <button type="button" class="btn btn-success" id="edit-btn">Update</button> #}
+                           </div>
+                       </div>
+                       {{ form_end(form) }}
+
+                   </div>
+
+               </div>
+           </div>
+       </div>
+   {% endblock %}
+
+{% block javascripts %}
+
+{% endblock %}
+
+
+
+
+

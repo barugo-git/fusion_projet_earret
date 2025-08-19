@@ -1,0 +1,217 @@
+{% extends 'front/status_base.html.twig' %}
+
+{% block status_content %}
+    <div class="status-card">
+        <div class="status-header">
+            <h2 class="text-white">
+                <i class="fas fa-info-circle me-3"></i> Vérification du Statut
+            </h2>
+        </div>
+        <div class="status-body">
+            {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+            
+            <div class="mb-4">
+                {{ form_label(form.identifiant, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.identifiant, {'attr': {
+                    'class': 'form-control form-control-status',
+                    'placeholder': 'EX:  NPEtiNI ou N°2025-05-03-/F.E-P.C '
+                }}) }}
+            </div>
+            
+            <div class="text-center">
+                <button type="submit" class="btn btn-status">
+                    <i class="fas fa-search me-2"></i> Vérifier le statut
+                </button>
+            </div>
+            
+            {{ form_end(form) }}
+
+            {% if status is defined %}
+                <div class="result-container mt-4">
+                    <h2 class="mb-3">Résultats de la vérification</h2>
+                    
+                    {% if dossier %}
+                        <div class="mb-2">
+                            <strong>Statut :</strong> {{ dossier.etatDossier }}
+                        </div>
+                        <div class="mb-5">
+                            {# Afficher le bouton uniquement pour ces deux statuts spécifiques #}
+                            {% if dossier.etatDossier in ['Dossier au Rôle', 'Dossier vidé : Arrêt disponible'] and dossier.Calendrier %}
+                                <a href="{{ asset('uploads/' ~ dossier.Calendrier) }}" 
+                                    class="btn btn-sm btn-outline-primary" 
+                                    target="_blank">
+                                    <i class="fas fa-file-pdf mr-1"></i> Voir le Rôle
+                                </a>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex flex-column gap-2">
+                                <!-- Code de suivi -->
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong class="me-3">Code de suivi :</strong>
+                                    <span>{{ dossier.codeSuivi }}</span>
+                                </div>
+
+                                <!-- Référence -->
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong class="me-3">Référence du dossier :</strong>
+                                    <span>{{ dossier.referenceDossier }}</span>
+                                </div>
+
+                                <!-- Consignation -->
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong class="me-3">Consignation :</strong>
+                                <span class="badge 
+                                    {% if dossier.consignation == 1 and dossier.recuConsignation == 1 %}
+                                        bg-success text-white
+                                    {% elseif dossier.consignation == 1 and dossier.recuConsignation == 0 %}
+                                        bg-warning text-dark
+                                    {% elseif dossier.consignation == 0 and dossier.recuConsignation == 0 %}
+                                        bg-danger text-white
+                                    {% else %}
+                                        bg-secondary text-white
+                                    {% endif %}
+                                ">
+                                    {% if dossier.consignation == 1 and dossier.recuConsignation == 1 %}
+                                        <i class="fas fa-check-circle me-1"></i> Reçu envoyé
+                                    {% elseif dossier.consignation == 1 and dossier.recuConsignation == 0 %}
+                                        <i class="fas fa-clock me-1"></i> Payée - En attente
+                                    {% elseif dossier.consignation == 0 and dossier.recuConsignation == 0 %}
+                                        <i class="fas fa-times-circle me-1"></i> Non effectuée
+                                    {% else %}
+                                        <i class="fas fa-question-circle me-1"></i> État inconnu
+                                    {% endif %}
+                                </span>
+
+                            </div>
+                                <!-- Mémoire ampliatif -->
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong class="me-3">Mémoire ampliatif :</strong>
+                                    <span class="badge bg-{{ dossier.memoireAmpliatif ? 'success' : 'danger' }}">
+                                        {{ dossier.memoireAmpliatif ? 'Mémoire Reçu' : 'Non envoyé' }}
+                                    </span>
+                                </div>
+
+                                <!-- Mémoire en défense -->
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong class="me-3">Mémoire en défense :</strong>
+                                    <span class="badge bg-{{ dossier.memoireEnDefense ? 'success' : 'danger' }}">
+                                        {{ dossier.memoireEnDefense ? 'Mémoire Produit' : 'Non produit' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% if dossier.recuConsignation == 0 and dossier.consignation == 1 %}
+                            <div class="d-grid gap-2 mt-4">
+                                <a href="{{ path('greffier_dossier_consignation', {id: dossier.id}) }}" 
+                                class="btn btn-status btn-warning">
+                                    <i class="fas fa-money-bill-wave me-2"></i> Envoyer la quittance de paiement
+                                </a>
+                            </div>
+                        {% endif %}
+
+                    {% set reponseMemAmpliatif = null %}
+                    {% set mesureInstruction = null %}
+
+                    {# Recherche de la réponse et mesure d'instruction concernant le mémoire ampliatif #}
+                    {% set memAmpliatifFound = false %}
+                    {% set dateLimite = null %}
+
+                    {% for mesure in dossier.mesuresInstructions %}
+                        {% if mesure.reponses and 'mémoire ampliatif' in mesure.reponses.reponse|lower %}
+                            {% set memAmpliatifFound = true %}
+                            {% set dateNotification = mesure.reponses.dateNotification %}
+                            {% set delaisJours = mesure.delais %}
+                            {% set dateLimite = dateNotification|date_modify("+" ~ delaisJours ~ " days") %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if dossier.recuConsignation == 1 and dossier.memoireAmpliatif == 0 and memAmpliatifFound %}
+                        <div class="d-grid gap-2 mt-4">
+                            <div class="alert alert-info d-flex align-items-center">
+                                <i class="fas fa-calendar-day me-3 fs-4"></i>
+                                <div>
+                                    <h5 class="alert-heading mb-1">Échéance mémoire ampliatif</h5>
+                                    <p class="mb-0">Date limite : <strong>{{ dateLimite|date('d/m/Y') }}</strong></p>
+                                    {% if date() > dateLimite %}
+                                        <span class="badge bg-danger mt-2">Délai expiré</span>
+                                        <p>Veuillez contactez le Greffier en charge</p>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark mt-2">
+                                            {{ dateLimite.diff(date()).days }} jours restants
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if date() <= dateLimite %}
+                                <a href="{{ path('greffier_dossier_memoire_ampliatif', {id: dossier.id}) }}" 
+                                class="btn btn-status btn-warning">
+                                    <i class="fas fa-file-upload me-2"></i> Envoyer le mémoire ampliatif
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    {% else %}
+                        <div class="alert alert-warning mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            {{ status }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <style>
+        /* Animation du marquee */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+            margin: 0 auto;
+            max-width: 80%;
+        }
+        
+        .marquee-content {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 15s linear infinite;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        /* Animation d'entrée */
+        .status-card {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        
+        .status-card.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animation d'entrée
+            const card = document.querySelector('.status-card');
+            setTimeout(() => {
+                card.classList.add('animated');
+            }, 100);
+            
+            // Focus sur le champ de saisie
+            document.getElementById('{{ form.identifiant.vars.id }}').focus();
+        });
+    </script>
+{% endblock %}

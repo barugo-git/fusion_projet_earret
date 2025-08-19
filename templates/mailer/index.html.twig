@@ -1,0 +1,39 @@
+{% apply inline_css(source("@styles/bootstrap.min.css"),source("@styles/icons.min.css")
+    ,source("@styles/app.min.css"),source("@styles/custom.min.css")) %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-10">
+            <p>Bonjour Monsieur/Madame {{ user.fullname }}. Votre compte a été crée. Les informations sont les suivantes. SVP!
+
+            Veuillez changer le mot de passe une fois connecté.
+            </p>
+            <table>
+                <tbody>
+
+                <tr>
+                    <th>Nom de la Structure :</th>
+                    <td>{{ user.structure }}</td>
+                </tr>
+
+                <tr>
+                    <th>Email:</th>
+                    <td>{{ user.email }}</td>
+                </tr>
+                <tr>
+                    <th>Mot de Passe: </th>
+                    <td>{{ password }}</td>
+                </tr>
+
+                <tr>
+                    <th>Lien de Connexion:</th>
+                    <td><a href="{{ url('app_login')  }}">Se connecter</a> </td>
+                </tr>
+
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+</div>
+{% endapply %}

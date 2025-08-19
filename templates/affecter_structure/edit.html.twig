@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit AffecterStructure{% endblock %}
+
+{% block body %}
+    <h1>Edit AffecterStructure</h1>
+
+    {{ include('affecter_structure/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_affecter_structure_index') }}">back to list</a>
+
+    {{ include('affecter_structure/_delete_form.html.twig') }}
+{% endblock %}

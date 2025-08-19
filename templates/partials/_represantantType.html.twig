@@ -1,0 +1,21 @@
+<div class="row" id="representant-subform" style="display: none;">
+    {#                                        {{ form_row(form.requerant.representants) }} #}
+    {% if form.requerant.representants1 is defined %}
+        <div class="col-md-6">
+            {{ form_row(form.requerant.representants1.nom) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.requerant.representants1.prenom) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.requerant.representants1.email) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.requerant.representants1.telephone) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_row(form.requerant.representants1.adresse) }}
+        </div>
+        {#                                            {{ form_row(form.requerant.representants1.) }}#}
+    {% endif %}
+</div>

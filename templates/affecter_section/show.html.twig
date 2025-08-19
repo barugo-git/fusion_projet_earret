@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}AffecterSection{% endblock %}
+
+{% block body %}
+    <h1>AffecterSection</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ affecter_section.id }}</td>
+            </tr>
+            <tr>
+                <th>DateAffectation</th>
+                <td>{{ affecter_section.dateAffectation ? affecter_section.dateAffectation|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Motif</th>
+                <td>{{ affecter_section.Motif }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_affecter_section_index') }}">back to list</a>
+
+    <a href="{{ path('app_affecter_section_edit', {'id': affecter_section.id}) }}">edit</a>
+
+    {{ include('affecter_section/_delete_form.html.twig') }}
+{% endblock %}

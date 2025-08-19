@@ -1,0 +1,82 @@
+{{ include('partials/main.html.twig') }}
+
+<head>
+
+    {{ include('partials/title-meta.html.twig', {title: 'Plateforme de Gestion des requêtes'}) }}
+
+    {{ include('partials/head-css.html.twig') }}
+
+    {% block stylesheets %}
+
+
+        <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/2.0.3/css/dataTables.dataTables.min.css">
+        <link href="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-2.0.3/b-3.0.1/b-html5-3.0.1/b-print-3.0.1/datatables.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+        {#<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.2/css/buttons.dataTables.min.css">#}
+{#        <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">#}
+{#        <link rel="stylesheet" href="{{ asset('assets/css/datatables.min.css') }}">#}
+
+
+    {% endblock %}
+
+
+</head>
+
+<body>
+
+<!-- Begin page -->
+<div id="layout-wrapper">
+
+    {{ include('partials/menu.html.twig') }}
+
+    <!-- ============================================================== -->
+    <!-- Start right Content here -->
+    <!-- ============================================================== -->
+    <div class="main-content">
+
+        <div class="page-content">
+
+
+            <div class="container-fluid">
+                {{ include('partials/page-title.html.twig', {pagetitle: 'Page', title:'Plateforme e-arret' }) }}
+                {#                        {{ include('partials/page-title.html.twig', {pagetitle: pagetitle, title: title}) }}#}
+                {{ include('partials/header.html.twig') }}
+                {% block body %}
+
+                {% endblock %}
+
+            </div>
+
+            <!-- container-fluid -->
+        </div>
+        <!-- End Page-content -->
+
+        {{ include('partials/footer.html.twig') }}
+    </div>
+    <!-- end main content-->
+
+</div>
+<!-- END layout-wrapper -->
+
+
+{#        {{ include('partials/customizer.html.twig') }}#}
+
+{{ include('partials/vendor-scripts.html.twig') }}
+
+
+{% block javascripts %}
+
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+{#    <script src="{{ asset('js/app.js') }}"></script>#}
+
+{% endblock %}
+
+</body>
+
+</html>

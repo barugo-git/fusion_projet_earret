@@ -1,0 +1,120 @@
+{% extends 'base.html.twig' %}
+
+        {% block stylesheets %}
+            <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css">
+            <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.2/css/buttons.dataTables.min.css">
+
+
+        {% endblock %}
+{% block body %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Liste des arrêts</h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+                    <div id="customerList">
+                        {#                        <div class="row g-4 mb-3">#}
+                        {#                            <div class="col-sm-auto">#}
+                        {#                                <div>#}
+                        {#                                    <a href="{{ path('app_dossier_new') }}" class="btn btn-success add-btn"><i class="ri-add-line align-bottom me-1"></i>Enregistrer une nouvelle requete</a>#}
+                        {#                                    <button type="button" class="btn btn-success add-btn" data-bs-toggle="modal" id="create-btn" data-bs-target="#showModal"><i class="ri-add-line align-bottom me-1"></i>Enregistrer une nouvelle requete</button>#}
+                        {#                                </div>#}
+                        {#                            </div>#}
+{#                        <div class="col-sm">#}
+{#                            <div class="d-flex justify-content-sm-end">#}
+{#                                <div class="search-box ms-2">#}
+{#                                    <input type="text" class="form-control search" placeholder="Search...">#}
+{#                                    <i class="ri-search-line search-icon"></i>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                        <div class="table-responsive table-card mt-3 mb-1">#}
+                            <table class="table align-middle table-nowrap" id="customerTable">
+                                <thead class="table-light">
+                                <tr>
+                                    {#                            <th class="sort"></th>#}
+
+                                    <th class="sort" data-sort="id">Dossier</th>
+                                    <th class="sort" data-sort="customer_name">Date Arret</th>
+                                    <th class="sort" data-sort="email">Numéro de l"arrêt</th>
+                                    <th class="sort" data-sort="date">Réquerant</th>
+                                    <th class="sort" data-sort="phone">Defendeur</th>
+
+                                    <th class="sort" data-sort="status">Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for arret in arrets %}
+                                    <tr>
+                                        <td class="id"> {{ arret.dossier.referenceDossier }}
+                                            - {{ arret.dossier.referenceDossier }}</td>
+                                        <td class="customer_name">{{ arret.dateArret ? arret.dateArret|date('Y-m-d H:i:s') : '' }}</td>
+                                        <td class="email">{{ arret.numArret }}</td>
+                                        <td class="date">
+                                            {% if  arret.dossier.requerant.type =='moral' %}
+
+                                                {{ arret.dossier.requerant.intitule }}
+                                            {% else %}
+
+                                                {{ arret.dossier.requerant.nom ~" "~  arret.dossier.requerant.prenoms }}
+                                            {% endif %}
+                                        </td>
+                                        <td class="phone">
+                                            {% if  arret.dossier.defendeur.type =='moral' %}
+                                                {{ arret.dossier.defendeur.intitule }}
+
+                                            {% else %}
+                                                {{ arret.dossier.defendeur.nom ~" "~  arret.dossier.defendeur.prenoms }}
+                                            {% endif %}
+                                        </td>
+                                        <td class="status">
+                                            <div class="dropdown">
+                                                <a href="#" role="button" id="dropdownMenuLink5" data-bs-toggle="dropdown"
+                                                   aria-expanded="false">
+                                                    <i class="ri-more-2-fill"></i>
+                                                </a>
+
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink5">
+                                                    <li><a class="dropdown-item" href="#">Plus de détails</a></li>
+                                                    <li><a class="dropdown-item" href="/uploads/{{ asset(arret.arret) }}">Télécharger
+                                                            l'arrêt</a></li>
+                                                    {% if arret.forclusion %}
+                                                        <li><a class="dropdown-item"
+                                                               href="/uploads/{{ asset(arret.forclusion) }}">Télécharger la
+                                                                forclusion</a></li>
+                                                    {% endif %}
+
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block javascripts %}
+    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.3.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.print.min.js"></script>
+
+
+    <!-- listjs init -->
+    <script src="/js/pages/listjs.init.js"></script>
+
+
+{% endblock %}

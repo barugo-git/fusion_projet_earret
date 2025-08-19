@@ -1,0 +1,114 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Liste des mesures d'instructions du
+                        dossier {{ dossier.referenceDossier }}</h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+
+
+                    <div class="data_table mt-3 mb-1">
+                        {#                        {% if mesures|length > 0 %}#}
+                        <table class="table align-middle table-nowrap">
+                            <thead class="table-light">
+                            <tr>
+                                <th class="sort"></th>
+
+                                <th class="sort" data-sort="customer_name">Mesures</th>
+                                <th class="sort" data-sort="email">Parties</th>
+                                <th class="sort" data-sort="phone">Délai</th>
+                                <th class="sort" data-sort="date">Etat</th>
+{#                                <th class="sort" data-sort="date">Décompte</th>#}
+                                <th class="sort" data-sort="action">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for mesure in mesures %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+
+                                    <td class="customer_name">{{ mesure.instruction }}</td>
+                                    <td class="customer_name">{{ mesure.partiesConcernes }}</td>
+                                    <td class="email">{{ mesure.delais }} Jours</td>
+
+                                    <td class="email">
+                                        {% if mesure.reponses %}
+                                            Débutée
+                                            {% if mesure.reponses.dateNotification %}
+                                                <br> et notifie le {{ mesure.reponses.dateNotification | date('d-m-Y') }}
+                                            {% else %}
+                                                <br> non notifée a la partie concernée
+                                            {% endif %}
+                                        {% else %}
+                                            Non débutée
+                                        {% endif %}
+                                    </td>
+{#                                    <td></td>#}
+                                    <td class="email">
+                                        <div class="dropdown">
+                                            <a href="#" role="button" id="dropdownMenuLink1"
+                                               data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="ri-more-2-fill"></i>
+                                            </a>
+
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink1">
+
+                                                <li><a class="dropdown-item"
+                                                       href="{{ path('admin_dossier_details',{'id':dossier.id}) }}">Détails
+                                                        du dossier</a></li>
+                                                <li><a class="dropdown-item"
+                                                       href="{{ path('greffier_rapporteur_mesures_instructions_reponse_show',{'id':mesure.id}) }}">Détails
+                                                        de la mesure d'instruction</a></li>
+                                                <li>
+                                                    {% if is_granted('ROLE_GREFFIER') or is_granted('ROLE_GREFFIER_EN_CHEF') %}
+                                                    {% if mesure.reponses %}
+                                                        <a class="dropdown-item"
+                                                           href="{{ path('greffier_rapporteur_mesures_instructions_reponse_edit',{'id':mesure.reponses.id}) }}">Completer ma réponse</a>
+
+                                                    {% else %}
+
+                                                        <a class="dropdown-item"
+                                                           href="{{ path('greffier_rapporteur_mesures_instructions_reponse',{'id':mesure.id}) }}">Repondre</a>
+                                                            {% endif %}
+                                                    {% endif %}
+
+                                                </li>
+
+                                            </ul>
+                                        </div>
+
+                                    </td>
+
+
+
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        {#                        {% else %}#}
+                        {#                            <div class="noresult">#}
+                        {#                                <div class="text-center">#}
+                        {#                                    <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"#}
+                        {#                                               colors="primary:#121331,secondary:#08a88a"#}
+                        {#                                               style="width:75px;height:75px">#}
+                        {#                                    </lord-icon>#}
+                        {#                                    <h5 class="mt-2">Aucune donnée pour l'instant</h5>#}
+                        {#                                    #}{#                                       <p class="text-muted mb-0">We've searched more than 150+ Orders We did not find any#}
+                        {#                                    #}{#                                           orders for you search.</p>#}
+                        {#                                </div>#}
+                        {#                            </div>#}
+                        {#                        {% endif %}#}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

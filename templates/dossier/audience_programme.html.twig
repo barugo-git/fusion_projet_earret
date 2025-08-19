@@ -1,0 +1,191 @@
+{% extends 'base.html.twig' %}
+
+        {% block stylesheets %}
+            <link rel="stylesheet" type="text/css"
+                  href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css">
+            <link rel="stylesheet" type="text/css"
+                  href="https://cdn.datatables.net/buttons/2.3.2/css/buttons.dataTables.min.css">
+
+
+        {% endblock %}
+{% block body %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">{{ audience.avisAudience }}
+                    du
+                    à {{ audience.heureAudience ? audience.heureAudience|date('H') : '' }}
+                    h{{ audience.heureAudience ? audience.heureAudience|date('i') : '' }}</h4>
+            </div><!-- end card header -->
+
+            <div class="card-body">
+                <h2>Audience du {{ audience.dateAudience ? audience.dateAudience|date('d-m-Y') : '' }}
+                    à {{ audience.heureAudience ? audience.heureAudience|date('H') : '' }}
+                    h{{ audience.heureAudience ? audience.heureAudience|date('i') : '' }}
+                </h2>
+                <h3>
+                    Section : {{ app.user.sections.name }}
+                </h3>
+                <table class="table align-middle" id="customerTable">
+                    <thead class="table-light">
+                    <tr>
+                        {#                            <th class="sort"></th> #}
+
+                        <th class="sort" data-sort="id"></th>
+                        <th class="sort" data-sort="id">N°Dossiers</th>
+                        <th class="sort" data-sort="customer_name">Nom & prénoms du demandeur</th>
+                        <th class="sort" data-sort="email">Decision attaquée</th>
+                        <th class="sort" data-sort="customer_name">Nom & prénoms du defendeur</th>
+                        <th class="sort" data-sort="date">Decision</th>
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td colspan="6" class="text-center"> <h2>{{ audience.avisAudience }}</h2></td>
+                    </tr>
+                    {% for dossier in audience.dossiers %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ dossier.referenceDossier }}</td>
+                        <td>
+                            {% if dossier.requerant.type =='moral' %}
+
+                                {{ dossier.requerant.intitule }}
+                            {% else %}
+
+                                {{ dossier.requerant.nom ~" "~ dossier.requerant.prenoms }}
+                            {% endif %}
+
+                            {% if dossier.requerant.conseil %} <br>
+                                {%if (dossier.requerant.conseil | length) > 0 %}
+                                (
+
+
+                                {% for conseiller in dossier.requerant.conseil %}
+                                    {{ conseiller.fullName }}
+                                    {% if conseiller.nomCabinet %}
+                                        <br>
+                                        du cabinet
+                                        {{ conseiller.nomCabinet }}
+                                    {% endif %} <br>
+                                {% endfor %}
+                                )
+                            {% endif %}
+                            {% endif %}
+
+                        </td>
+                        <td>
+                            {{ dossier.objet.name }}
+                        </td>
+                        <td>
+                            {% if dossier.defendeur.type =='moral' %}
+
+                                {{ dossier.defendeur.intitule }}
+                            {% else %}
+
+                                {{ dossier.defendeur.nom ~" "~ dossier.defendeur.prenoms }}
+                            {% endif %} <br>
+
+                            {% if dossier.defendeur.defendeurs %}
+                            {%if (dossier.defendeur.defendeurs | length) > 0 %}
+                                (
+                                {% for defendeurs in dossier.defendeur.defendeurs %}
+                                    {{ defendeurs.fullName }}
+                                    {% if defendeurs.nomCabinet %}
+                                        <br>
+                                        du cabinet
+                                        {{ defendeurs.nomCabinet }}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            )
+                            {% endif %}
+                        </td>
+                        <td>
+
+                        </td>
+
+{#                        <td>#}
+{#                            <a href="{{ path('avis_audience_dossier_programme',{'id': dossier.id}) }}"> Voir#}
+{#                                l'avis d'audience</a>#}
+{#                        </td>#}
+                    </tr>
+                    {% endfor %}
+                    {# #}
+                    {#                            <tr> #}
+                    {#                                <td class="id"> {{ arret.dossier.referenceDossier }} #}
+                    {#                                    - {{ arret.dossier.referenceDossier }}</td> #}
+                    {#                                <td class="customer_name">{{ arret.dateArret ? arret.dateArret|date('Y-m-d H:i:s') : '' }}</td> #}
+                    {#                                <td class="email">{{ arret.numArret }}</td> #}
+                    {#                                <td class="date"> #}
+                    {#                                    {% if  arret.dossier.requerant.type =='moral' %} #}
+
+                    {#                                        {{ arret.dossier.requerant.intitule }} #}
+                    {#                                    {% else %} #}
+
+                    {#                                        {{ arret.dossier.requerant.nom ~" "~  arret.dossier.requerant.prenoms }} #}
+                    {#                                    {% endif %} #}
+                    {#                                </td> #}
+                    {#                                <td class="phone"> #}
+                    {#                                    {% if  arret.dossier.defendeur.type =='moral' %} #}
+                    {#                                        {{ arret.dossier.defendeur.intitule }} #}
+
+                    {#                                    {% else %} #}
+                    {#                                        {{ arret.dossier.defendeur.nom ~" "~  arret.dossier.defendeur.prenoms }} #}
+                    {#                                    {% endif %} #}
+                    {#                                </td> #}
+                    {#                                <td class="status"> #}
+                    {#                                    <div class="dropdown"> #}
+                    {#                                        <a href="#" role="button" id="dropdownMenuLink5" data-bs-toggle="dropdown" #}
+                    {#                                           aria-expanded="false"> #}
+                    {#                                            <i class="ri-more-2-fill"></i> #}
+                    {#                                        </a> #}
+
+                    {#                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink5"> #}
+                    {#                                            <li><a class="dropdown-item" href="#">Plus de détails</a></li> #}
+                    {#                                            <li><a class="dropdown-item" href="/uploads/{{ asset(arret.arret) }}">Télécharger #}
+                    {#                                                    l'arrêt</a></li> #}
+                    {#                                            {% if arret.forclusion %} #}
+                    {#                                                <li><a class="dropdown-item" #}
+                    {#                                                       href="/uploads/{{ asset(arret.forclusion) }}">Télécharger la #}
+                    {#                                                        forclusion</a></li> #}
+                    {#                                            {% endif %} #}
+
+                    {#                                        </ul> #}
+                    {#                                    </div> #}
+                    {#                                </td> #}
+                    {#                            </tr> #}
+                    {#                        {% endfor %} #}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block javascripts %}
+    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+            integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/buttons/2.3.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.print.min.js"></script>
+    <script src="/libs/prismjs/prism.js"></script>
+    <script src="/libs/list.js/list.min.js"></script>
+    <script src="/libs/list.pagination.js/list.pagination.min.js"></script>
+
+    <!-- listjs init -->
+    <script src="/js/pages/listjs.init.js"></script>
+
+
+{% endblock %}

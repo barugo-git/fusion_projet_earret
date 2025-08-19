@@ -1,0 +1,121 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Liste des dossiers affectés au parquet général</h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+
+
+                    <div class="data_table">
+                        {% if dossiers|length > 0 %}
+                            <table id="exemple" class="table table-striped table-bordered">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="sort"></th>
+                                    <th class="sort" data-sort="customer_name">N° Dossier</th>
+
+                                    <th class="sort" data-sort="phone">Affaire</th>
+
+                                    <th class="sort" data-sort="action">Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for dossier in dossiers %}
+                                    {% set structure_affectante = '' %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td>{{ dossier.referenceDossier }}</td>
+                                        <td>
+                                            <strong>
+                                                {% if dossier %}
+
+                                                    {% if dossier.requerant.type =='moral' %}
+                                                        {{ dossier.requerant.intitule }}
+                                                    {% else %}
+                                                        {{ dossier.requerant.nom ~ " " ~ dossier.requerant.prenoms }}
+                                                    {% endif %}
+                                                    {% if dossier.requerant.conseiller %}
+                                                        {% for conseilRequerant in dossier.requerant.conseiller %}
+                                                            ( ME {{ conseilRequerant.fullName }} )
+                                                        {% endfor %}
+                                                    {% endif %} <br/>
+                                                    CONTRE
+                                                    {% if dossier.defendeur.type =='moral' %}
+                                                        {{ dossier.defendeur.intitule }}
+                                                    {% else %}
+                                                        {{ dossier.defendeur.nom ~ " " ~ dossier.defendeur.prenoms }}
+                                                    {% endif %}
+                                                    {% if dossier.defendeur.conseiller %}
+                                                        {% for conseilRequerant in dossier.defendeur.conseiller %}
+                                                            ( ME {{ conseilRequerant.fullName }} )
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                {% endif %}
+                                            </strong>
+                                        </td>
+
+
+                                        <td>
+                                            {% if is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_PCA') or is_granted('ROLE_PCJ') or is_granted('ROLE_PROCUREUR_GENERAL') or is_granted('ROLE_PCS') or is_granted('ROLE_PRESIDENT_DE STRUCTURE') %}
+
+                                            <div class="dropdown">
+                                                <a href="#" role="button" id="dropdownMenuLink1"
+                                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="ri-more-2-fill"></i>
+                                                </a>
+
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink1">
+
+
+                                                    <li>
+                                                        <a class="dropdown-item"
+                                                           href="{{ path('pg_affecter_dossier_structure_new',{'id': dossier.id}) }}">
+                                                            Retour au president {{ structure_affectante }}</a>
+                                                    </li>
+
+                                                    <li><a class="dropdown-item"
+                                                           href="{{ path('parquet_general_affectations_avocat',{'id': dossier.id}) }}">A
+                                                            un avocat général</a>
+                                                    </li>
+
+                                                    <li><a class="dropdown-item"
+                                                           href="{{ path('admin_dossier_details',{'id':dossier.id}) }}">Details
+                                                            du dossier</a>
+                                                    </li>
+
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        {% endif %}
+
+
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div class="noresult">
+                                <div class="text-center">
+                                    <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
+                                               colors="primary:#121331,secondary:#08a88a"
+                                               style="width:75px;height:75px">
+                                    </lord-icon>
+                                    <h5 class="mt-2">Aucune donnée pour l'instant</h5>
+                                    {#                                       <p class="text-muted mb-0">We've searched more than 150+ Orders We did not find any #}
+                                    {#                                           orders for you search.</p> #}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

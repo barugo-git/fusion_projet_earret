@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New AffecterStructure{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-lg-8 offset-lg-2">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    {% include 'partials/_intitule_dossier.html.twig' %}
+                </h4>
+                <h4 class="card-title mb-0">
+                   Affectation du dossier à un greffier pour ouverture
+                </h4>
+            </div><!-- end card header -->
+
+            <div class="card-body">
+                {{ include('affecter_structure/_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

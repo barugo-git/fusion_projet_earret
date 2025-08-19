@@ -1,0 +1,64 @@
+    <!-- ========== App Menu ========== -->
+<div class="app-menu navbar-menu">
+    <!-- LOGO -->
+    <div class="navbar-brand-box">
+        <!-- Dark Logo-->
+        <a href="{{ path('app_index')  }}" class="logo logo-dark">
+            <span class="logo-sm">
+                <img src="{{ asset('images/imbenin.png') }}" alt="" height="22">
+            </span>
+            <span class="logo-lg">
+                <img src="{{ asset('images/imbenin.png') }}" alt="" style="width: 100%">
+            </span>
+        </a>
+        <!-- Light Logo-->
+        <a href="{{ path('app_index')  }}" class="logo logo-light">
+            <span class="logo-sm">
+                <img src="{{ asset('images/imbenin.png') }}" alt="" height="22">
+            </span>
+            <span class="logo-lg">
+                <img src="{{ asset('images/imbenin.png') }}" alt="" height="75">
+            </span>
+        </a>
+        <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover"
+                id="vertical-hover">
+            <i class="ri-record-circle-line"></i>
+        </button>
+    </div>
+
+    <div id="scrollbar">
+        <div class="container-fluid">
+
+            <div id="two-column-menu">
+            </div>
+            <ul class="navbar-nav" id="navbar-nav">
+                {% if is_granted('ROLE_SUPER_ADMIN') %}
+                    {% include  ('partials/menu_super_admin.html.twig') %}
+                {% elseif  is_granted('ROLE_AGENT_DE_SAISIE') or is_granted('ROLE_BUREAU_ORIENTATION') %}
+                    {% include  ('partials/menu_bureau_orrientation.html.twig') %}
+                    {#                    {% include  ('partials/_menu_super_admin.html.twig') %} #}
+                {% elseif  is_granted('ROLE_CONSEILLER') %}
+                    {% include  ('partials/menu_conseiller_rapporteur.html.twig') %}
+
+                {% elseif  is_granted('ROLE_PCA') or is_granted('ROLE_PCJ') %}
+                    {% include  ('partials/menu_president_chambre.html.twig') %}
+                {% elseif  is_granted('ROLE_GREFFIER_EN_CHEF') %}
+                    {% include  ('partials/menu_greffier_en_chef.html.twig') %}
+                {% elseif  is_granted('ROLE_GREFFIER') %}
+                    {% include  ('partials/menu_greffier.html.twig') %}
+                {% elseif  is_granted('ROLE_AVOCAT_GENERAL') %}
+                    {% include  ('partials/menu_avocat_general.html.twig') %}
+
+                {% elseif  is_granted('ROLE_PROCUREUR_GENERAL') %}
+                    {% include  ('partials/menu_procureur_general.html.twig') %}
+                {% endif %}
+
+
+            </ul>
+        </div>
+        <!-- Sidebar -->
+    </div>
+</div>
+<!-- Left Sidebar End -->
+<!-- Vertical Overlay-->
+<div class="vertical-overlay"></div>

@@ -1,0 +1,161 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dossier index{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Liste des recours en ligne</h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+                    <div id="customerList">
+{#                        <div class="row g-4 mb-3">#}
+{#                            <div class="col-sm-auto">#}
+{#                                <div>#}
+{#                                    #}{#                                    {% if  is_granted('ROLE_AGENT_DE_SAISIE') %} #}
+{#                                    <a href="{{ path('app_dossier_new_requerant') }}" class="btn btn-success add-btn"><i#}
+{#                                                class="ri-add-line align-bottom me-1"></i>Enregistrer un recours#}
+{#                                    </a>#}
+{#                                    #}{#                                    {% endif %} #}
+
+{#                                    #}{#                                    <button type="button" class="btn btn-success add-btn" data-bs-toggle="modal" id="create-btn" data-bs-target="#showModal"><i class="ri-add-line align-bottom me-1"></i>Enregistrer une nouvelle requete</button> #}
+{#                                </div>#}
+{#                            </div>#}
+
+{#                        </div>#}
+
+                        <div class="data_table table-card mt-3 mb-1">
+                            {% if dossiers|length > 0 %}
+                                <table class="table align-middle table-nowrap" id="customerTable">
+                                    <thead class="table-light">
+                                    <tr>
+                                        <th class="sort"></th>
+                                        <th class="sort" data-sort="customer_name">N°enre</th>
+                                        <th class="sort" data-sort="email">Date enr</th>
+                                        <th>Code de suivi</th>
+                                        <th class="sort" data-sort="email">Structure</th>
+                                        <th class="sort" data-sort="phone">Réquerant</th>
+                                        {#                                        <th class="sort" data-sort="phone">Téléphone réquerant</th> #}
+
+                                        <th class="sort" data-sort="date">Defendeur</th>
+                                        {#                                        <th class="sort" data-sort="phone">Téléphone du defendeur</th> #}
+                                        <th class="sort" data-sort="action">Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for dossier in dossiers %}
+                                        <tr>
+                                            <td>{{ loop.index }}</td>
+                                            <td>{{ dossier.referenceEnregistrement }}</td>
+                                            <td>{{ dossier.dateEnregistrement ? dossier.dateEnregistrement|date('Y-m-d') : '' }}</td>
+                                            <td>{{ dossier.codeSuivi ? dossier.codeSuivi : '' }}</td>
+                                           {% if dossier.structure %}
+                                            <td>{{ dossier.structure.name }}</td>
+                                               {% else %}
+                                               <td></td>
+                                            {% endif %}
+                                            <td>
+
+                                                {% if dossier.requerant.type =='moral' %}
+
+                                                    {{ dossier.requerant.intitule }} <br>
+                                                    <small> {{ dossier.requerant.Telephone }}</small>
+                                                {% else %}
+
+                                                    {{ dossier.requerant.nom ~" "~ dossier.requerant.prenoms }} <br>
+                                                    <small> {{ dossier.requerant.Telephone }}</small>
+                                                {% endif %}
+
+                                            </td>
+                                            {#                                            <td class="email">{{ dossier.requerant.Telephone }}</td> #}
+                                            <td class="email">
+                                                {% if dossier.defendeur.type =='moral' %}
+                                                    {{ dossier.defendeur.intitule }} <br>
+                                                    <small>{{ dossier.defendeur.telephone }}</small>
+
+                                                {% else %}
+                                                    {{ dossier.defendeur.nom ~" "~ dossier.defendeur.prenoms }} <br>
+                                                    <small>{{ dossier.defendeur.telephone }}</small>
+                                                {% endif %}
+                                            </td>
+
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-soft-secondary btn-sm dropdown" type="button"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="ri-more-fill align-middle"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end" style="">
+                                                        <li>
+                                                            <a class="dropdown-item" href="{{ path('admin_dossier_details',{'id':dossier.id}) }}" title="Voir les détails du recours">
+                                                                <i class="ri-eye-fill align-bottom me-2 text-muted"></i>
+                                                                Détails
+                                                            </a>
+                                                        </li>
+                                                        {% if is_granted('ROLE_AGENT_DE_SAISIE')  or is_granted('ROLE_BUREAU_ORIENTATION') %}
+                                                        <li>
+                                                            <a class="dropdown-item" href="{{ path('app_dossier_edit',{'id':dossier.id}) }}"
+                                                                   ><i class="ri-pencil-fill align-bottom me-2 text-muted"></i>
+                                                                Modifier
+                                                            </a>
+                                                        </li>
+                                                        {% endif %}
+
+                                                    </ul>
+                                                </div>
+                                                {% if is_granted('ROLE_AGENT_DE_SAISIE') %}
+
+                                                    <a href="{{ path('app_dossier_edit',{'id':dossier.id}) }}"
+                                                       title="Modifier la requete">
+                                                        <i class="ri-edit-2-line"></i>
+                                                    </a>
+                                                    {% if dossier.structure %}
+                                                        <a href="{{ path('app_dossier_open',{'id':dossier.id}) }}"
+                                                           title="Ouvrir un dossier">
+                                                            <i class="ri-folder-open-fill"></i>
+                                                        </a>
+                                                    {% endif %}
+                                                {% elseif  is_granted('ROLE_CONSEILLER') %}
+                                                    <a href="{{ path('app_dossier_open',{'id':dossier.id}) }}"
+                                                       title="Autoriser l'ouverture du dossier">
+                                                        <i class="ri-eye-fill"></i>
+                                                    </a>
+                                                    <a href="{{ path('admin_affectr_dossier_section_new',{'id':dossier.id}) }}"
+                                                       title="Affecter a une section">
+                                                        <i class="ri-eye-fill"></i>
+                                                    </a>
+                                                    <a href="{{ path('admin_dossier_details',{'id':dossier.id}) }}"
+                                                       title="Voir les détails de la requete">
+                                                        <i class="ri-eye-fill"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <div class="noresult">
+                                    <div class="text-center">
+                                        <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
+                                                   colors="primary:#121331,secondary:#08a88a"
+                                                   style="width:75px;height:75px">
+                                        </lord-icon>
+                                        <h5 class="mt-2">Aucunes donnees pour l'instant</h5>
+                                        {#                                       <p class="text-muted mb-0">We've searched more than 150+ Orders We did not find any #}
+                                        {#                                           orders for you search.</p> #}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

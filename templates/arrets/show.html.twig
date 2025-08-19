@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Arrets{% endblock %}
+
+{% block body %}
+    <h1>Arrets</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ arret.id }}</td>
+            </tr>
+            <tr>
+                <th>DateArret</th>
+                <td>{{ arret.dateArret ? arret.dateArret|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Titrage</th>
+                <td>{{ arret.titrage }}</td>
+            </tr>
+            <tr>
+                <th>Resume</th>
+                <td>{{ arret.resume }}</td>
+            </tr>
+            <tr>
+                <th>Commentaire</th>
+                <td>{{ arret.commentaire }}</td>
+            </tr>
+            <tr>
+                <th>Arret</th>
+                <td>{{ arret.arret }}</td>
+            </tr>
+            <tr>
+                <th>NumArret</th>
+                <td>{{ arret.numArret }}</td>
+            </tr>
+            <tr>
+                <th>Forclusion</th>
+                <td>{{ arret.forclusion }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_arrets_index') }}">back to list</a>
+
+    <a href="{{ path('app_arrets_edit', {'id': arret.id}) }}">edit</a>
+
+    {{ include('arrets/_delete_form.html.twig') }}
+{% endblock %}
