@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dossier{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Détails du récours </h4>
+                </div><!-- end card header -->
+                <div class="card-body">
+                    <div class="alert bg-dark text-white  alert-border-left alert-dismissible fade show material-shadow" role="alert">
+                        AFFAIRE :
+                        {% if dossier.requerant.type =='moral' %}
+                            {{ dossier.requerant.intitule }}
+                        {% else %}
+                            {{ dossier.requerant.nom ~ " " ~ dossier.requerant.prenoms }}
+                        {% endif %}
+                        {% if dossier.requerant.conseiller %}
+                            {% for conseilRequerant in dossier.requerant.conseiller %}
+                                ( ME {{ conseilRequerant.fullName }} )
+                            {% endfor %}
+                        {% endif %}
+                        CONTRE
+                        {% if dossier.defendeur.type =='moral' %}
+                            {{ dossier.defendeur.intitule }}
+                        {% else %}
+                            {{ dossier.defendeur.nom ~ " " ~ dossier.defendeur.prenoms }}
+                        {% endif %}
+                        {% if dossier.defendeur.conseiller %}
+                            {% for conseilRequerant in dossier.defendeur.conseiller %}
+                                ( ME {{ conseilRequerant.fullName }} )
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <table class="table">
+                        <tbody>
+                        <tr>
+                            <th>N°enregistrement</th>
+                            <td>{{ dossier.referenceEnregistrement }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date d'enregistrement</th>
+                            <td>{{ dossier.dateEnregistrement ? dossier.dateEnregistrement|date('Y-m-d H:i:s') : '' }}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Objet</th>
+                            <td>{{ dossier.objet.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Type de dossier</th>
+                            <td>{{ dossier.typeDossier }}</td>
+                        </tr>
+                        <tr>
+                            <th>Arrêt attaqué</th>
+                            <td>{{ dossier.arreteAttaquee }}</td>
+                        </tr>
+                        <tr>
+                            <th>Intitule de l'Objet</th>
+                            <td>{{ dossier.intituleObjet }}</td>
+                        </tr>
+                        {% if dossier.affecterSection %}
+                            <tr>
+                                <th>Section d'affectation</th>
+                                <td>{{ dossier.affecterSection.section.libelle }}</td>
+                            </tr>
+                            <tr>
+                                <th>Conseiller Rapporteur</th>
+                                <td>{{ dossier.affecterSection.conseillerRapporteur.fullName }}</td>
+                            </tr>
+                            <tr>
+                                <th>Greffier</th>
+                                <td>{{ dossier.affecterSection.greffier.fullName }}</td>
+                            </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Réference Dossier </h4>
+                </div><!-- end card header -->
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    {{ form_widget(form) }}
+                    <button class="btn btn-primary bx-pull-right">{{ button_label|default('Ouvrir le dossier') }}</button>
+                    {{ form_end(form) }}
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Pieces de la requête</h4>
+                </div><!-- end card header -->
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th> Nom de la piece</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for piece in dossier.pieces %}
+                            <tr>
+                                <td> {{ piece.name }}</td>
+                                <td><img src="{{ asset(piece.path) }}" alt="" width="55"></td>
+                                <td>
+                                    <a href="{{ piece.path }}" target="_blank">
+                                        <i class="ri-eye-fill align-bottom me-2 text-muted"></i>
+                                        Voir la piece
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {#    <a href="{{ path('app_dossier_index') }}">back to list</a>#}
+
+    {#    <a href="{{ path('app_dossier_edit', {'id': dossier.id}) }}">edit</a>#}
+
+    {#    {{ include('dossier/_delete_form.html.twig') }}#}
+{% endblock %}

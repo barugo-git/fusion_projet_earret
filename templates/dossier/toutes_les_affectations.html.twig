@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Toutes les affections</h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+
+                    <div class="data_table">
+                        <table class="table align-middle table-nowrap table-striped" id="customerTable">
+                            <thead class="table-light">
+                            <tr>
+                                <th class="sort"></th>
+                                <th class="sort" data-sort="customer_name">N° Dossier</th>
+                                <th class="sort" data-sort="requerant">Date affectation</th>
+                                <th class="sort" data-sort="defendeur">De</th>
+                                <th class="sort" data-sort="structure">A</th>
+                                <th class="sort" data-sort="section">Section d'affectation</th>
+                                <th class="sort" data-sort="section">Délai</th>
+                                <th class="sort" data-sort="action">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for affectation in affectations %}
+                                <tr>
+                                    <td class="sort">{{ loop.index }}</td>
+                                    <td class="sort" data-sort="customer_name">{{ affectation.dossier.referenceDossier }}</td>
+                                    <td class="sort" data-sort="customer_name">{{ affectation.dateAffection ? affectation.dateAffection | date('Y-m-d') : '' }}</td>
+                                    <td class="sort" data-sort="structure">{{ affectation.de.name }}</td>
+                                    <td class="sort" data-sort="structure">{{ affectation.structure.name }}</td>
+                                    <td class="sort" data-sort="section">-</td>
+                                    <td class="sort" data-sort="section">{{ affectation.delaiTraitement ? affectation.delaiTraitement | date('Y-m-d') : '' }}</td>
+                                    <td> <a href="{{ path('admin_dossier_details',{'id':affectation.dossier.id}) }}" title="Voir les details de la requete">
+                                            <i class="ri-eye-fill"></i>
+                                        </a></td>
+                                </tr>
+                            {% endfor %}
+                            {% for section in sections %}
+                                <tr>
+                                    <td class="sort">{{ loop.index }}</td>
+                                    <td class="sort" data-sort="customer_name">{{ section.dossier.referenceDossier }}</td>
+                                    <td class="sort" data-sort="customer_name">{{ section.dateAffectation ? section.dateAffectation | date('Y-m-d') : '' }}</td>
+                                    <td class="sort" data-sort="structure">{{section.section.structure.name }}</td>
+                                    <td class="sort" data-sort="structure">{{section.section.structure.name }}</td>
+                                    <td class="sort" data-sort="section">{{section.section.name }}</td>
+{#                                    <td></td>#}
+                                    <td class="sort" data-sort="section">{{ section.delaiTraitement ? section.delaiTraitement | date('Y-m-d') : '' }}</td>
+                                    <td> <a href="{{ path('admin_dossier_details',{'id':section.dossier.id}) }}" title="Voir les details de la requete">
+                                            <i class="ri-eye-fill"></i>
+                                        </a></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

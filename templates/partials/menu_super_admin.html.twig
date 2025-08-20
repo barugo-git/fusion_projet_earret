@@ -1,0 +1,47 @@
+<li class="nav-item">
+    <a class="nav-link menu-link" href="#sidebarDashboards" data-bs-toggle="collapse" role="button"
+       aria-expanded="false" aria-controls="sidebarDashboards">
+        <i class="ri-settings-2-line" aria-hidden="true"></i> <span data-key="t-dashboards">Paramètres</span>
+    </a>
+    <div class="collapse menu-dropdown" id="sidebarDashboards">
+        <ul class="nav nav-sm flex-column">
+            <li class="nav-item">
+                <a href="{{ path('app_admin_user') }}" class="nav-link" data-key="t-analytics">
+                    Gestion des Utilisateurs
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ path('app_structure_index') }}" class="nav-link" data-key="t-analytics"> Structures </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ path('app_section_index') }}" class="nav-link" data-key="t-crm"> Section</a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ path('app_admin_objet_index') }}" class="nav-link" data-key="t-crypto"> Objets </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ path('app_salle_index') }}" class="nav-link" data-key="t-crypto"> Salle </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ path('app_statut_index') }}" class="nav-link" data-key="t-crypto"> Statuts </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ path('app_instructions_index') }}" class="nav-link" data-key="t-crypto">
+                    <i class="ri-list-check"></i> Instructions
+                </a>
+            </li>
+        </ul>
+    </div>
+<li class="nav-item">
+    <a href="{{ path('app_dossier_index') }}" class="nav-link" data-key="t-crm">
+        <i class="ri-git-repository-commits-fill"></i> <span data-key="t-dashboards">Recours Interne</span></a>
+</li>
+<li class="nav-item">
+    <a href="{{ path('app_dossier_index') }}" class="nav-link" data-key="t-crm">
+        <i class="ri-git-repository-commits-fill"></i> <span data-key="t-dashboards">Recours en ligne</span></a>
+</li>
+<li class="nav-item">
+    <a href="{{ path('app_dossier_open_list') }}" class="nav-link" data-key="t-crypto">
+        <i class="ri-folder-add-fill"></i> <span data-key="t-dashboards">Dossiers ouverts</span> </a>
+</li>
+

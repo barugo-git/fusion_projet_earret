@@ -1,0 +1,200 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Sections {% endblock %}
+
+{% block body %}
+    <div class="row">
+
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center gy-3">
+                        <div class="col-sm">
+                            <h4 class="card-title mb-0">Liste des sections</h4>
+                        </div>
+                        <div class="col-sm-auto">
+                            <div class="d-flex gap-1 flex-wrap">
+
+                                <a href="{{ path('app_section_new') }}" class="btn btn-success add-btn"
+                                   data-toggle="modal" data-target="#adddeals">
+                                    <i class="ri-add-line align-bottom me-1"> Ajouter une section </i>
+                                </a>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+                    <div class="table-responsive table-card mt-3 mb-1">
+                        {% if sections|length > 0 %}
+                            <table class="table align-middle table-nowrap" id="myTable">
+                                <thead class="table-light">
+                                <tr>
+                                    <th></th>
+                                    <th>Code Section</th>
+                                    <th>Nom</th>
+
+{#                                    <th class="sort" data-sort="status">Delivery Status</th> #}
+                                    <th>Action</th>
+{#                                    <th></th>#}
+                                </tr>
+                                </thead>
+                                <tbody class="list form-check-all">
+                                {% for section in sections %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+{#                                        <td class="id" style="display:none;"><a href="javascript:void(0);" class="fw-medium link-primary">#VZ2101</a></td>#}
+                                        <td>{{ section.codeSection }}</td>
+                                        <td>{{ section.name }}</td>
+                                      <td>
+                                            <div class="d-flex gap-2">
+                                                <div class="edit">
+                                                    <a href="{{ path('app_section_edit',{'id':section.id}) }}"
+                                                       class="btn btn-success add-btn" data-toggle="modal"
+                                                       data-target="#adddeals">
+                                                        <i class="ri-add-line align-bottom me-1"></i>
+                                                    </a>
+
+                                                    {#                                                    <button class="btn btn-sm btn-success edit-item-btn"> #}
+                                                    {#                                                        Modifier #}
+                                                    {#                                                    </button> #}
+                                                </div>
+                                                <div class="remove">
+                                                    <button class="btn btn-sm btn-danger remove-item-btn"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#deleteRecordModal">Supprimer
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div class="noresult">
+                                <div class="text-center">
+                                    <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
+                                               colors="primary:#121331,secondary:#08a88a"
+                                               style="width:75px;height:75px">
+                                    </lord-icon>
+                                    <h5 class="mt-2">Aucune section enregistrée </h5>
+                                    {#                                       <p class="text-muted mb-0">We've searched more than 150+ Orders We did not find any #}
+                                    {#                                           orders for you search.</p> #}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div><!-- end card -->
+            </div>
+            <!-- end col -->
+        </div>
+        <!-- end col -->
+
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-light p-3">
+                    <h5 class="modal-title" id="exampleModalLabel">Ajout Section</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="loading-spinner" style="display: none;">
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end modal-->
+
+    {#    <a href="{{ path('app_structure_new') }}">Create new</a> #}
+{% endblock %}
+{% block javascripts %}
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="//cdn.datatables.net/2.0.3/js/dataTables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-2.0.3/b-3.0.1/b-html5-3.0.1/b-print-3.0.1/datatables.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#myTable').DataTable({
+                dom: 'Bfrtip',
+                buttons: ['copy','excel','csv','print','pdf']
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const modal = document.getElementById('modal');
+            const modalBody = modal.querySelector('.modal-body');
+            const productList = document.getElementById('product-list');
+            const loadingSpinner = document.getElementById('loading-spinner');
+
+            document.querySelectorAll('[data-toggle="modal"]').forEach((button) => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+
+                    modalBody.innerHTML = ''; // Clear any existing content
+                    loadingSpinner.style.display = 'block'; // Show the loading spinner
+
+                    fetch(button.getAttribute('href'), {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                        .then(response => response.text())
+                        .then(html => {
+                            loadingSpinner.style.display = 'none'; // Hide the loading spinner
+                            modalBody.innerHTML = html; // Insert the loaded form
+                            $('#modal').modal('show');
+                        });
+                });
+            });
+
+            modal.addEventListener('hidden.bs.modal', () => {
+                modalBody.innerHTML = '';
+            });
+
+            document.addEventListener('submit', (e) => {
+                if (e.target.matches('form')) {
+                    e.preventDefault();
+
+                    const form = e.target;
+                    const url = form.action;
+                    const formData = new FormData(form);
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message === 'Success') {
+                                productList.innerHTML = data.html;
+                                $('#modal').modal('hide');
+                            } else {
+                                modalBody.innerHTML = data.html;
+                            }
+                        });
+                }
+            });
+        });
+    </script>
+
+
+{% endblock %}

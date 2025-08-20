@@ -1,0 +1,24 @@
+{% apply inline_css(source("@styles/bootstrap.min.css"),source("@styles/icons.min.css"),source("@styles/app.min.css"),source("@styles/custom.min.css")) %}
+    <div class="container" style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <div class="row">
+            <div class="col-md-10">
+                <p style="margin-bottom: 15px;">Bonjour Monsieur/Madame {{ nom }},</p>
+                <p style="margin-bottom: 20px;">
+                    L'arrêt de votre dossier : <strong>{{ dossier.intituleObjet }}</strong> est disponible.
+                </p>
+                <p style="margin-bottom: 20px;">
+                    <a href="{{ absolute_url(asset('uploads/' ~ arret)|trim) }}"
+                       target="_blank"
+                       style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+                        Télécharger l'arrêt
+                    </a>
+                </p>
+                <p style="font-size: 12px; color: #666; margin-top: 20px;">
+                    Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :
+                    <br>
+                    {{ absolute_url(asset('uploads/' ~ arret)) }}
+                </p>
+            </div>
+        </div>
+    </div>
+{% endapply %}

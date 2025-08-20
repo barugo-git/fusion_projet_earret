@@ -1,0 +1,218 @@
+{% extends 'base.html.twig' %}
+
+   {% block body%}
+
+       <div class="row">
+           <div class="col-lg-4">
+               <div class="card">
+                   <div class="card-header">
+                       <h4 class="card-title mb-0">Ajout </h4>
+                   </div><!-- end card header -->
+                   <div class="card-body">
+                       {{ form_start(form) }}
+                       {{ form_widget(form) }}
+                       <button type="submit" class="btn btn-success" id="add-btn">Ajouter</button>
+                       {{ form_end(form) }}
+
+                   </div>
+
+               </div>
+
+           </div>
+           <div class="col-lg-8">
+               <div class="card">
+                   <div class="card-header">
+                       <h4 class="card-title mb-0">Ajout, Modification, Suppression</h4>
+                   </div><!-- end card header -->
+
+                   <div class="card-body">
+
+
+                           <div class="table-responsive table-card mt-3 mb-1">
+                               {% if objets|length > 0 %}
+                                   <table class="table align-middle table-nowrap" id="customerTable">
+                                       <thead class="table-light">
+                                       <tr>
+
+                                           <th class="sort" data-sort="customer_name">Objet</th>
+{#                                           <th class="sort" data-sort="email">Email</th>#}
+{#                                           <th class="sort" data-sort="phone">Téléphone</th>#}
+{#                                           <th class="sort" data-sort="date">Joining Date</th>#}
+{#                                           <th class="sort" data-sort="status">Delivery Status</th>#}
+                                           <th class="sort" data-sort="action">Action</th>
+                                       </tr>
+                                       </thead>
+                                       <tbody class="list form-check-all">
+                                       {% for objet in objets%}
+                                           <tr>
+
+                                               <td class="id" style="display:none;"><a href="javascript:void(0);" class="fw-medium link-primary">#VZ2101</a></td>
+                                               <td class="customer_name">{{objet.name}}</td>
+{#                                               <td class="email">{{ user.email}}</td>#}
+{#                                               <td class="phone">{{ user.telephone}}</td>#}
+{#                                               <td class="date">06 Apr, 2021</td>#}
+{#                                               <td class="status"><span class="badge badge-soft-success text-uppercase">Active</span></td>#}
+                                               <td>
+                                                   <div class="d-flex gap-2">
+                                                       <div class="edit">
+{#                                                           <a href="{{ path('app_admin_user_edit', {'id': user.id}) }}" title="Modifier" data-rec="{{  user.id }}" onclick="BonplanEdit(event, this)"> <i class="bx bx-edit-alt me-1"></i></a>#}
+
+                                                           {#                                                       <button class="btn btn-sm btn-success edit-item-btn"#}
+                                                           {#                                                               data-bs-toggle="modal" data-bs-target="#showModal">Modifier</button>#}
+                                                       </div>
+                                                       <div class="remove">
+                                                           <button class="btn btn-sm btn-danger remove-item-btn" data-bs-toggle="modal" data-bs-target="#deleteRecordModal">Supprimer</button>
+                                                       </div>
+                                                   </div>
+                                               </td>
+                                           </tr>
+                                       {% endfor%}
+
+
+
+                                       </tbody>
+                                   </table>
+                               {% else%}
+                                   <div class="noresult">
+                                       <div class="text-center">
+                                           <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
+                                                      colors="primary:#121331,secondary:#08a88a" style="width:75px;height:75px">
+                                           </lord-icon>
+                                           <h5 class="mt-2">Aucun uobjet enregistrer </h5>
+                                           {#                                       <p class="text-muted mb-0">We've searched more than 150+ Orders We did not find any#}
+                                           {#                                           orders for you search.</p>#}
+                                       </div>
+                                   </div>
+                               {% endif %}
+                           </div>
+
+                           <div class="d-flex justify-content-end">
+                               <div class="pagination-wrap hstack gap-2">
+                                   <a class="page-item pagination-prev disabled" href="#">
+                                       Previous
+                                   </a>
+                                   <ul class="pagination listjs-pagination mb-0"></ul>
+                                   <a class="page-item pagination-next" href="#">
+                                       Next
+                                   </a>
+                               </div>
+                           </div>
+                       </div>
+                   </div><!-- end card -->
+               </div>
+               <!-- end col -->
+           </div>
+           <!-- end col -->
+
+       </div>
+
+       <div class="modal fade" id="showModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+           <div class="modal-dialog modal-dialog-centered">
+               <div class="modal-content">
+                   <div class="modal-header bg-light p-3">
+                       <h5 class="modal-title" id="exampleModalLabel"></h5>
+                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                               id="close-modal"></button>
+                   </div>
+
+                   <div class="modal-body">
+                       <div class="container">
+
+{#                           <div class="row">#}
+
+{#                               <div class="col-md-6">{{ form_row(registrationForm.nom) }}</div>#}
+{#                               <div class="col-md-6">  {{ form_row(registrationForm.prenoms) }}</div>#}
+{#                               <div class="col-md-6"> {{ form_row(registrationForm.telephone) }}</div>#}
+{#                               <div class="col-md-6"> {{ form_row(registrationForm.email) }}</div>#}
+{#                               <div class="col-md-6"> {{ form_row(registrationForm.titre) }}</div>#}
+{#                               <div class="col-md-6">   {{ form_row(registrationForm.password, {#}
+{#                                       label: 'Mot de passe'#}
+{#                                   }) }}</div>#}
+{#                               <div class="col-md-6">    {{ form_row(registrationForm.passwordConfirm) }}#}
+{#                               </div>#}
+{#                           </div>#}
+                       </div>
+
+                       {#                           {{render(controller('App\\Controller\\RegistrationController::register'))}}#}
+                       <div class="modal-footer justify-content-center">
+                           {#                               <div class="hstack gap-2 justify-content-end">#}
+                           {#                                   <button type="submit" class="btn">Register</button>#}
+                           {#                               </div>#}
+                           <div class="hstack gap-2 justify-content-end">
+                               <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fermer</button>
+                               <button type="submit" class="btn btn-success" id="add-btn">Ajouter</button>
+                               {#                                   <button type="button" class="btn btn-success" id="edit-btn">Update</button>#}
+                           </div>
+                       </div>
+                       {#                           <button type="submit" class="btn">Register</button>#}
+                       {#                           {{ form_end(registrationForm) }}#}
+
+                       {#                           <div class="mb-3" id="modal-id" style="display: none;">#}
+                       {#                               <label for="id-field" class="form-label">ID</label>#}
+                       {#                               <input type="text" id="id-field" class="form-control" placeholder="ID" readonly />#}
+                       {#                           </div>#}
+
+                       {#                           <div class="mb-3">#}
+                       {#                               <label for="customername-field" class="form-label">Customer Name</label>#}
+                       {#                               <input type="text" id="customername-field" class="form-control" placeholder="Enter Name" required />#}
+                       {#                           </div>#}
+
+                       {#                           <div class="mb-3">#}
+                       {#                               <label for="email-field" class="form-label">Email</label>#}
+                       {#                               <input type="email" id="email-field" class="form-control" placeholder="Enter Email" required />#}
+                       {#                           </div>#}
+
+                       {#                           <div class="mb-3">#}
+                       {#                               <label for="phone-field" class="form-label">Phone</label>#}
+                       {#                               <input type="text" id="phone-field" class="form-control"  placeholder="Enter Phone no." required />#}
+                       {#                           </div>#}
+
+                       {#                           <div class="mb-3">#}
+                       {#                               <label for="date-field" class="form-label">Joining Date</label>#}
+                       {#                               <input type="text" id="date-field" class="form-control" placeholder="Select Date" required />#}
+                       {#                           </div>#}
+
+                       {#                           <div>#}
+                       {#                               <label for="status-field" class="form-label">Status</label>#}
+                       {#                               <select class="form-control" data-trigger name="status-field" id="status-field" >#}
+                       {#                                   <option value="">Status</option>#}
+                       {#                                   <option value="Active">Active</option>#}
+                       {#                                   <option value="Block">Block</option>#}
+                       {#                               </select>#}
+                       {#                           </div>#}
+                   </div>
+
+
+               </div>
+           </div>
+       </div>
+
+{#    <table class="table">#}
+{#        <thead>#}
+{#            <tr>#}
+
+{#                <th>Name</th>#}
+{#                <th>actions</th>#}
+{#            </tr>#}
+{#        </thead>#}
+{#        <tbody>#}
+{#        {% for objet in objets %}#}
+{#            <tr>#}
+{#                <td>{{ objet.id }}</td>#}
+{#                <td>{{ objet.name }}</td>#}
+{#                <td>#}
+{#                    <a href="{{ path('app_objet_show', {'id': objet.id}) }}">show</a>#}
+{#                    <a href="{{ path('app_objet_edit', {'id': objet.id}) }}">edit</a>#}
+{#                </td>#}
+{#            </tr>#}
+{#        {% else %}#}
+{#            <tr>#}
+{#                <td colspan="3">no records found</td>#}
+{#            </tr>#}
+{#        {% endfor %}#}
+{#        </tbody>#}
+{#    </table>#}
+
+{#    <a href="{{ path('app_objet_new') }}">Create new</a>#}
+{% endblock %}

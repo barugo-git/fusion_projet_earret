@@ -1,0 +1,60 @@
+{{ include('partials/main.html.twig') }}
+<head>
+
+    {{ include('partials/title-meta.html.twig', {title: 'Cour suprême|e-arret'}) }}
+
+    <!--Swiper slider css-->
+{#    <link href="assets/libs/swiper/swiper-bundle.min.css" rel="stylesheet" type="text/css" />#}
+
+    {{ include('partials/head-css.html.twig') }}
+
+</head>
+<body data-bs-spy="scroll" data-bs-target="#navbar-example">
+<div class="layout-wrapper landing">
+    <nav class="navbar navbar-expand-lg navbar-landing fixed-top job-navbar" id="navbar">
+        <div class="container-fluid custom-container">
+            <a class="navbar-brand" href="https://www.coursupreme.bj/">
+                <img src="{{ asset('images/imbenin.png') }}" class="card-logo card-logo-dark" alt="logo dark" height="70">
+                <img src="{{ asset('assets/images/logo-light.png') }}" class="card-logo card-logo-light" alt="logo light" height="17">
+            </a>
+            <button class="navbar-toggler py-0 fs-20 text-body" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="mdi mdi-menu"></i>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mx-auto mt-2 mt-lg-0" id="navbar-example">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ path('front_requerant') }}">Nouveau recours</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('front_recours_status') }}">Statut de mon recours</a>
+                    </li>
+
+                </ul>
+            </div>
+
+        </div>
+
+    </nav>
+    <!-- end navbar -->
+
+
+    {% block body %}
+
+
+
+    {% endblock %}
+    <!--start back-to-top-->
+    <button onclick="topFunction()" class="btn btn-info btn-icon landing-back-top" id="back-to-top">
+        <i class="ri-arrow-up-line"></i>
+    </button>
+    <!--end back-to-top-->
+</div>
+
+{{ include('partials/vendor-scripts.html.twig') }}
+
+{% block javascripts %}
+{% endblock %}
+</body>
+
+</html>

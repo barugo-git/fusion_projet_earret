@@ -1,0 +1,14 @@
+{% for label, messages in app.flashes %}
+
+    <!-- success Alert -->
+    <div class="alert alert-{{ label }}" role="alert">
+
+
+        {% for message in messages %}
+            <strong> {{ message | raw }} </strong>
+        {% endfor %}
+
+    </div>
+
+{% endfor %}
+

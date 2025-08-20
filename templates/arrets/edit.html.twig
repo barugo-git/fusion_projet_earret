@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Arrets{% endblock %}
+
+{% block body %}
+    <h1>Edit Arrets</h1>
+
+    {{ include('arrets/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_arrets_index') }}">back to list</a>
+
+    {{ include('arrets/_delete_form.html.twig') }}
+{% endblock %}

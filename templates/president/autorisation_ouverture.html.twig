@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        {% include 'partials/_intitule_dossier.html.twig' %}  </h4>
+
+                    <h4 class="card-title mb-0">
+                        Annotation pour ouverture du dossier au greffier en chef {{ greffierEnChef }}
+                    </h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+
+                    {{ form_start(form) }}
+                    {{ form_row(form.dateAutorisation) }}
+{#                    {{ form_row(form.delaiTraitement) }}#}
+                    {{ form_row(form.annotation) }}
+                    <div class="mb-3">
+                        <label for="" class="form-label required">Greffier en chef</label>
+                        <input type="text" id="greffier_en_chef" name="greffier_en_chef" value="{{ greffierEnChef }}" class="form-control"></div>
+                    <button class="btn  btn-success">{{ button_label|default('Autoriser l\'ouverture du dossier') }}</button>
+                    {{ form_end(form) }}
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

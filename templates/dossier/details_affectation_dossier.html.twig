@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dossier{% endblock %}
+
+{% block body %}
+    <div class="row">
+
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Historique des affectations du dossier {{ dossier.referenceDossier }} {{ dossier.intituleObjet }}</h4>
+                </div><!-- end card header -->
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th> Date</th>
+                            <th> De</th>
+                            <th> A </th>
+{#                            <th> Section</th>#}
+                            <th> Motif</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        {% for structure in dossier.structures %}
+                            <tr>
+                                <td> {{ structure.dateAffection ? structure.dateAffection|date('Y-m-d') : '' }}</td>
+                                <td> {{ structure.de.name }} </td>
+                                <td> {{ structure.structure.name }} </td>
+{#                                <td> -</td>#}
+                                <td> {{ structure.motif }}</td>
+                            </tr>
+                        {% endfor %}
+
+
+
+{#                        {% for section in dossier.affecterSections %}#}
+{#                            <tr>#}
+{#                                <td> {{ section.dateAffectation ? section.dateAffectation|date('Y-m-d') : '' }}</td>#}
+{#                                <td>  {{ section.section.structure.name }}</td>#}
+{#                                <td>  {{ section.section.structure.name }}</td>#}
+{#                                <td>{{ section.section.name }}</td>#}
+{#                                <td> {{ section.motif }}</td>#}
+{#                            </tr>#}
+{#                        {% endfor %}#}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {#    <a href="{{ path('app_dossier_index') }}">back to list</a>#}
+
+    {#    <a href="{{ path('app_dossier_edit', {'id': dossier.id}) }}">edit</a>#}
+
+    {#    {{ include('dossier/_delete_form.html.twig') }}#}
+{% endblock %}

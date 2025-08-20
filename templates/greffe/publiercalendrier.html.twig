@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chargement de la Programmation de l'audience{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0"> Chargez le Rôle</h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    {{ form_widget(form) }}
+                    <button class="btn  btn-success la-pull-right">{{ button_label|default('Publier le Rôle') }}</button>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

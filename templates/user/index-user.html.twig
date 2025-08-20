@@ -1,0 +1,380 @@
+{% extends 'base.html.twig' %}
+
+   {% block body%}
+
+
+
+       <div class="row">
+           <div class="col-lg-12">
+               <div class="card">
+                   <div class="card-header">
+                       <h4 class="card-title mb-0">Ajout, Modification, Suppression</h4>
+                   </div><!-- end card header -->
+
+
+                   <div class="card-body">
+
+                               {{ form_start(registrationForm) }}
+                               <div class="row">
+
+                                   <div class="col-md-6">{{ form_row(registrationForm.nom) }}</div>
+                                   <div class="col-md-6">  {{ form_row(registrationForm.prenoms) }}</div>
+                                   <div class="col-md-6"> {{ form_row(registrationForm.telephone) }}</div>
+                                   <div class="col-md-6"> {{ form_row(registrationForm.email) }}</div>
+                                   <div class="col-md-6"> {{ form_row(registrationForm.titre) }}</div>
+                                   <div class="col-md-6">   {{ form_row(registrationForm.password, {
+                                           label: 'Mot de passe'
+                                       }) }}</div>
+                                   <div class="col-md-6">    {{ form_row(registrationForm.passwordConfirm) }}
+                                       {{ form_row(registrationForm.structure) }}
+
+                                   </div>
+                                   <div class="col-md-6"> {{ form_row(registrationForm.roles,{'attr': {'class':  ' data-choices data-choices-removeItem multiple'}})  }}</div>
+                                   <div class="hstack gap-2 justify-content-center">
+                                       <button type="button" class="btn btn-light" data-bs-dismiss="modal" href="{{ path('app_admin_user') }}">Fermer</button>
+                                       <button type="submit" class="btn btn-success" id="add-btn">Ajouter</button>
+                                       {#                                   <button type="button" class="btn btn-success" id="edit-btn">Update</button>#}
+                                   </div>
+                               </div>
+                       {{ form_end(registrationForm) }}
+
+                   </div>
+
+                   <div class="card-body">
+                       <div id="customerList">
+{#                           <div class="row g-4 mb-3">#}
+{#                               <div class="col-sm-auto">#}
+{#                                   <div>#}
+{#                                       <button type="button" class="btn btn-success add-btn" data-bs-toggle="modal" id="create-btn" data-bs-target="#showModal"><i class="ri-add-line align-bottom me-1"></i> Ajouter</button>#}
+{#                                   </div>#}
+{#                               </div>#}
+                               <div class="col-sm">
+                                   <div class="d-flex justify-content-sm-end">
+                                       <div class="search-box ms-2">
+                                           <input type="text" class="form-control search" placeholder="Rechercher...">
+                                           <i class="ri-search-line search-icon"></i>
+                                       </div>
+                                   </div>
+                               </div>
+                           </div>
+
+                           <div class="table-responsive table-card mt-3 mb-1">
+                               {% if users|length > 0 %}
+                               <table class="table align-middle table-nowrap" id="customerTable">
+                                   <thead class="table-light">
+                                   <tr>
+{#                                       <th scope="col" style="width: 50px;">#}
+{#                                           <div class="form-check">#}
+{#                                               <input class="form-check-input" type="checkbox" id="checkAll" value="option">#}
+{#                                           </div>#}
+{#                                       </th>#}
+                                       <th class="sort" data-sort="customer_name">Utilisateur</th>
+                                       <th class="sort" data-sort="email">Email</th>
+                                       <th class="sort" data-sort="phone">Téléphone</th>
+                                       <th class="sort" data-sort="date">Titre</th>
+                                       <th class="sort" data-sort="status">Structure</th>
+                                       <th class="sort" data-sort="action">Action</th>
+                                   </tr>
+                                   </thead>
+                                   <tbody class="list form-check-all">
+                                   {% for user in users%}
+                                       <tr>
+{#                                           <th scope="row">#}
+{#                                               <div class="form-check">#}
+{#                                                   <input class="form-check-input" type="checkbox" name="checkAll" value="option1">#}
+{#                                               </div>#}
+{#                                           </th>#}
+                                           <td class="id" style="display:none;"><a href="javascript:void(0);" class="fw-medium link-primary">#VZ2101</a></td>
+                                           <td class="customer_name">{{user.fullName}}</td>
+                                           <td class="email">{{ user.email}}</td>
+                                           <td class="phone">{{ user.telephone}}</td>
+                                           <td class="title">{{ user.titre }}</td>
+                                           <td class="mdi-office-building">{{ user.structure }}</td>
+                                           <td class="status"><span class="badge badge-soft-success text-uppercase">Active</span></td>
+                                           <td>
+                                               <div class="d-flex gap-2">
+                                                   <div class="edit">
+                                                       <a href="{{ path('app_admin_user_edit', {'id': user.id}) }}" title="Modifier" data-rec="{{  user.id }}" onclick="BonplanEdit(event, this)"> <i class="bx bx-edit-alt me-1"></i></a>
+
+{#                                                       <button class="btn btn-sm btn-success edit-item-btn"#}
+{#                                                               data-bs-toggle="modal" data-bs-target="#showModal">Modifier</button>#}
+                                                   </div>
+                                                   <div class="remove">
+                                                       <button class="btn btn-sm btn-danger remove-item-btn" data-bs-toggle="modal" data-bs-target="#deleteRecordModal">Supprimer</button>
+                                                   </div>
+                                               </div>
+                                           </td>
+                                       </tr>
+                                   {% endfor%}
+
+
+
+                                   </tbody>
+                               </table>
+                                   {% else%}
+                               <div class="noresult">
+                                   <div class="text-center">
+                                       <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
+                                                  colors="primary:#121331,secondary:#08a88a" style="width:75px;height:75px">
+                                       </lord-icon>
+                                       <h5 class="mt-2">Aucun utilisateur pour l'instant</h5>
+{#                                       <p class="text-muted mb-0">We've searched more than 150+ Orders We did not find any#}
+{#                                           orders for you search.</p>#}
+                                   </div>
+                               </div>
+                               {% endif %}
+                           </div>
+
+                           <div class="d-flex justify-content-end">
+                               <div class="pagination-wrap hstack gap-2">
+                                   <a class="page-item pagination-prev disabled" href="#">
+                                       Previous
+                                   </a>
+                                   <ul class="pagination listjs-pagination mb-0"></ul>
+                                   <a class="page-item pagination-next" href="#">
+                                       Next
+                                   </a>
+                               </div>
+                           </div>
+                       </div>
+                   </div><!-- end card -->
+               </div>
+               <!-- end col -->
+           </div>
+           <!-- end col -->
+       </div>
+
+       <div class="modal fade" id="showModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+           <div class="modal-dialog modal-dialog-centered">
+               <div class="modal-content">
+                   <div class="modal-header bg-light p-3">
+                       <h5 class="modal-title" id="exampleModalLabel"></h5>
+                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                               id="close-modal"></button>
+                   </div>
+
+                       <div class="modal-body">
+                        {#   <div class="container">
+                               {{ form_start(registrationForm) }}
+                               <div class="row">
+
+                                   <div class="col-md-6">{{ form_row(registrationForm.nom) }}</div>
+                                   <div class="col-md-6">  {{ form_row(registrationForm.prenoms) }}</div>
+                                   <div class="col-md-6"> {{ form_row(registrationForm.telephone) }}</div>
+                                   <div class="col-md-6"> {{ form_row(registrationForm.email) }}</div>
+                                   <div class="col-md-6"> {{ form_row(registrationForm.titre) }}</div>
+                                   <div class="col-md-6">   {{ form_row(registrationForm.password, {
+                                           label: 'Mot de passe'
+                                       }) }}</div>
+                                   <div class="col-md-6">    {{ form_row(registrationForm.passwordConfirm) }}
+                                   </div>
+                               </div>
+                           </div>#}
+
+{#                           {{render(controller('App\\Controller\\RegistrationController::register'))}}#}
+             <div class="modal-footer justify-content-center">
+{#                               <div class="hstack gap-2 justify-content-end">#}
+{#                                   <button type="submit" class="btn">Register</button>#}
+{#                               </div>#}
+                               <div class="hstack gap-2 justify-content-end">
+                                   <button type="button" class="btn btn-light" data-bs-dismiss="modal">Fermer</button>
+                                   <button type="submit" class="btn btn-success" id="add-btn">Ajouter</button>
+{#                                   <button type="button" class="btn btn-success" id="edit-btn">Update</button>#}
+                               </div>
+                           </div>
+{#                           <button type="submit" class="btn">Register</button>#}
+{#                           {{ form_end(registrationForm) }}#}
+
+{#                           <div class="mb-3" id="modal-id" style="display: none;">#}
+{#                               <label for="id-field" class="form-label">ID</label>#}
+{#                               <input type="text" id="id-field" class="form-control" placeholder="ID" readonly />#}
+{#                           </div>#}
+
+{#                           <div class="mb-3">#}
+{#                               <label for="customername-field" class="form-label">Customer Name</label>#}
+{#                               <input type="text" id="customername-field" class="form-control" placeholder="Enter Name" required />#}
+{#                           </div>#}
+
+{#                           <div class="mb-3">#}
+{#                               <label for="email-field" class="form-label">Email</label>#}
+{#                               <input type="email" id="email-field" class="form-control" placeholder="Enter Email" required />#}
+{#                           </div>#}
+
+{#                           <div class="mb-3">#}
+{#                               <label for="phone-field" class="form-label">Phone</label>#}
+{#                               <input type="text" id="phone-field" class="form-control"  placeholder="Enter Phone no." required />#}
+{#                           </div>#}
+
+{#                           <div class="mb-3">#}
+{#                               <label for="date-field" class="form-label">Joining Date</label>#}
+{#                               <input type="text" id="date-field" class="form-control" placeholder="Select Date" required />#}
+{#                           </div>#}
+
+{#                           <div>#}
+{#                               <label for="status-field" class="form-label">Status</label>#}
+{#                               <select class="form-control" data-trigger name="status-field" id="status-field" >#}
+{#                                   <option value="">Status</option>#}
+{#                                   <option value="Active">Active</option>#}
+{#                                   <option value="Block">Block</option>#}
+{#                               </select>#}
+{#                           </div>#}
+                       </div>
+
+                   {{ form_end(registrationForm) }}
+               </div>
+           </div>
+       </div>
+
+
+       {% include 'partials/modal.html.twig' with { modalId: 'edit-modal', modalTitle: 'Modifier' } %}
+       <div class="modal" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false">
+           <div class="modal-body" style="position:absolute;
+                                left: 50%;
+                                top: 50%;
+                                width: 200px;
+                                margin-left: -100px;
+                                margin-top: -100px;
+                                background-color: rgba(0, 0, 0, 0);
+                                ">
+               <div class="progress progress-striped active"
+                    style="text-align: center; height: 100px; background-color: rgba(0, 0, 0, 0);">
+                   <div class="bar">
+                       <i class="fa fa-circle-o-notch fa-spin fa-5x fa-fw" style="color: #f5f5f5;"></i>
+                   </div>
+               </div>
+           </div>
+       </div>
+   {% endblock %}
+
+{% block javascripts%}
+<!-- prismjs plugin -->
+<script src="{{asset('libs/prismjs/prism.js')}}"></script>
+<script src="{{asset('libs/list.js/list.min.js')}}"></script>
+<script src="{{asset('libs/list.pagination.js/list.pagination.min.js')}}"></script>
+
+<!-- listjs init -->
+<script src="{{asset('js/pages/listjs.init.js')}}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+
+        function BonplanEdit(e, $elem){
+            e.preventDefault();
+            //Get record to edit
+            var $id = $($elem).data('rec');
+            var $modal = $('#pleaseWaitDialog');
+            var $autoEcoleForm = $('#edit-modal');
+            // Block screen
+            // $modal.show();
+            $route ="/users/"+$id+"/create-form"
+            $submit_route = "/users/"+$id+"/edit"
+            $urlSucces = window.location.protocol + "//" + window.location.host + window.location.pathname;
+
+            // Ajax request for get edit autoEcole form
+            $.ajax({
+                url: $route, //Routing.generate('bonsplans_editss', {'id' : $id }),
+                type: 'GET',
+                success: function (html) {
+                    // Permit
+                    $modal.modal('hide');
+                    // add content to display
+
+                    $autoEcoleForm.find('.modal-body').html(html);
+                    //  alert(html);
+
+                    // Add submit link to finish
+                    var $submit = $("<input type='button' class ='btn btn-outline-success' value='Modifier' />").on('click', function (e) {
+                        e.preventDefault();
+                        // Get form to submit
+                        // alert("html");
+                        var $form = $('#usermodif');
+                        // alert($form.serialize());
+                        // Validate the form
+                        if(!formIsValide()){
+                            console.log('Some fields are required !!!');
+                            return false;
+                        }
+
+                        // Block btn action for future click
+                        var $el = $(this);
+                        $el.button('loading');
+                        // Submit form
+                        $.ajax({
+                            type:  $form.attr('method'),
+                            url: $submit_route, //Routing.generate('admin_categories_circuit_edit', {'id' : $id }),
+                            data: $form.serialize()
+                        })
+                            .done(function (data) {
+                                if(!data.success){
+                                    console.log(JSON.stringify(data.errors));
+                                    alert(JSON.stringify(data.errors))
+                                }else{
+                                    // Redirect to Home page
+                                    window.location.href = $urlSucces;
+                                }
+                            }).fail(function (jqXHR, textStatus, errorThrown) {
+                            console.log(jqXHR);
+                            console.log(textStatus);
+                            console.log(errorThrown);
+
+                            // Permit the button
+                            $el.button('reset');
+                        });
+                    });
+
+                    // Append it
+                    $autoEcoleForm.find('.modal-footer').empty().append($submit);
+                    // Display
+                    $autoEcoleForm.modal('show');
+                }
+            })
+        }
+        function formIsValide() {
+            var isvalid = true;
+
+            // Vérifier si tous les champs obligatoires sont remplis
+            $('.mandatory').each(function () {
+                var $el = $(this);
+                var val, $parent;
+                if ($el.is('input')) {
+                    if ($el.attr('type') === 'number') {
+                        val = $.trim($el.val());
+                        $parent = $el.closest('.form-group');
+                        $parent.removeClass('has-error');
+                        if (val == '') {
+                            $parent.addClass('has-error');
+                            isvalid = isvalid && false;
+                        }
+                    } else if ($el.attr('type') === 'checkbox') {
+                    } else {
+                        val = $.trim($el.val());
+                        $parent = $el.closest('.form-group');
+                        $parent.removeClass('has-error');
+                        if (val == '') {
+                            $parent.addClass('has-error');
+                            isvalid = isvalid && false;
+                        }
+                    }
+                } else if ($el.is('select')) {
+                    val = $.trim($el.val());
+                    $parent = $el.closest('.form-group');
+                    $parent.removeClass('has-error');
+                    if (val == '') {
+                        $parent.addClass('has-error');
+                        isvalid = isvalid && false;
+                    }
+                } else if ($el.is('textarea')) {
+                    val = $.trim($el.val());
+                    $parent = $el.closest('.form-group');
+                    $parent.removeClass('has-error');
+                    if (val == '') {
+                        $parent.addClass('has-error');
+                        isvalid = isvalid && false;
+                    }
+                }
+            });
+
+            return isvalid;
+        }
+    </script>
+{% endblock javascripts%}

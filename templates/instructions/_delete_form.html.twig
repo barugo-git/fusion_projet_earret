@@ -1,0 +1,8 @@
+{% if is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_CONSEILLER') %}
+    <form method="post" action="{{ path('app_instructions_delete', {'id': instruction.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette instruction ?');" class="d-inline">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ instruction.id) }}">
+        <button class="btn btn-danger">
+            <i class="fas fa-trash"></i> Supprimer
+        </button>
+    </form>
+{% endif %}

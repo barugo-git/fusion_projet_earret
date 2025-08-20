@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dossier index{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-10 offset-lg-1">
+            <div class="card">
+                <div class="card-header">
+
+                    {% include 'partials/_intitule_dossier.html.twig' %} <br>
+
+                    <h4 class="card-title mb-0">Production du rapport suite aux mesures d'instruction</h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    {{ form_widget(form) }}
+                    <button class="btn  btn-success la-pull-right">{{ button_label|default('Televerser le rapport') }}</button>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

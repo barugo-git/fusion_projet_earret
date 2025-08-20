@@ -1,0 +1,60 @@
+{% block _dossier_defendeur_defendeur_conseiller_widget %}
+
+    <p> Ajouter des conseils au defendeur</p>
+    <hr>
+    {{ form_widget(form) }}
+
+    <input type="hidden" id="widgets-counter-defendeur" value="0">
+
+    <div type="button" id="add-conseil-defendeur" class="btn btn-outline-primary"><i
+                class="ri-add-line align-bottom me-1"></i>Ajouter un conseil au defendeur
+    </div>
+
+{% endblock %}
+
+{% block _dossier_defendeur_defendeur_conseiller_entry_row %}
+
+    {{ form_widget(form) }}
+    <hr>
+{% endblock %}
+
+  {% block _dossier_defendeur_defendeur_conseiller_entry_widget %}
+
+      <div class="form-group" id="block_{{ id }}">
+          <div class="row">
+              <div class="col-11">
+                  <div class="row">
+                      <div class="col-md-12">
+                          {{ form_row(form.nomCabinet) }}
+                          {{ form_errors(form.nomCabinet) }}
+                      </div>
+                      <div class="col-md-6">
+                          {{ form_row(form.nomAvocat) }}
+                          {{ form_errors(form.nomAvocat) }}
+                      </div>
+                      <div class="col-md-6">
+                          {{ form_row(form.prenomAvocat) }}
+                          {{ form_errors(form.prenomAvocat) }}
+                      </div>
+                      <div class="col-md-6">
+                          {{ form_row(form.telephone) }}
+                          {{ form_errors(form.telephone) }}
+                      </div>
+                      <div class="col-md-6">
+                          {{ form_row(form.email) }}
+                          {{ form_errors(form.email) }}
+                      </div>
+                      <div class="col-md-12">
+                          {{ form_row(form.adresseAvocat) }}
+                          {{ form_errors(form.adresseAvocat) }}
+                      </div>
+                  </div>
+              </div>
+              <div class="col-1">
+                  <button type="button" data-action="delete" data-target="#block_{{ id }}" class="btn btn-danger">X
+                  </button>
+              </div>
+          </div>
+      </div>
+
+  {% endblock %}

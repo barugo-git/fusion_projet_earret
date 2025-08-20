@@ -1,0 +1,200 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Liste des mesures d'instructions</h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+
+
+                    <div class="data_table mt-3 mb-1">
+                        {% if mesures|length > 0 %}
+
+                            <table class="table align-middle" id="customerTable">
+                                <thead class="table-light">
+                                <tr>
+                                    <th class="sort"></th>
+
+                                    <th class="sort" data-sort="customer_name">N° Dossier</th>
+                                    {#                                    <th class="sort" data-sort="customer_name">N° reference</th> #}
+
+                                    <th class="sort" data-sort="phone">Mesures</th>
+
+                                    <th class="sort" data-sort="date">Etat</th>
+
+                                    <th class="sort" data-sort="action">Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% set dossier ='' %}
+                                {% for mesure in mesures %}
+{#                                    {% set dossier = mesure.dossier  %}#}
+{#                                    {% include 'partials/_intitule_dossier.html.twig' %}#}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td>
+                                            {% if mesure.dossier %}
+                                                AFFAIRE :
+                                                {% if mesure.dossier.requerant.type =='moral' %}
+                                                    {{ mesure.dossier.requerant.intitule }}
+                                                {% else %}
+                                                    {{ mesure.dossier.requerant.nom ~ " " ~ mesure.dossier.requerant.prenoms }} <br>
+                                                {% endif %}
+                                                {% if mesure.dossier.requerant.conseiller %}
+                                                    {% for conseilRequerant in mesure.dossier.requerant.conseiller %}
+                                                        ( ME {{ conseilRequerant.fullName }} )
+                                                    {% endfor %}
+                                                {% endif %} <br/><br>
+                                                CONTRE <br/><br>
+                                                {% if mesure.dossier.defendeur.type =='moral' %}
+                                                    {{ mesure.dossier.defendeur.intitule }}
+                                                {% else %}
+                                                    {{ mesure.dossier.defendeur.nom ~ " " ~ mesure.dossier.defendeur.prenoms }} <br>
+                                                {% endif %}
+                                                {% if mesure.dossier.defendeur.conseiller %}
+                                                    {% for conseilRequerant in mesure.dossier.defendeur.conseiller %}
+                                                        ( ME {{ conseilRequerant.fullName }} )
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ mesure.instruction.libelle }}
+                                        </td>
+                                        <td>
+                                            {% if mesure.reponses %}
+                                                Débutée
+                                                {% if mesure.reponses.dateNotification %}
+                                                    <br> et notifie le {{ mesure.reponses.dateNotification | date('d-m-Y') }}
+                                                {% else %}
+                                                    <br> non notifée à la partie concernée
+                                                {% endif %}
+                                            {% else %}
+                                                Non débutée
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <a href="#" role="button" id="dropdownMenuLink1"
+                                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="ri-more-2-fill"></i>
+                                                </a>
+
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink1">
+
+
+                                                    <li><a class="dropdown-item"
+                                                           href="{{ path('greffier_rapporteur_mesures_instructions_reponse_show',{'id':mesure.id}) }}">
+                                                        Voir la réponse
+                                                        </a></li>
+
+
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        {#                                            <a href="{{ path('admin_dossier_details',{'id':dossier.id}) }}" title="Voir les details du dossier"> #}
+
+                                        {#                                                <i class="ri-eye-fill"></i> #}
+                                        {#                                            </a> #}
+                                        {#                                            <a href="{{ path('app_conseiller_rapporteur_nouvelle_mesure_instruction',{'id':dossier.id}) }}" title="Voir les details du dossier"> #}
+
+                                        {#                                                Mesures instructions #}
+                                        {#                                            </a> #}
+
+                                        {#                                            {% if dossier.mesuresInstructions|length > 0  %} #}
+
+                                        {#                                                <a href="{{ path('greffier_mesures_instructions_dossier_list',{'id':dossier.id}) }}" title="Voir les details du dossier"> #}
+                                        {#                                                    Voir les mesures d'instructions #}
+
+                                        {#                                                </a> #}
+                                        {#                                            {% endif %} #}
+                                        {#                                            <a class="dropdown-item" #}
+                                        {#                                               href="{{ path('admin_dossier_details',{'id':dossier.id}) }}">Details #}
+                                        {#                                                du dossier</a> #}
+                                        {#                                            {% if is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_AGENT_DE_SAISIE') %} #}
+
+
+                                        {#                                            #}{#                                            {% elseif  is_granted('ROLE_AGENT_DE_SAISIE') %} #}
+                                        {#                                            #}{#                                                <a href="{{ path('admin_dossier_details',{'id':dossier.id}) }}" title="Voir les details du dossier"> #}
+                                        {#                                            #}{#                                                    <i class="ri-eye-fill"></i> #}
+                                        {#                                            #}{#                                                </a> #}
+                                        {#                                            #}{#                                                <div class="dropdown"> #}
+                                        {#                                            #}{#                                                    <a href="#" role="button" id="dropdownMenuLink5" data-bs-toggle="dropdown" aria-expanded="false"> #}
+                                        {#                                            #}{#                                                        <i class="ri-more-2-fill"></i> #}
+                                        {#                                            #}{#                                                       #}
+                                        {#                                            #}{#                                                    </a> #}
+
+                                        {#                                            #}{#                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink5"> #}
+                                        {#                                            #}{#                                                        <li><a class="dropdown-item" href="#">View</a></li> #}
+                                        {#                                            #}{#                                                        <li><a class="dropdown-item" href="#">Edit</a></li> #}
+                                        {#                                            #}{#                                                        <li><a class="dropdown-item" href="#">Delete</a></li> #}
+                                        {#                                            #}{#                                                    </ul> #}
+                                        {#                                            #}{#                                                </div> #}
+
+                                        {#                                            <div class="dropdown"> #}
+                                        {#                                                <a href="#" role="button" id="dropdownMenuLink1" #}
+                                        {#                                                   data-bs-toggle="dropdown" aria-expanded="false"> #}
+                                        {#                                                    <i class="ri-more-2-fill"></i> #}
+                                        {#                                                </a> #}
+
+                                        {#                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink1"> #}
+                                        {#                                                    #}{#                                                        <li><a class="dropdown-item" href="{{ path('admin_affecter_dossier_structure_new',{'id': dossier.id}) }}">A une structure</a></li> #}
+                                        {#                                                    <li><a class="dropdown-item" #}
+                                        {#                                                           href="{{ path('admin_affectr_dossier_section_new',{'id': dossier.id}) }}">Affecter #}
+                                        {#                                                            à une section</a></li> #}
+                                        {#                                                    <li> #}
+                                        {#                                                        {% if dossier.userDossiers %} #}
+                                        {#                                                            <a class="dropdown-item" #}
+                                        {#                                                               href="{{ path('admin_dossier_affections_user',{'id': dossier.id}) }}">Voir les membres affecte</a> #}
+                                        {#                                                        {% else %} #}
+                                        {#                                                            <a class="dropdown-item" #}
+                                        {#                                                               href="{{ path('admin_dossier_affections_user',{'id': dossier.id}) }}">Ajouter #}
+                                        {#                                                                un membre</a> #}
+                                        {#                                                        {% endif %} #}
+
+                                        {#                                                    </li> #}
+                                        {#                                                    <li><a class="dropdown-item" #}
+                                        {#                                                           href="{{ path('admin_dossier_affections',{'id': dossier.id}) }}">Voir #}
+                                        {#                                                            les affections</a></li> #}
+                                        {#                                                    <li><a class="dropdown-item" #}
+                                        {#                                                           href="{{ path('admin_dossier_details',{'id':dossier.id}) }}">Details #}
+                                        {#                                                            du dossier</a></li> #}
+
+                                        {#                                                </ul> #}
+                                        {#                                            </div> #}
+                                        {#                                        </td> #}
+                                        {#                                        {% endif %} #}
+
+
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div class="noresult">
+                                <div class="text-center">
+                                    <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
+                                               colors="primary:#121331,secondary:#08a88a"
+                                               style="width:75px;height:75px">
+                                    </lord-icon>
+                                    <h5 class="mt-2">Aucune donnée pour l'instant</h5>
+                                    {#                                       <p class="text-muted mb-0">We've searched more than 150+ Orders We did not find any #}
+                                    {#                                           orders for you search.</p> #}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}

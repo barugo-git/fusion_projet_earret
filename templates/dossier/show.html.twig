@@ -1,0 +1,106 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dossier{% endblock %}
+
+{% block body %}
+    <h1>Dossier</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ dossier.id }}</td>
+            </tr>
+            <tr>
+                <th>ReferenceEnregistrement</th>
+                <td>{{ dossier.referenceEnregistrement }}</td>
+            </tr>
+            <tr>
+                <th>DateEnregistrement</th>
+                <td>{{ dossier.dateEnregistrement ? dossier.dateEnregistrement|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>TypeDossier</th>
+                <td>{{ dossier.typeDossier }}</td>
+            </tr>
+            <tr>
+                <th>NomRequerant</th>
+                <td>{{ dossier.nomRequerant }}</td>
+            </tr>
+            <tr>
+                <th>PrenomsRequerant</th>
+                <td>{{ dossier.prenomsRequerant }}</td>
+            </tr>
+            <tr>
+                <th>SexeRequerant</th>
+                <td>{{ dossier.sexeRequerant }}</td>
+            </tr>
+            <tr>
+                <th>ContactRequerant</th>
+                <td>{{ dossier.contactRequerant }}</td>
+            </tr>
+            <tr>
+                <th>AdresseRequerant</th>
+                <td>{{ dossier.adresseRequerant }}</td>
+            </tr>
+            <tr>
+                <th>NomContact</th>
+                <td>{{ dossier.nomContact }}</td>
+            </tr>
+            <tr>
+                <th>PrenomsContact</th>
+                <td>{{ dossier.prenomsContact }}</td>
+            </tr>
+            <tr>
+                <th>AdresseContact</th>
+                <td>{{ dossier.adresseContact }}</td>
+            </tr>
+            <tr>
+                <th>ReferenceDossier</th>
+                <td>{{ dossier.referenceDossier }}</td>
+            </tr>
+            <tr>
+                <th>IntituleObjet</th>
+                <td>{{ dossier.intituleObjet }}</td>
+            </tr>
+            <tr>
+                <th>ReferenceDossierComplet</th>
+                <td>{{ dossier.referenceDossierComplet }}</td>
+            </tr>
+            <tr>
+                <th>EtatDossier</th>
+                <td>{{ dossier.etatDossier }}</td>
+            </tr>
+            <tr>
+                <th>TelephoneRequerant</th>
+                <td>{{ dossier.telephoneRequerant }}</td>
+            </tr>
+            <tr>
+                <th>MailRequerant</th>
+                <td>{{ dossier.mailRequerant }}</td>
+            </tr>
+            <tr>
+                <th>TelephoneContact</th>
+                <td>{{ dossier.telephoneContact }}</td>
+            </tr>
+            <tr>
+                <th>MailContact</th>
+                <td>{{ dossier.mailContact }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ dossier.createdAt ? dossier.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ dossier.updatedAt ? dossier.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_dossier_index') }}">back to list</a>
+
+    <a href="{{ path('app_dossier_edit', {'id': dossier.id}) }}">edit</a>
+
+    {{ include('dossier/_delete_form.html.twig') }}
+{% endblock %}

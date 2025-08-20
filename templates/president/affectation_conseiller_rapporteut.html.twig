@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New AffecterStructure{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        {% include 'partials/_intitule_dossier.html.twig' %}
+                    </h4>
+                    <h4 class="card-title mb-0">
+                        Affecter le dossier au conseiller rapporteur pour avis des parties
+                    </h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+                    <div class="mb-5">
+                        {{ form_start(form) }}
+                        {{ form_widget(form) }}
+                        <button class="btn btn-success la-pull-right"> Transfer au Conseiller rapporteur</button>
+                        {{ form_end(form) }}
+                    </div>
+                    <div class="mt-5  alert  alert-border-left alert-dismissible fade show material-shadow" role="alert">
+                        <a href="{{  dossier.piecesDoc[0].rapportFichier  }}" target="_blank">
+                            <h6> Voir le rapport de l'avocat general  </h6>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

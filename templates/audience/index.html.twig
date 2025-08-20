@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Audience index{% endblock %}
+
+{% block body %}
+    <h1>Audience index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>DateAudience</th>
+                <th>AvisAudience</th>
+                <th>Commentaire</th>
+                <th>Date</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for audience in audiences %}
+            <tr>
+                <td>{{ audience.id }}</td>
+                <td>{{ audience.dateAudience ? audience.dateAudience|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ audience.avisAudience }}</td>
+                <td>{{ audience.commentaire }}</td>
+                <td>{{ audience.date ? audience.date|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('greffier_audience_programme', {'id': audience.id}) }}">show</a>
+                    <a href="{{ path('app_audience_edit', {'id': audience.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_audience_new') }}">Create new</a>
+{% endblock %}

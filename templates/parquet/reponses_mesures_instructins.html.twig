@@ -1,0 +1,153 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dossier index{% endblock %}
+{% form_theme form 'form_theme/_form_collection_dossier_reponse.html.twig' %}
+{% block body %}
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Mesures d'instruction prescriptes par le president ou le
+                        juge-rapporteur </h4>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                            <th> Demandeur</th>
+                        </tr>
+                        <tr>
+                            <td>
+
+                                {% if mesures.dossier.requerant.type =='moral' %}
+
+                                    {{ mesures.dossier.requerant.intitule }}
+                                {% else %}
+
+                                    {{ mesures.dossier.requerant.nom ~" "~ mesures.dossier.requerant.prenoms }}
+                                {% endif %}
+                                <p><strong>Les conseils</strong></p>
+                                <ul>
+                                    {% if mesures.dossier.requerant.conseil %}
+                                        {% for conseil in mesures.dossier.requerant.conseil %}
+                                            <li> {{ conseil.infosIdentite }}</li>
+
+                                        {% endfor %}
+                                    {% endif %}
+
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> Défendeur</th>
+                        </tr>
+                        <tr>
+                            <td>
+
+                                {% if mesures.dossier.defendeur.type =='moral' %}
+
+                                    {{ mesures.dossier.defendeur.intitule }}
+                                {% else %}
+
+                                    {{ mesures.dossier.defendeur.nom ~" "~ mesures.dossier.defendeur.prenoms }}
+                                {% endif %}
+
+
+                                {% if mesures.dossier.defendeur.defendeurs %}
+                                    <p> Les conseils</p>
+                                    <ul>
+                                        {% for conseil in mesures.dossier.defendeur.defendeurs %}
+                                            <li> {{ conseil.infosIdentite }}</li>
+
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <th> Détails de la mesure d'instruction</th>
+                        </tr>
+                        <tr>
+                            <td> {{ mesures.instruction }} </td>
+                        </tr>
+                        <tr>
+                            <th> Délais d'execution de la mesure</th>
+                        </tr>
+                        <tr>
+                            <td>{{ mesures.delais ? mesures.delais : '' }} jours</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Note du greffier a l'adresse du president ou le juge-rapporteur </h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    {{ form_widget(form) }}
+                    <button class="btn  btn-success la-pull-right">{{ button_label|default('Répondre à la mesure') }}</button>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block javascripts %}
+    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="{{ asset('libs/tinymce/js/tinymce/tinymce.min.js') }}"></script>
+    <script>
+        tinymce.init({
+            selector: '#reponse_mesure_reponse',
+
+            plugins: ['autolink', 'codesample', 'link', 'lists',
+                'media', 'powerpaste', 'table', 'image',
+                'quickbars', 'codesample', 'help']
+        });
+    </script>
+    <script>
+
+        $('#add-image').click(function () {
+            // Je récupère le numéo des futurs champs que je vais créer
+            const index = +$('#widgets-counter').val();
+
+            console.log(index);
+
+            // Je récupère le prototype des entrées (remplace /__name__/(g veut dire qu'on peut le faire plusieurs fois) par index)
+            const tmpl = $('#reponse_mesure_pieces').data('prototype').replace(/__name__/g, index);
+
+            // J'injecte ce code au sein de la div
+            $('#reponse_mesure_pieces').append(tmpl);
+
+            $('#widgets-counter').val(index + 1);
+
+            // Je gère le bouton supprimer
+            handleDeleteButtons();
+        })
+
+        function handleDeleteButtons() {
+            $('button[data-action="delete"]').click(function () {
+                const target = this.dataset.target;
+
+                $(target).remove();
+            })
+        }
+
+        function updateCounter() {
+            const count = +$('#reponse_mesure_pieces div.form-group').length;
+
+            $('#widgets-counter').val(count);
+        }
+
+        updateCounter();
+
+        handleDeleteButtons();
+    </script>
+{% endblock %}

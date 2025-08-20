@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+   {% block body%}
+
+       <div class="row">
+           <div class="col-lg-12">
+               <div class="card">
+                   <div class="card-header">
+                       <h4 class="card-title mb-0"> Modification du Profil de </h4>
+                   </div><!-- end card header -->
+
+                   <div class="card-body">
+
+                       {{ form_start(registrationForm) }}
+                       <div class="row">
+
+                           <div class="col-md-6">{{ form_row(registrationForm.nom) }}</div>
+                           <div class="col-md-6">  {{ form_row(registrationForm.prenoms) }}</div>
+                           <div class="col-md-6"> {{ form_row(registrationForm.telephone) }}</div>
+                           <div class="col-md-6"> {{ form_row(registrationForm.email) }}</div>
+                           <div class="col-md-6"> {{ form_row(registrationForm.titre) }}</div>
+{#                           <div class="col-md-6">   {{ form_row(registrationForm.password, {#}
+{#                                   label: 'Mot de passe'#}
+{#                               }) }}</div>#}
+{#                           <div class="col-md-6">    {{ form_row(registrationForm.passwordConfirm) }}#}
+
+{#                           </div>#}
+                           <div class="col-md-6">
+                               {{ form_row(registrationForm.structure) }}
+                           </div>
+                           <div class="col-md-6"> {{ form_row(registrationForm.roles,{'attr': {'class':  ' data-choices data-choices-search-false data-choices-removeItem'}})  }}</div>
+
+                           <div class="hstack gap-2 justify-content-center">
+                               <button type="submit" class="btn btn-danger"  href="{{ path('app_admin_user') }}">Fermer</button>
+                               <button type="submit" class="btn btn-success" id="add-btn" href="{{ path('app_user_edit',{'id':user.id}) }}">Modifier</button>
+                               {#                                   <button type="button" class="btn btn-success" id="edit-btn">Update</button>#}
+                           </div>
+                       </div>
+                       {{ form_end(registrationForm) }}
+
+                   </div>
+
+   {% endblock %}
+
+{% block javascripts%}
+<!-- prismjs plugin -->
+<script src="{{asset('libs/prismjs/prism.js')}}"></script>
+<script src="{{asset('libs/list.js/list.min.js')}}"></script>
+<script src="{{asset('libs/list.pagination.js/list.pagination.min.js')}}"></script>
+
+<!-- listjs init -->
+<script src="{{asset('js/pages/listjs.init.js')}}"></script>
+
+{% endblock javascripts%}

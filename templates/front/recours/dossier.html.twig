@@ -1,0 +1,349 @@
+
+{% extends 'front/front_base.html.twig' %}
+{#{% extends 'front/base-front.html.twig' %}#}
+
+        {% block stylesheets %}
+            <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+
+
+        {% endblock %}
+{% form_theme form _self %}
+
+{#{% form_theme form 'form_theme/_form_collection_conseil_defendeur.html.twig' %}#}
+{% form_theme form 'form_theme/_form_collection_dossier.html.twig' %}
+{% block body %}
+<section class="section  bg-light pb-5">
+    <div class="container">
+    <div class="row">
+
+        <div class="col-lg-12">
+            <div class="col-xl-12">
+                <div class="card">
+{#                    <div class="card-header">#}
+{#                        <h4 class="card-title mb-0">Enregistrement d'un recours - Informations du dossier</h4>#}
+{#                    </div><!-- end card header -->#}
+                    <div class="card-body">
+                        {{ form_start(form, { attr: { id: 'form_infos_recours' }}) }}
+                        <div>
+                            <div class="container">
+                                <div class="row gy-5">
+                                    <div class="col-lg-3">
+                                        <div class="vertical-navs-step">
+                                            <div class="nav flex-column custom-nav nav-pills" role="tablist"
+                                                 aria-orientation="vertical">
+                                                <button class="nav-link done" id="v-pills-bill-info-tab"
+                                                        data-bs-toggle="pill"
+                                                        data-bs-target="#v-pills-bill-info" type="button" role="tab"
+                                                        aria-controls="v-pills-bill-info" aria-selected="false"
+                                                        data-position="0"
+                                                        tabindex="-1">
+                                                        <span class="step-title me-2">
+                                                            <i class="ri-close-circle-fill step-icon me-2"></i> Mes Informations
+                                                        </span>
+                                                </button>
+                                                <button class="nav-link done" id="v-pills-bill-address-tab"
+                                                        data-bs-toggle="pill"
+                                                        data-bs-target="#v-pills-bill-address" type="button" role="tab"
+                                                        aria-controls="v-pills-bill-address" aria-selected="true"
+                                                        data-position="1">
+                                                        <span class="step-title me-2">
+                                                            <i class="ri-close-circle-fill step-icon me-2"></i> Informations Défendeur
+                                                        </span>
+
+                                                </button>
+                                                <button class="nav-link active"  id="v-pills-payment-tab" data-bs-toggle="pill"
+                                                        data-bs-target="#v-pills-payment" type="button" role="tab"
+                                                        aria-controls="v-pills-payment" aria-selected="false"
+                                                        data-position="2"
+                                                        tabindex="-1">
+                                                        <span class="step-title me-2">
+                                                            <i class="ri-close-circle-fill step-icon me-2"></i> Informations du Recours
+                                                        </span>
+
+                                                </button>
+                                                <button class="nav-link" id="v-pills-finish-tab" data-bs-toggle="pill"
+                                                        data-bs-target="#v-pills-finish" type="button" role="tab"
+                                                        aria-controls="v-pills-finish" aria-selected="false"
+                                                        data-position="3"
+                                                        tabindex="-1">
+                                                        <span class="step-title me-2">
+                                                            <i class="ri-close-circle-fill step-icon me-2"></i> Résumé
+                                                        </span>
+
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <!-- end nav -->
+                                    </div>
+                                    <div class="col-lg-9">
+                                        <div class="row">
+
+                                            <div class="col-md-12">
+                                                {{ form_row(form.objet) }}
+                                            </div>
+
+                                            <div class="col-md-12">
+                                                {{ form_row(form.arreteAttaquee) }}
+                                            </div>
+
+                                            <div class="col-md-12">
+                                                {{ form_row(form.structure) }}
+
+                                            </div>
+                                            {#                                <div class="col-md-12">#}
+                                            {#                                    {{ form_row(form.intituleObjet) }}#}
+
+                                            {#                                </div>#}
+                                            {{ form_row(form.pieces) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-end ">
+                <button type="submit" class="btn btn-success btn-label right ">
+                  <!--  <i
+                            class="ri-arrow-right-line label-icon align-middle fs-16 ms-2"></i> -->
+                    Enregistrer le recours
+                </button>
+
+            </div>
+
+
+            {#<div  class="d-flex justify-content-center my-5">
+                <button id="previous"  class="btn btn-success -btn-label text-center" onclick="navigate('/depot-recours/infos-defendeur')">
+                    Précédent
+                </button>
+                <span class="mx-5"></span>
+                <button type="submit" id="next" class="btn btn-success -btn-label text-center" onclick="navigateNext()">
+                    Suivant
+                </button>
+            </div>#}
+
+            {{ form_end(form) }}
+
+
+
+
+            {#            {{ include('dossier/_form.html.twig') }}#}
+
+        </div>
+    </div>
+    </div>
+</section>
+
+    {#    <a href="{{ path('app_dossier_index') }}">back to list</a>#}
+{% endblock %}
+{% block javascripts %}
+
+
+   {# <script>
+        /* Navigation managenent */
+
+
+      /*  document.addEventListener("DOMContentLoaded", function() {
+            // Restore form data if available
+            restoreFormData();
+
+        });*/
+
+        function navigate(route){
+
+            window.location.href = route;
+        }
+
+        function validateForm() {
+            const form = document.getElementById("form_infos_recours");
+            return form.checkValidity();  // This returns true if the form is valid, false otherwise
+        }
+
+
+
+        function navigateNext() {
+
+            const form = document.getElementById("form_infos_recours");
+
+            // Validate form before navigation
+            if (!validateForm()) {
+                alert("Veuillez d'abord remplir les champs du formulaire");
+                return;
+            }
+
+            saveFormData();
+
+            navigate("/depot-recours/recap")
+        }
+
+
+
+        // store form data
+        function saveFormData() {
+            const formData = new FormData(document.getElementById("form_infos_recours"));
+            for (const [name, value] of formData.entries()) {
+                sessionStorage.setItem(name, value);
+            }
+        }
+
+        // restore form data
+        function restoreFormData() {
+            const form = document.getElementById("form_infos_recours");
+            for (const element of form.elements) {
+                if (sessionStorage.getItem(element.name)) {
+                    element.value = sessionStorage.getItem(element.name);
+                }
+            }
+        }
+        /* Navigation managenent */
+
+    </script>#}
+
+
+    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+            integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        // var $typerequerent = $('#dossier_defendeur_defendeur_type')
+        // $typerequerent.change(function () {
+        //     console.log($typerequerent.val())
+        //     if ($typerequerent.val() == "moral") {
+        //         $('.morale').show()
+        //         $('.physique').hide()
+        //
+        //     } else if ($typerequerent.val() == "physique") {
+        //         $('.morale').hide()
+        //         $('.physique').show()
+        //     }
+        //
+        // })
+        //
+        // class LinkedSelect {
+        //
+        //     /**
+        //      * @param {HTMLSelectElement} $select
+        //      */
+        //     constructor($select) {
+        //         this.$select = $select
+        //         this.$target = document.querySelector(this.$select.dataset.target)
+        //         this.$placeholder = this.$target.firstElementChild
+        //         //  this.onChange = debounce(this.onChange.bind(this), 500)
+        //         this.onChange = this.onChange.bind(this)
+        //         this.$loader = null
+        //         this.cache = {}
+        //         this.$select.addEventListener('change', this.onChange)
+        //     }
+        //
+        //     /**
+        //      * Se déclenche au changement de valeur d'un select
+        //      * @param {Event} e
+        //      */
+        //     onChange(e) {
+        //         if (e.target.value === '0') {
+        //
+        //             return
+        //         }
+        //
+        //         this.loadOptions(e.target.value, (options) => {
+        //             this.$target.innerHTML = options
+        //             this.$target.insertBefore(this.$placeholder, this.$target.firstChild)
+        //             this.$target.selectedIndex = 0
+        //             this.$target.style.display = null
+        //
+        //         })
+        //     }
+        //
+        //     /**
+        //      * Charge les options à partir du serveur (ou du cache)
+        //      * @param {string} id
+        //      * @param callback
+        //      */
+        //     loadOptions(id, callback) {
+        //         if (this.cache[id]) {
+        //             callback(this.cache[id])
+        //             return
+        //         }
+        //         this.showLoader()
+        //         let request = new XMLHttpRequest()
+        //         request.open('GET', this.$select.dataset.source.replace('id', id), true)
+        //         request.onload = () => {
+        //             if (request.status >= 200 && request.status < 400) {
+        //                 let data = JSON.parse(request.responseText)
+        //                 let options = data.reduce(function (acc, option) {
+        //                     return acc + '<option value="' + option.value + '">' + option.label + '</option>'
+        //                 }, '')
+        //                 this.cache[id] = options
+        //                 this.hideLoader()
+        //                 callback(options)
+        //             } else {
+        //                 alert('Impossible de charger la liste')
+        //             }
+        //         }
+        //         request.onerror = function () {
+        //             alert('Impossible de charger la liste')
+        //         }
+        //         request.send()
+        //     }
+        //
+        //     showLoader() {
+        //         this.$loader = document.createTextNode('Chargement...')
+        //         this.$target.parentNode.appendChild(this.$loader)
+        //     }
+        //
+        //     hideLoader() {
+        //         if (this.$loader !== null) {
+        //             this.$loader.parentNode.removeChild(this.$loader)
+        //             this.$loader = null
+        //         }
+        //     }
+        //
+        // }
+        //
+        // let $selects = document.querySelectorAll('.linked-select')
+        // $selects.forEach(function ($select) {
+        //     new LinkedSelect($select)
+        //
+        // })
+
+        $('#add-image').click(function(){
+            // Je récupère le numéo des futurs champs que je vais créer
+            const index = +$('#widgets-counter').val();
+
+            console.log(index);
+
+            // Je récupère le prototype des entrées (remplace /__name__/(g veut dire qu'on peut le faire plusieurs fois) par index)
+            const tmpl = $('#dossier_pieces').data('prototype').replace(/__name__/g, index);
+
+            // J'injecte ce code au sein de la div
+            $('#dossier_pieces').append(tmpl);
+
+            $('#widgets-counter').val(index+1);
+
+            // Je gère le bouton supprimer
+            handleDeleteButtons();
+        })
+
+        function handleDeleteButtons() {
+            $('button[data-action="delete"]').click(function(){
+                const target = this.dataset.target;
+
+                $(target).remove();
+            })
+        }
+
+        function updateCounter() {
+            const count = +$('#dossier_pieces div.form-group').length;
+
+            $('#widgets-counter').val(count);
+        }
+
+        updateCounter();
+
+        handleDeleteButtons();
+
+    </script>
+{% endblock %}

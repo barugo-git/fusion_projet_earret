@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+{% form_theme form 'form_theme/_form_collection_dossier_user.html.twig' %}
+
+
+{% block body %}
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0"> Affectation des membres au {{ dossier.referenceDossier }}</h4>
+                </div><!-- end card header -->
+
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    {{ form_widget(form) }}
+                    <button class="btn  btn-success la-pull-right">{{ button_label|default('Affecter les membres') }}</button>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block javascripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
+    <script>
+
+    $('#add-image').click(function(){
+        // Je récupère le numéo des futurs champs que je vais créer
+        const index = +$('#widgets-counter').val();
+
+        console.log(index);
+
+        // Je récupère le prototype des entrées (remplace /__name__/(g veut dire qu'on peut le faire plusieurs fois) par index)
+        const tmpl = $('#user_dossier_userDossiers').data('prototype').replace(/__name__/g, index);
+
+        // J'injecte ce code au sein de la div
+        $('#user_dossier_userDossiers').append(tmpl);
+
+        $('#widgets-counter').val(index+1);
+
+        // Je gère le bouton supprimer
+        handleDeleteButtons();
+    })
+
+    function handleDeleteButtons() {
+        $('button[data-action="delete"]').click(function(){
+            const target = this.dataset.target;
+
+            $(target).remove();
+        })
+    }
+
+    function updateCounter() {
+        const count = +$('#user_dossier_userDossiers div.form-group').length;
+
+        $('#widgets-counter').val(count);
+    }
+
+    updateCounter();
+
+    handleDeleteButtons();
+
+</script>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% apply inline_css(source("@styles/bootstrap.min.css"),source("@styles/icons.min.css")
+    ,source("@styles/app.min.css"),source("@styles/custom.min.css")) %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10">
+                <p>Bonjour Monsieur/Madame {{ requerent }}.</p>
+                <p> Félicitations votre recours a été bien validé par la Cour suprême.</p>
+                <p>
+                    Utilisez ce code suivi <span class="badge bg-success-subtle text-success"> {{ codeSuivi }}</span> pour suivre l'évolution de votre requête
+                </p>
+                <p>
+                    Veuillez garder ce numéro afin de l'utiliser pour vérifier l'état de votre recours
+                    ultérieurement
+                </p>
+{#                <p>L'audience du  dossier : {{ dossier.intituleObjet }} a été programmé le {{ audience.dateAudience ? audience.dateAudience|date('Y-m-d') : '' }} à {{ audience.dateAudience ? audience.heureAudience|date('H:i') : '' }}.</p>#}
+            </div>
+        </div>
+    </div>
+{% endapply %}
