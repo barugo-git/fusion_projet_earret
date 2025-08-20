@@ -36,10 +36,11 @@ use App\Repository\PartieRepository;
 use App\Repository\ReponseMesuresInstructionsRepository;
 use App\Repository\RepresentantRepository;
 use App\Repository\StatutRepository;
-use  App\Repository\ArretsRepository;
+use App\Repository\ArretsRepository;
 use App\Service\CodeGenerator;
 use App\Service\FileUploader;
 use App\Service\MailService;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Infobip\Api\SendSmsApi;
 use Infobip\Configuration;
@@ -63,11 +64,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use function Symfony\Component\Mime\from;
 
 #[Route(path: '/greffier/dossiers')]
-//#[IsGranted(new Expression('is_granted("ROLE_GREFFIER") or is_granted("ROLE_GREFFIER_EN_CHEF")'))]
 class GreffierController extends AbstractController
 {
     #[Route(path: '/list-recours', name: 'greffier_recours_list')]
-    public function index(DossierRepository $dossierRepository): \Symfony\Component\HttpFoundation\Response
+    public function index(DossierRepository $dossierRepository): Response
     {
         return $this->render('greffe/liste-recours-by-greffier.html.twig', [
             'dossiers' => $dossierRepository->recoursAutoriseParGreffierChef($this->getUser())
@@ -77,33 +77,15 @@ class GreffierController extends AbstractController
     #[Route(path: '/recours-en-d-ouverture', name: 'greffier_en_d_ouverture')]
     public function recoursEnOuverture(DossierRepository $dossierRepository): Response
     {
-
         $listRecours = $dossierRepository->recourstransfererParGreffierChef($this->getUser());
-        return $this->render('greffe/liste-autorisation-greffe-chef.html.twig',
-            [
-                'dossiers' => $listRecours,
-            ]);
+        return $this->render('greffe/liste-autorisation-greffe-chef.html.twig', [
+            'dossiers' => $listRecours,
+        ]);
     }
-
-//    #[IsGranted(new Expression('is_granted("ROLE_GREFFIER") or is_granted("ROLE_GREFFIER_EN_CHEF") or is_granted("ROLE_BUREAU_ORIENTATION")'))]
-//    #[Route(path: '/demandes-en-ligne', name: 'greffier_demande_ligne')]
-//    public function demandeEnLigne( #[CurrentUser] User    $user, DossierRepository $dossierRepository): Response
-//    {
-//        return $this->render('dossier/index.html.twig', [
-//            'dossiers' => $dossierRepository->findBy([
-//                'etatDossier' => 'NOUVEAU',
-////                'createdBy'=>$this->getUser(),
-////                'structure'=>$this->getUser()->getStructure()
-//            ]),
-//        ]);
-//    }
-
 
     #[Route(path: '/dossier-ouverture/{id}', name: 'greffier_dossier_open')]
     public function ouvertureDossier(Request $request, Dossier $dossier, DossierRepository $dossierRepository): Response
-
     {
-
         $form = $this->createForm(OuvertureDossierType::class, $dossier);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -121,20 +103,16 @@ class GreffierController extends AbstractController
     }
 
     #[Route(path: '/liste-dossier-ouvert/', name: 'greffier_dossier_open_list')]
-    public function ListeDossierOuvert(DossierRepository $dossierRepository): \Symfony\Component\HttpFoundation\Response
+    public function ListeDossierOuvert(DossierRepository $dossierRepository): Response
     {
-
         return $this->render('greffe/liste-autorisation-greffe.html.twig', [
-           // listeDossierOuvertEtauRoleParGreffier
-           // 'dossiers' => $dossierRepository->listeDossierOuvertParGreffier($this->getUser()),
-                    'dossiers' => $dossierRepository->listeDossierOuvertEtauRoleParGreffier($this->getUser()),
-
+            'dossiers' => $dossierRepository->listeDossierOuvertParGreffier($this->getUser()),
         ]);
     }
+
     #[Route(path: '/conclusion-parquet-pour-avis-parties/', name: 'greffier_dossier_conclusion_parquet')]
     public function dossierConclusionParquet(DossierRepository $dossierRepository): Response
     {
-
         return $this->render('greffe/avis_parties.html.twig', [
             'dossiers' => $dossierRepository->listeDossierPourAvisParties($this->getUser()),
         ]);
@@ -147,22 +125,30 @@ class GreffierController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             if ($form->get('document')->getData()) {
                 $image = $form->get('document')->getData();
                 $fmane = $dossier->getReferenceDossier();
                 $fichier = $fileUploader->upload($image, $fmane, 'piecesJointes');
-                $dossier->setPreuveConsignation($fichier);
+                $dossier->setPreuveConsignationRequerant($fichier);
+                $dossier->setDatePreuveConsignationRequerant(new DateTimeImmutable());
+                $dossier->setRecuConsignation(true);
             }
-            $dossier->setConsignation(true);
-//            $piece->setDossier($dossier);
             $dossierRepository->add($dossier, true);
-            $this->addFlash('success', 'Le paiement de la consignation a ete constate');
-            return $this->redirectToRoute('greffier_dossier_open_list');
+            $user = $this->getUser();
+
+            if ($user && in_array('ROLE_GREFFIER', $user->getRoles())) {
+                return $this->redirectToRoute('greffier_dossier_open_list');
+            } else {
+                return $this->redirectToRoute('app_index_front');
+            }
         }
+        
+        $templateParent = $this->getUser() ? 'base.html.twig' : 'front/status_base.html.twig';
+
         return $this->render('greffe/paiementConsignation.html.twig', [
             'dossier' => $dossier,
             'form' => $form->createView(),
+            'template_parent' => $templateParent,
         ]);
     }
 
@@ -173,22 +159,32 @@ class GreffierController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-            if ($form->get('document')->getData()) {
-                $image = $form->get('document')->getData();
-                $fmane = $dossier->getReferenceDossier();
-                $fichier = $fileUploader->upload($image, $fmane, 'piecesJointes');
+            $uploadedFile = $form->get('document')->getData();
+            if ($uploadedFile) {
+                $fmane = $dossier->getReferenceEnregistrement();
+                $fichier = $fileUploader->upload($uploadedFile, $fmane, 'piecesJointes');
                 $dossier->setUrlMemoireAmpliatif($fichier);
             }
+
             $dossier->setMemoireAmpliatif(true);
-//            $piece->setDossier($dossier);
+            $dossier->setDateMemoireAmpliatif(new DateTimeImmutable());
             $dossierRepository->add($dossier, true);
-            $this->addFlash('success', 'Le memoire ampliatif a ete produit avec succes ');
-            return $this->redirectToRoute('greffier_dossier_open_list');
+
+            $user = $this->getUser();
+
+            if ($user && in_array('ROLE_GREFFIER', $user->getRoles())) {
+                return $this->redirectToRoute('greffier_dossier_open_list');
+            } else {
+                return $this->redirectToRoute('app_index_front');
+            }
         }
+
+        $templateParent = $this->getUser() ? 'base.html.twig' : 'front/status_base.html.twig';
+
         return $this->render('greffe/memoireAmpliatif.html.twig', [
             'dossier' => $dossier,
             'form' => $form->createView(),
+            'template_parent' => $templateParent,
         ]);
     }
 
@@ -199,17 +195,15 @@ class GreffierController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             if ($form->get('document')->getData()) {
                 $image = $form->get('document')->getData();
-                $fmane = $dossier->getReferenceDossier();
+                $fmane = $dossier->getReferenceEnregistrement();
                 $fichier = $fileUploader->upload($image, $fmane, 'piecesJointes');
                 $dossier->setUrlMemoireEnDefense($fichier);
             }
             $dossier->setMemoireEnDefense(true);
-//            $piece->setDossier($dossier);
             $dossierRepository->add($dossier, true);
-            $this->addFlash('success', 'Le paiement de la consignation a ete constate');
+            $this->addFlash('success', 'Le memoire en défense a été produit avec succès.');
             return $this->redirectToRoute('greffier_dossier_open_list');
         }
         return $this->render('greffe/paiementConsignation.html.twig', [
@@ -218,20 +212,13 @@ class GreffierController extends AbstractController
         ]);
     }
 
-//    #[Route(path: '/mesures-instructions/dossier/{id}', name: 'greffier_mesures_instructions_dossier_list')]
-//    public function listeMesuresInstruction(MesuresInstructionsRepository $mesuresInstructionsRepository, Dossier $dossier): \Symfony\Component\HttpFoundation\Response
-//    {
-//        //dd($mesuresInstructions);
-//        return $this->render('greffe/greffe_liste_instruction_par_dossier.html.twig', [
-//            'mesures' => $mesuresInstructionsRepository->findBy(['dossier' => $dossier]),
-//            'dossier' => $dossier
-//        ]);
-//    }
-
     #[Route(path: '/reposnse-mesures-instruction/instruction/{id}', name: 'greffier_rapporteur_mesures_instructions_reponse')]
-    public function reponsemesuresInstruction(Request             $request, DossierRepository $dossierRepository,
-                                              MesuresInstructions $mesuresInstructions, ReponseMesuresInstructionsRepository $reponseMesuresInstructionsRepository)
-    {
+    public function reponsemesuresInstruction(
+        Request $request,
+        DossierRepository $dossierRepository,
+        MesuresInstructions $mesuresInstructions,
+        ReponseMesuresInstructionsRepository $reponseMesuresInstructionsRepository
+    ): Response {
         $reponse = new ReponseMesuresInstructions();
         $form = $this->createForm(ReponseMesureType::class, $reponse);
         $form->handleRequest($request);
@@ -248,39 +235,29 @@ class GreffierController extends AbstractController
         ]);
     }
 
-
     #[Route(path: '/reposnse-mesures-instruction/instruction/edit/{id}', name: 'greffier_rapporteur_mesures_instructions_reponse_edit')]
-    public function reponsemesuresInstructionComplete(Request                    $request, DossierRepository $dossierRepository,
-                                                      ReponseMesuresInstructions $reponseMesuresInstructions, ReponseMesuresInstructionsRepository $reponseMesuresInstructionsRepository)
-    {
-//        $reponse = new ReponseMesuresInstructions();
+    public function reponsemesuresInstructionComplete(
+        Request $request,
+        DossierRepository $dossierRepository,
+        ReponseMesuresInstructions $reponseMesuresInstructions,
+        ReponseMesuresInstructionsRepository $reponseMesuresInstructionsRepository
+    ): Response {
         $form = $this->createForm(ReponseMesureType::class, $reponseMesuresInstructions);
         $form->handleRequest($request);
-        $dossier = $reponseMesuresInstructions->getMesure()->getDossier()->getId();
+        $dossierId = $reponseMesuresInstructions->getMesure()->getDossier()->getId();
         if ($form->isSubmitted() && $form->isValid()) {
-
             $reponseMesuresInstructionsRepository->add($reponseMesuresInstructions, true);
-            return $this->redirectToRoute('greffier_mesures_instructions_dossier_list', ['id' => $dossier]);
+            return $this->redirectToRoute('greffier_mesures_instructions_dossier_list', ['id' => $dossierId]);
         }
         return $this->render('conseiller_rapporteur/reponses_mesures_instructins.html.twig', [
             'mesures' => $reponseMesuresInstructions->getMesure(),
             'form' => $form->createView(),
-            'dossier' => $dossier
+            'dossier' => $dossierId
         ]);
     }
 
-//    #[Route(path: '/reposnse-mesures-instruction/instruction/show/{id}', name: 'greffier_rapporteur_mesures_instructions_reponse_show')]
-//    public function detailsmesuresInstruction(DossierRepository   $dossierRepository,
-//                                              MesuresInstructions $mesuresInstructions, ReponseMesuresInstructionsRepository $reponseMesuresInstructionsRepository): \Symfony\Component\HttpFoundation\Response
-//    {
-//        return $this->render('conseiller_rapporteur/details_mesures_instructins.html.twig', [
-//            'mesures' => $mesuresInstructions,
-//
-//        ]);
-//    }
-
     #[Route(path: '/cloture-dossier/{id}', name: 'greffier_cloture_dossier')]
-    public function clotureDossier(Request $request, Dossier $dossier, DossierRepository $dossierRepository)
+    public function clotureDossier(Request $request, Dossier $dossier, DossierRepository $dossierRepository): Response
     {
         $form = $this->createForm(ClotureDossierType::class, $dossier);
         $form->handleRequest($request);
@@ -306,10 +283,6 @@ class GreffierController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-//            $audience->setDossier($dossier);
-            // $audienceRepository->add($audience, true);
-//            $smsMessage = "L'audience du  dossier : " . $dossier->getReferenceDossier() . " a été programmé le : " . $audience->getDateAudience()->format("Y-m-d H:i:s");
-//            dd($smsMessage);
             foreach ($form->get('dossiers')->getData() as $dossier) {
                 $dossier->setEtatDossier('AUDIENCE');
                 $requerant_mail = $dossier->getRequerant()->getEmail();
@@ -321,21 +294,14 @@ class GreffierController extends AbstractController
                     $email = (new TemplatedEmail())
                         ->from('xxxxx@fuprobenin.org')
                         ->to(new Address($requerant_mail))
-                        // ->priority(Email::PRIORITY_HIGH)
                         ->subject('Programmation de l\'audience du dossier : ' . $dossier->getReferenceDossier())
                         ->priority(Email::PRIORITY_HIGH)
-
-                        // path of the Twig template to render
                         ->htmlTemplate('mailer/partie_audience.html.twig')
-
-                        // pass variables (name => value) to the template
                         ->context([
                             'dossier' => $dossier,
                             'audience' => $audience,
                             'nom' => $dossier->getRequerant()->getNom()
-
                         ]);
-
                     $mailer->send($email);
                 }
 
@@ -343,53 +309,30 @@ class GreffierController extends AbstractController
                     $email = (new TemplatedEmail())
                         ->from('xxxxx@fuprobenin.org')
                         ->to(new Address($defendeur_mail))
-                        // ->priority(Email::PRIORITY_HIGH)
                         ->subject('Programmation de l\'audience du dossier : ' . $dossier->getReferenceDossier())
                         ->priority(Email::PRIORITY_HIGH)
-
-                        // path of the Twig template to render
                         ->htmlTemplate('mailer/partie_audience.html.twig')
-
-                        // pass variables (name => value) to the template
                         ->context([
                             'dossier' => $dossier,
                             'audience' => $audience,
                             'nom' => $dossier->getDefendeur()->getNom()
-
                         ]);
-
                     $mailer->send($email);
                 }
-
-                /*   if ($request_telephone) {
-                       $this->envoiSMS($smsMessage, $request_telephone);
-
-                   }
-                   if ($defendeur_telephone) {
-                       $this->envoiSMS($smsMessage, $defendeur_telephone);
-
-                   }*/
 
                 foreach ($dossier->getUserDossiers() as $membre) {
                     if ($membre->getUSer()->getEmail()) {
                         $email = (new TemplatedEmail())
                             ->from('xxxxx@fuprobenin.org')
                             ->to(new Address($membre->getUSer()->getEmail()))
-                            // ->priority(Email::PRIORITY_HIGH)
                             ->subject('Programmation de l\'audience du dossier : ' . $dossier->getReferenceDossier())
                             ->priority(Email::PRIORITY_HIGH)
-
-                            // path of the Twig template to render
                             ->htmlTemplate('mailer/partie_audience.html.twig')
-
-                            // pass variables (name => value) to the template
                             ->context([
                                 'dossier' => $dossier,
                                 'audience' => $audience,
                                 'nom' => $membre->getUSer()->getNom()
-
                             ]);
-
                         $mailer->send($email);
                     }
                 }
@@ -404,45 +347,40 @@ class GreffierController extends AbstractController
 
         return $this->render('audience/new.html.twig', [
             'audience' => $audience,
-
             'form' => $form,
         ]);
     }
 
     #[Route(path: '/audience-programme/{id}', name: 'greffier_audience_programme', methods: ['GET', 'POST'])]
-    public function audienceProgramme(Audience $audience): \Symfony\Component\HttpFoundation\Response
+    public function audienceProgramme(Audience $audience): Response
     {
         return $this->render('dossier/audience_programme.html.twig', [
             'audience' => $audience,
-//            'user'
         ]);
     }
 
     #[Route(path: '/audiences/liste', name: 'greffier_audience_liste', methods: ['GET', 'POST'])]
-    public function listeAudience(AudienceRepository $audienceRepository): \Symfony\Component\HttpFoundation\Response
+    public function listeAudience(AudienceRepository $audienceRepository): Response
     {
         $audiences = $audienceRepository->findBy([], ['id' => 'DESC']);
 
         return $this->render('audience/index_audience.html.twig', [
             'audiences' => $audiences,
-
         ]);
     }
 
     #[Route(path: '/dossier-audience', name: 'greffier_audience_dossier', methods: ['GET', 'POST'])]
-    public function dossierPasseEnAudience(DossierRepository $dossierRepository): \Symfony\Component\HttpFoundation\Response
+    public function dossierPasseEnAudience(DossierRepository $dossierRepository): Response
     {
         return $this->render('greffe/dossier-audience-by-greffier.html.twig', [
             'dossiers' => $dossierRepository->findBy([
                 'etatDossier' => "AUDIENCE",
-//                'createdBy'=>$this->getUser(),
-//                'structure'=>$this->getUser()->getStructure()
             ]),
         ]);
     }
 
     #[Route(path: '/deliberation-dossier/{id}', name: 'greffier_deliberation_dossier')]
-    public function deliberationDossier(Request $request, Dossier $dossier, DossierRepository $dossierRepository, DeliberationDossiersRepository $deliberationDossiersRepository)
+    public function deliberationDossier(Request $request, Dossier $dossier, DossierRepository $dossierRepository, DeliberationDossiersRepository $deliberationDossiersRepository): Response
     {
         $delibre = new DeliberationDossiers();
         $form = $this->createForm(DeliberationDossiersType::class, $delibre);
@@ -450,8 +388,6 @@ class GreffierController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $dossier->setEtatDossier('DELIBERE');
             $delibre->setDossier($dossier);
-//            $dossier->setDateCloture(new \DateTime());
-//            $dossier->setClos(true);
             $dossierRepository->add($dossier);
             $deliberationDossiersRepository->add($delibre, true);
             $this->addFlash('success', 'Le dossier à été deliberer avec succes');
@@ -464,20 +400,17 @@ class GreffierController extends AbstractController
     }
 
     #[Route(path: '/liste-deliberation-dossier', name: 'greffier_deliberation_dossier_list')]
-    public function listeDossierDeliberes(DossierRepository $dossierRepository): \Symfony\Component\HttpFoundation\Response
+    public function listeDossierDeliberes(DossierRepository $dossierRepository): Response
     {
         return $this->render('greffe/dossier-delibere-by-greffier.html.twig', [
             'dossiers' => $dossierRepository->findBy([
                 'etatDossier' => "DELIBERE",
-//                'createdBy'=>$this->getUser(),
-//                'structure'=>$this->getUser()->getStructure()
             ]),
         ]);
     }
 
     public function envoiSMS($msg, $telephone)
     {
-        // 1. Create configuration object and client
         $baseurl = $this->getParameter("sms_gateway.baseurl");
         $apikey = $this->getParameter("sms_gateway.apikey");
         $apikeyPrefix = $this->getParameter("sms_gateway.apikeyprefix");
@@ -488,31 +421,22 @@ class GreffierController extends AbstractController
             ->setApiKey('Authorization', $apikey);
 
         $client = new \GuzzleHttp\Client();
-        $sendSmsApi = new SendSMSApi($client, $configuration);
+        $sendSmsApi = new SendSmsApi($client, $configuration);
 
-        // 2. Create message object with destination
         $destination = (new SmsDestination())->setTo($telephone);
         $message = (new SmsTextualMessage())
-            // Alphanumeric sender ID length should be between 3 and 11 characters (Example: `CompanyName`).
-            // Numeric sender ID length should be between 3 and 14 characters.
             ->setFrom('InfoSMS')
             ->setText($msg)
             ->setDestinations([$destination]);
 
-        // 3. Create message request with all the messages that you want to send
         $request = (new SmsAdvancedTextualRequest())->setMessages([$message]);
 
-        // 4. Send !
         try {
             $smsResponse = $sendSmsApi->sendSmsMessage($request);
-
             dump($smsResponse);
         } catch (\Throwable $apiException) {
-            // HANDLE THE EXCEPTION
             dump($apiException);
         }
-
-
     }
 
     #[Route(path: '{id}/mise-a-jour-statut/', name: 'greffier_mise_ajour')]
@@ -521,24 +445,15 @@ class GreffierController extends AbstractController
         $mouvement = new Mouvement();
         $mouvement->setDossier($dossier);
 
-        // dd($statutRepository->findStatutsNonAffectesAuDossier($dossier));
-
-        // Création du formulaire
         $form = $this->createForm(MouvementType::class, $mouvement, [
-            'dossier' => $dossier // Passer le dossier pour le filtrage
+            'dossier' => $dossier
         ]);
-
-        //  dd($form);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Définir l'utilisateur actuel comme greffier
             $mouvement->setUser($this->getUser());
-
-            // dd($form->getData());
             $dossier->setStatut($mouvement->getStatut()->getLibelle());
-
             $em->persist($mouvement);
             $em->persist($dossier);
             $em->flush();
@@ -552,7 +467,6 @@ class GreffierController extends AbstractController
                 'statut' => $dossier->getStatut(),
                 'codeSuivi' => $dossier->getCodeSuivi(),
                 'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL),
-
             ];
 
             $mailService->sendEmail($mail, $sujet, 'notificationsstatut.html.twig', $context);
@@ -566,9 +480,8 @@ class GreffierController extends AbstractController
         ]);
     }
 
-
     #[Route(path: '/mise-a-jour-historique/{id}', name: 'dossier_historique')]
-    public function historique(Dossier $dossier, EntityManagerInterface $em)
+    public function historique(Dossier $dossier, EntityManagerInterface $em): Response
     {
         $mouvements = $dossier->getMouvements();
 
@@ -578,51 +491,41 @@ class GreffierController extends AbstractController
         ]);
     }
 
-
     #[Route(path: '/mise-a-jour/{id}/update', name: 'mouvement_update')]
-    public function historiqueedit(Request $request, Mouvement $mouvement, EntityManagerInterface $em)
+    public function historiqueedit(Request $request, Mouvement $mouvement, EntityManagerInterface $em): Response
     {
-        //  dd($mouvement);
         $dossier = $mouvement->getDossier();
-
         $form = $this->createForm(MouvementUpdateType::class, $mouvement);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-
             $dossier->setStatut($mouvement->getStatut()->getLibelle());
-
             $em->persist($mouvement);
             $em->persist($dossier);
             $em->flush();
             $this->addFlash('success', 'Le statut du  dossier à été mis à jour avec succes');
 
             return $this->redirectToRoute('dossier_historique', ['id' => $dossier->getId()]);
-
-
         }
 
         return $this->render('greffe/miseajourdossierstatut.html.twig', [
-
             'mouvement' => $mouvement,
             'dossier' => $mouvement->getDossier(),
-            'form' => $form
+            'form' => $form,
         ]);
     }
 
-
     #[Route(path: '/publier-calendrier', name: 'greffier_publie_calendrier', methods: ['GET', 'POST'])]
-    public function publierCalendrier(Request $request, FileUploader $fileUploader, DossierRepository $dossierRepository,MailerInterface $mailer): Response
+    public function publierCalendrier(Request $request, FileUploader $fileUploader, DossierRepository $dossierRepository, MailerInterface $mailer): Response
     {
-        //  CalendrierType
         $form = $this->createForm(CalendrierType::class, null, [
-            'user' => $this->getUser() // Passer le dossier pour le filtrage
+            'user' => $this->getUser(),
         ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $calendrier = $form->get('calendrier')->getData();
+            $fichier = null;
             if ($calendrier) {
                 $fichier = $fileUploader->upload($calendrier, null, 'calendrier');
-
             }
 
             foreach ($form->get('dossiers')->getData() as $dossier) {
@@ -636,151 +539,12 @@ class GreffierController extends AbstractController
             $defendeur_mail = $dossier->getDefendeur()->getEmail();
             $defendeur_telephone = $dossier->getDefendeur()->getTelephone();
 
-
-
             $email = (new TemplatedEmail())
-                ->from(new Address('juridiction@coursupreme.bj', 'Cour Suprême'))
-                ->to(new Address($requerant_mail))
-                // ->priority(Email::PRIORITY_HIGH)
-                ->subject('Audience Programmée de votre dossier  : ' . $dossier->getReferenceDossier())
-                ->priority(Email::PRIORITY_HIGH)
-
-                // path of the Twig template to render
-                ->htmlTemplate('mailer/calendrier_mail_front.html.twig')
-
-                // pass variables (name => value) to the template
-                ->context([
-                    'dossier' => $dossier,
-                    'calendrier' => $dossier->getCalendrier(),
-                    'nom' => $dossier->getRequerant()->getNom()
-
-                ]);
-
-            $mailer->send($email);
-            return $this->redirectToRoute('greffier_recours_list');
-
-
+                ->from(new Address('juridiction@coursupreme.bj', 'Cour Suprême'));
         }
 
-
-        return $this->render('greffe/publiercalendrier.html.twig', [
+        return $this->render('greffe/publie_calendrier.html.twig', [
             'form' => $form->createView(),
         ]);
     }
-
-
-    #[Route(path: '/arret/{id}', name: 'greffier_arret_new', methods: ['GET', 'POST'])]
-    public function arrets( #[CurrentUser] User    $user,Dossier  $dossier, Request $request, ArretsRepository $arretsRepository,
-        FileUploader $fileUploader, MailerInterface $mailer, DossierRepository $dossierRepository): Response
-    {
-        $arret = new Arrets();
-        $form = $this->createForm(ArretResumeType::class, $arret);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $arret->setDossier($dossier);
-            $file_arret = $form->get('arret_file')->getData();
-            $fichier = $fileUploader->upload($file_arret, null);
-            $dossier->setStatut('Dossier vidé : Arrêt disponible');
-            $arret->setArret($fichier);
-            $dossier->setEtatDossier("ARRETS");
-            $arretsRepository->add($arret, true);
-            // $audienceRepository->add($audience, true);
-            //     $smsMessage = "L'audience du  dossier : " . $dossier->getReferenceDossier() . " a été programmé le : " . $audience->getDateAudience()->format("Y-m-d H:i:s");
-//            dd($smsMessage);
-            $requerant_mail = $dossier->getRequerant()->getEmail();
-            $request_telephone = $dossier->getRequerant()->getTelephone();
-            $defendeur_mail = $dossier->getDefendeur()->getEmail();
-            $defendeur_telephone = $dossier->getDefendeur()->getTelephone();
-
-
-
-              $email = (new TemplatedEmail())
-                   ->from(new Address('juridiction@coursupreme.bj', 'Cour Suprême'))
-                   ->to(new Address($requerant_mail))
-                   // ->priority(Email::PRIORITY_HIGH)
-                   ->subject('Arrêt du dossier : ' . $dossier->getReferenceDossier())
-                   ->priority(Email::PRIORITY_HIGH)
-
-                   // path of the Twig template to render
-                   ->htmlTemplate('mailer/auience_mail_front.html.twig')
-
-                   // pass variables (name => value) to the template
-                   ->context([
-                       'dossier' => $dossier,
-                       'arret' => $arret->getArret(),
-                       'nom' => $dossier->getRequerant()->getNom()
-
-                   ]);
-
-               $mailer->send($email);
-
-
-           /* if ($defendeuail) {
-                $email = (new TemplatedEmail())
-                    ->from('xxxxx@fuprobenin.org')
-                    ->to(new Address($defendeur_mail))
-                    // ->priority(Email::PRIORITY_HIGH)
-                    ->subject('Programmation de l\'audience du dossier : ' . $dossier->getReferenceDossier())
-                    ->priority(Email::PRIORITY_HIGH)
-
-                    // path of the Twig template to render
-                    ->htmlTemplate('mailer/partie_audience.html.twig')
-
-                    // pass variables (name => value) to the template
-                    ->context([
-                        'dossier' => $dossier,
-                        'audience' => $audience,
-                        'nom' => $dossier->getDefendeur()->getNom()
-
-                    ]);
-
-                $mailer->send($email);
-            }
-
-            foreach ($dossier->getUserDossiers() as $membre) {
-                if ($membre->getUSer()->getEmail()) {
-                    $email = (new TemplatedEmail())
-                        ->from('xxxxx@fuprobenin.org')
-                        ->to(new Address($membre->getUSer()->getEmail()))
-                        // ->priority(Email::PRIORITY_HIGH)
-                        ->subject('Programmation de l\'audience du dossier : ' . $dossier->getReferenceDossier())
-                        ->priority(Email::PRIORITY_HIGH)
-
-                        // path of the Twig template to render
-                        ->htmlTemplate('mailer/partie_audience.html.twig')
-
-                        // pass variables (name => value) to the template
-                        ->context([
-                            'dossier' => $dossier,
-                            'audience' => $audience,
-                            'nom' => $membre->getUSer()->getNom()
-
-                        ]);
-
-                    $mailer->send($email);
-              }
-            }
-
-
-            /*         if ($request_telephone) {
-                         $this->envoiSMS($smsMessage, $request_telephone);
-
-                     }
-                     if ($defendeur_telephone) {
-                         $this->envoiSMS($smsMessage, $defendeur_telephone);
-
-                     }*/
-            $this->addFlash('success', 'L\'audience du dossier : ' . $dossier->getReferenceDossier() . ' a été programmé avec succes');
-            return $this->redirectToRoute('admin_arret_list', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('greffe/publicationarret.html.twig', [
-            'arret' => $arret,
-            'dossier' => $dossier,
-            'form' => $form,
-        ]);
-    }
-
-
 }

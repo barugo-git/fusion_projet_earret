@@ -10,6 +10,13 @@ parameters:
     sms_gateway.baseurl: '%env(resolve:SMSGATEWAY_BASEURL)%'
     sms_gateway.apikey: '%env(resolve:SMSGATEWAY_APIKEY)%'
     sms_gateway.apikeyprefix: '%env(resolve:SMSGATEWAY_APIKEYPREFIX)%'
+    upload_directory: '%kernel.project_dir%/public/uploads'
+    upload_models: '%upload_directory%/models'
+    upload_rapports: '%upload_directory%/rapports'
+    upload_piece_jointes: '%upload_directory%/piecesJointes'
+    upload_consignation: '%upload_directory%/consignations'
+    upload_calendrier: '%upload_directory%/calendrier'
+    profile_photos_directory: '%kernel.project_dir%/public/uploads/profile_photos'
 
 services:
     # default configuration for services in *this* file
@@ -25,27 +32,69 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+
     App\Service\FileUploader:
         arguments:
-            $targetDirectory: '%kernel.project_dir%/public/uploads'
+            $uploadDirectory: '%upload_directory%'
+            $uploadModels: '%upload_models%'
+            $uploadRapports: '%upload_rapports%'
+            $uploadPieceJointes: '%upload_piece_jointes%'
+            $uploadConsignation: '%upload_consignation%'
+            $uploadCalendrier: '%upload_calendrier%'
+            $logger: '@logger'
+
+    App\Controller\PaiementConsignationController:
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@mailer.mailer'
+            - '@logger'
+            - '@parameter_bag'
+        tags: ['controller.service_arguments']
+
+    App\Service\ReportGenerator:
+        arguments:
+            $uploadDirectory: '%upload_directory%'
+
+    App\Service\PdfGenerator:
+        arguments:
+            $uploadDirectory: '%upload_directory%'
+            $filesystem: '@filesystem'
+
+    App\Service\OnlyOfficeService:
+        arguments:
+            $documentServerUrl: '%onlyoffice_document_server_url%'
+            $secretKey: '%onlyoffice_secret_key%'
+            $urlGenerator: '@router.default'
+
+    App\Twig\AppExtension:
+        tags: ['twig.extension']
+
+    App\Controller\RapportController:
+        arguments:
+            $logger: '@logger'
+            $uploadDirectory: '%upload_directory%'
+            $rapportsDirectory: '%upload_rapports%'
+        tags: ['controller.service_arguments']
+
     monolog.dbhandler:
         class: App\Utility\DbHandler
 
-#    App\Controller\SecurityController:
-#        arguments: ['@monolog.logger.db']
     monolog.dbprocessor:
         class: App\Utility\DbProcessor
         tags:
             - {name: monolog.processor,handler: dbhandler }
+
     doctrine.doctrinesubscriber:
         class: App\EventListener\DoctrineSubscriber
         tags:
-            -   {name: doctrine.event_subscriber}
+            - {name: doctrine.event_subscriber}
+
     App\Service\CustomLoginLinkHandler:
         arguments:
             $urlGenerator: '@router'
-            $userProvider: '@security.user_providers' # Assurez-vous de remplacer par votre provider utilisateur
-        tags: [ 'security.login_link_handler' ]
+            $userProvider: '@security.user_providers'
+        tags: ['security.login_link_handler']
+
     App\EventSubscriber\LoginSubscriber:
         tags:
             - { name: kernel.event_subscriber }

@@ -1,0 +1,105 @@
+{# templates/emails/confirmation_consignation.html.twig #}
+{% extends 'front/status_base.html.twig' %}
+
+{% block body %}
+<div class="min-vh-100 d-flex align-items-center">
+    <div class="container status-container">
+        <div class="status-card">
+            <div class="status-header bg-success">
+                <h2><i class="fas fa-check-circle me-2"></i> Confirmation de Paiement</h2>
+            </div>
+            <div class="status-body">
+                <div class="text-center mb-4">
+                    <div class="success-icon mb-3">
+                        <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    <h3 class="text-success">Paiement confirmé !</h3>
+                </div>
+
+                <div class="confirmation-details">
+                    <div class="detail-item">
+                        <i class="fas fa-user-circle me-2 text-primary"></i>
+                        <span class="fw-bold">Destinataire :</span> {{ dossier.requerant.prenom }} {{ dossier.requerant.nom }}
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-barcode me-2 text-primary"></i>
+                        <span class="fw-bold">Code de suivi :</span> {{ dossier.codeSuivi }}
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-money-bill-wave me-2 text-primary"></i>
+                        <span class="fw-bold">Montant :</span> {{ paiement.montant|number_format(0, ',', ' ') }} FCFA
+                    </div>
+                    <div class="detail-item">
+                        <i class="far fa-calendar-alt me-2 text-primary"></i>
+                        <span class="fw-bold">Date :</span> {{ paiement.datePaiement|date('d/m/Y à H:i') }}
+                    </div>
+                </div>
+
+                <div class="thank-you mt-4 p-3 text-center bg-light rounded">
+                    <i class="fas fa-heart text-danger me-2"></i>
+                    <span class="fst-italic">Merci de votre confiance et de votre contribution à la justice béninoise</span>
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <a href="{{ path('paiement_consignation_index') }}" class="btn btn-status">
+                        <i class="fas fa-home me-2"></i> Retour à l'accueil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<style>
+    .success-icon {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    
+    .confirmation-details {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+    
+    .detail-item {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .detail-item:last-child {
+        border-bottom: none;
+    }
+    
+    .status-header.bg-success {
+        background: linear-gradient(135deg, #28a745, #5cb85c) !important;
+    }
+    
+    .thank-you {
+        border-left: 4px solid #28a745;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animation d'entrée
+        const card = document.querySelector('.status-card');
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100);
+    });
+</script>
+{% endblock %}

@@ -40,36 +40,10 @@ class MesuresInstructionsRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return MesuresInstructions[] Returns an array of MesuresInstructions objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('m.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?MesuresInstructions
-//    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
-
     public function mesuresInstructionParAvocatParDossier()
     {
         return $this->createQueryBuilder('m')
             ->leftJoin('m.dossier','d')
-
             ->getQuery()
             ->getResult()
         ;

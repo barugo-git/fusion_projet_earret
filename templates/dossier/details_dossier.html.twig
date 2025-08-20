@@ -3,7 +3,7 @@
 {% block title %}Dossier{% endblock %}
 
 {% block body %}
-    <div class="alert bg-dark text-white  alert-border-left alert-dismissible fade show material-shadow" role="alert">
+    <div class="alert bg-dark text-white alert-border-left alert-dismissible fade show material-shadow" role="alert">
         AFFAIRE :
         {% if dossier.requerant.type =='moral' %}
             {{ dossier.requerant.intitule }}
@@ -27,7 +27,6 @@
             {% endfor %}
         {% endif %}
     </div>
-    <!-- Danger Alert -->
     {% if dossier.consignation == false %}
         <div class="alert border-0 alert-danger material-shadow" role="alert">
             <strong>Frais de consignation pas encore payee </strong>
@@ -53,7 +52,7 @@
                 <span class="d-none d-sm-block">Défendeur</span>
             </a>
         </li>
-        {% if dossier.structures is  null  and dossier.structures is empty %}
+        {% if dossier.structures is null and dossier.structures is empty %}
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" href="#arrow-affectation" role="tab">
                     <span class="d-block d-sm-none"><i class="mdi mdi-email"></i></span>
@@ -68,7 +67,7 @@
                 <span class="d-none d-sm-block">Pieces du dossier</span>
             </a>
         </li>
-        {% if dossier.userDossiers is not null  and dossier.userDossiers is not empty %}
+        {% if dossier.userDossiers is not null and dossier.userDossiers is not empty %}
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" href="#arrow-rapporteur" role="tab">
                     <span class="d-block d-sm-none"><i class="mdi mdi-email"></i></span>
@@ -77,7 +76,6 @@
             </li>
         {% endif %}
     </ul>
-    <!-- Tab panes -->
     <div class="tab-content text-muted">
         <div class="tab-pane active" id="arrow-overview" role="tabpanel">
             <div class="row">
@@ -88,9 +86,7 @@
                                 <div class="col-sm"><h4 class="card-title mb-0">Détails de la requête</h4></div>
                                 {% include 'partials/_traitement_demande_action.html.twig' %}
                             </div>
-
-                        </div><!-- end card header -->
-                        <div class="card-body">
+                        </div><div class="card-body">
                             <table class="table">
                                 <tbody>
                                 <tr>
@@ -161,7 +157,6 @@
                                         <td>{{ dossier.affecterSection.greffier.fullName }}</td>
                                     </tr>
                                 {% endif %}
-
                                 <tr>
                                     <th>Type de dossier</th>
                                     <td>{{ dossier.typeDossier }}</td>
@@ -179,7 +174,53 @@
                                     <a href="{{ path('greffier_demande_edit_recours',{'id':dossier.id}) }}"
                                        class="btn btn-primary btn-sm">Modifier les informations du recours</a>
                                 </div>
+                            {% endif %}
+                            {% if is_granted('ROLE_CONSEILLER') or is_granted('ROLE_PCA') or is_granted('ROLE_PCJ') %}
+                                {% set auMoinsUneMesure = dossier.mesuresInstructions|length > 0 %}
+                                {% set toutesMesuresTerminees = true %}
+                                {% set dateLimiteDepassee = false %}
+                                
+                                {# Vérifie toutes les conditions #}
+                                {% if auMoinsUneMesure %}
+                                    {% set derniereMesure = dossier.mesuresInstructions|last %}
+                                    
+                                    {# Vérifie si toutes les mesures sont terminées #}
+                                    {% for reponse in derniereMesure.reponses %}
+                                        {% if not reponse.termine %}
+                                            {% set toutesMesuresTerminees = false %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {# Vérifie si la date limite de la dernière mesure est dépassée #}
+                                    {% if derniereMesure.reponses and derniereMesure.reponses.dateNotification %}
+                                        {% set dateNotification = derniereMesure.reponses.dateNotification %}
+                                        {% set delaisJours = derniereMesure.delais %}
+                                        {% set dateLimite = dateNotification|date_modify("+#{delaisJours} days") %}
+                                        {% set maintenant = "now"|date('Y-m-d H:i:s') %}
+                                        
+                                        {% if dateLimite|date('Y-m-d H:i:s') < maintenant %}
+                                            {% set dateLimiteDepassee = true %}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
 
+                                {# Affichage des boutons si toutes les conditions sont remplies #}
+                                {% if auMoinsUneMesure and toutesMesuresTerminees and dateLimiteDepassee %}
+                                    {% set rapportExiste = dossier.rapport is not null %}
+                                    <div class="hstack gap-2 justify-content-end">
+                                        {% if rapportExiste %}
+                                            <a href="{{ path('rapport_show', {'id': dossier.rapport.id}) }}" class="btn btn-primary">
+                                                <i class="fas fa-eye me-1"></i> Voir les détails du rapport
+                                            </a>
+                                        {% else %}
+                                            {% if is_granted('ROLE_CONSEILLER') %}
+                                                <a href="{{ path('rapport_generer', {'dossierId': dossier.id}) }}" class="btn btn-primary">
+                                                    <i class="fas fa-file-alt me-1"></i> Générer un rapport
+                                                </a>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
                             {% endif %}
                         </div>
                     </div>
@@ -196,25 +237,19 @@
                                 <div class="col-sm"><h4 class="card-title mb-0">Informations du requerant</h4></div>
                                 {% include 'partials/_traitement_demande_action.html.twig' %}
                             </div>
-                        </div><!-- end card header -->
-                        <div class="card-body">
+                        </div><div class="card-body">
                             <table class="table">
                                 <tbody>
                                 {% if dossier.requerant.type =='moral' %}
-
                                     <tr>
                                         <th>Intitule</th>
                                         <td>{{ dossier.requerant.intitule }}</td>
                                     </tr>
-
-
                                 {% else %}
-
                                     <tr>
                                         <th>Nom</th>
                                         <td>{{ dossier.requerant.nom }}</td>
                                     </tr>
-
                                     <tr>
                                         <th>Prénoms</th>
                                         <td>{{ dossier.requerant.prenoms }}</td>
@@ -224,7 +259,6 @@
                                         <td>{{ dossier.requerant.sexe }}</td>
                                     </tr>
                                 {% endif %}
-
                                 <tr>
                                     <th>Téléphone</th>
                                     <td>{{ dossier.requerant.Telephone }}</td>
@@ -253,8 +287,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title mb-0">Conseil(s) du requérant </h4>
-                            </div><!-- end card header -->
-                            <div class="card-body">
+                            </div><div class="card-body">
                                 {% for conseilRequerant in dossier.requerant.conseiller %}
                                     <table class="table">
                                         <tbody>
@@ -286,21 +319,18 @@
                     </div>
                 {% endif %}
                 <div class="col-lg-12">
-                   <div class="card">
-                    <div class="card-footer">
-                        {% if is_granted('ROLE_GREFFIER') or is_granted("ROLE_GREFFIER_EN_CHEF") or is_granted("ROLE_BUREAU_ORIENTATION") %}
-                            <div class="hstack gap-2 justify-content-end">
-                                <a href="{{ path('greffier_demande_edit_requerant',{'id':dossier.id}) }}"
-                                   class="btn btn-primary btn-sm">Modifier les informations du recours</a>
-                            </div>
-
-                        {% endif %}
+                    <div class="card">
+                        <div class="card-footer">
+                            {% if is_granted('ROLE_GREFFIER') or is_granted("ROLE_GREFFIER_EN_CHEF") or is_granted("ROLE_BUREAU_ORIENTATION") %}
+                                <div class="hstack gap-2 justify-content-end">
+                                    <a href="{{ path('greffier_demande_edit_requerant',{'id':dossier.id}) }}"
+                                       class="btn btn-primary btn-sm">Modifier les informations du recours</a>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
-                   </div>
                 </div>
             </div>
-
-
         </div>
         <div class="tab-pane" id="arrow-contact" role="tabpanel">
             <div class="row">
@@ -311,8 +341,7 @@
                                 <div class="col-sm"><h4 class="card-title mb-0">Informations du défendeur</h4></div>
                                 {% include 'partials/_traitement_demande_action.html.twig' %}
                             </div>
-                        </div><!-- end card header -->
-                        <div class="card-body">
+                        </div><div class="card-body">
                             <table class="table">
                                 <tbody>
                                 {% if dossier.defendeur.type =='moral' %}
@@ -320,14 +349,11 @@
                                         <th>Intitule</th>
                                         <td>{{ dossier.defendeur.intitule }}</td>
                                     </tr>
-
                                 {% else %}
-
                                     <tr>
                                         <th>Nom</th>
                                         <td>{{ dossier.defendeur.nom }}</td>
                                     </tr>
-
                                     <tr>
                                         <th>Prénoms</th>
                                         <td>{{ dossier.defendeur.prenoms }}</td>
@@ -337,7 +363,6 @@
                                         <td>{{ dossier.defendeur.sexe }}</td>
                                     </tr>
                                 {% endif %}
-
                                 <tr>
                                     <th>Téléphone</th>
                                     <td>{{ dossier.defendeur.Telephone }}</td>
@@ -366,8 +391,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title mb-0">Conseil(s) du defendeur </h4>
-                            </div><!-- end card header -->
-                            <div class="card-body">
+                            </div><div class="card-body">
                                 {% for conseil in dossier.defendeur.conseiller %}
                                     <table class="table">
                                         <tbody>
@@ -400,16 +424,14 @@
                 {% endif %}
             </div>
         </div>
-        {% if dossier.structures is  null  and dossier.structures is empty %}
+        {% if dossier.structures is null and dossier.structures is empty %}
             <div class="tab-pane" id="arrow-affectation" role="tabpanel">
                 <div class="row">
-
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title mb-0">Les affectations </h4>
-                            </div><!-- end card header -->
-                            <div class="card-body">
+                            </div><div class="card-body">
                                 <table class="table table-striped">
                                     <thead>
                                     <tr>
@@ -420,7 +442,6 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-
                                     {% for structure in dossier.structures %}
                                         <tr>
                                             <td> {{ structure.dateAffection ? structure.dateAffection|date('Y-m-d') : '' }}</td>
@@ -429,91 +450,64 @@
                                             <td> {{ structure.motif }}</td>
                                         </tr>
                                     {% endfor %}
-
-
-
-                                    {#                        {% for section in dossier.affecterSections %} #}
-                                    {#                            <tr> #}
-                                    {#                                <td> {{ section.dateAffectation ? section.dateAffectation|date('Y-m-d') : '' }}</td> #}
-                                    {#                                <td>  {{ section.section.structure.name }}</td> #}
-                                    {#                                <td>{{ section.section.name }}</td> #}
-                                    {#                                <td> {{ section.motif }}</td> #}
-                                    {#                            </tr> #}
-                                    {#                        {% endfor %} #}
-
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
         {% endif %}
-        {% if dossier.userDossiers is not null  and dossier.userDossiers is not empty %}
+        {% if dossier.userDossiers is not null and dossier.userDossiers is not empty %}
             <div class="tab-pane" id="arrow-rapporteur" role="tabpanel">
                 <div class="row">
-
                     <div class="col-lg-12">
-
                         {% if dossier.userDossiers %}
                             <div class="card">
                                 <div class="card-header">
                                     <h4 class="card-title mb-0">Les rapporteurs du dossier</h4>
-                                </div><!-- end card header -->
-                                <div class="card-body">
+                                </div><div class="card-body">
                                     <table class="table table-striped">
                                         <thead>
                                         <tr>
                                             <th> Nom & prénoms</th>
                                             <th> Profil</th>
-
                                         </tr>
                                         </thead>
                                         <tbody>
-
                                         {% for user in dossier.userDossiers %}
                                             <tr>
-
                                                 <td> {{ user.user.FullName }} </td>
-
                                                 <td> {{ user.profil }}</td>
-
                                             </tr>
                                         {% endfor %}
-
                                         </tbody>
                                     </table>
                                     {% if dossier.statut =='Dossier au Rôle' or dossier.finMesuresInstruction == true %}
-                                    <div class=" mt-20  alert  alert-border-left alert-dismissible fade show material-shadow" role="alert">
-                                        <h5> Resume des Conclusion du Conseiller Rapporteur : </h5>
-                                        {{ dossier.rapportDescriptionCR }}
-                                    </div>
-                                        <div class=" mt-20  alert  alert-border-left alert-dismissible fade show material-shadow" role="alert">
-
+                                        <div class="mt-20 alert alert-border-left alert-dismissible fade show material-shadow" role="alert">
+                                            <h5> Resume des Conclusion du Conseiller Rapporteur : </h5>
+                                            {{ dossier.rapportDescriptionCR }}
+                                        </div>
+                                        <div class="mt-20 alert alert-border-left alert-dismissible fade show material-shadow" role="alert">
                                             <a href="{{ dossier.rapportCRFichier }}" target="_blank">
                                                 <h5> Télécharger ou lire les Conclusion du Conseiller Rapporteur : </h5>
                                             </a>
                                         </div>
-
                                     {% endif%}
                                 </div>
                             </div>
                         {% endif %}
-
                     </div>
                 </div>
             </div>
         {% endif %}
-
         <div class="tab-pane" id="arrow-pieces" role="tabpanel">
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-header">
                             <h4 class="card-title mb-0">Pieces de la requête</h4>
-                        </div><!-- end card header -->
-                        <div class="card-body">
+                        </div><div class="card-body">
                             <table class="table">
                                 <thead>
                                 <tr>
@@ -540,36 +534,11 @@
                         </div>
                     </div>
                 </div>
-                {#                <div class="col-lg-12"> #}
-                {#                    <div class="card"> #}
-                {#                        <div class="card-header"> #}
-                {#                            <h4 class="card-title mb-0">Ajoute des pieces supplementaires</h4> #}
-                {#                        </div><!-- end card header --> #}
-                {#                        {% form_theme form 'form_theme/_form_collection_dossier.html.twig' %} #}
-                {#                        <div class="card-body"> #}
-                {#                            {{ form_start(form) }} #}
-                {#                            {{ form_row(form.pieces) }} #}
-                {#                            {{ form_end(form) }} #}
-                {#                        </div> #}
-                {#                    </div> #}
-                {#                </div> #}
             </div>
         </div>
     </div>
-
-    {#    {{ form_row(form.pieces) }} #}
-    {#    <a href="{{ path('app_dossier_index') }}">back to list</a> #}
-
-    {#    <a href="{{ path('app_dossier_edit', {'id': dossier.id}) }}">edit</a> #}
-
-    {#    {{ include('dossier/_delete_form.html.twig') }} #}
 {% endblock %}
 {% block javascripts %}
     <script src="{{ asset('js/jquery-3.6.0.min.js') }}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
-            integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="{{ asset('js/collection-pieces-jointes.js') }}"></script>
-
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 {% endblock %}

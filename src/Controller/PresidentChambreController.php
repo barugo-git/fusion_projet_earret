@@ -29,29 +29,23 @@ use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route(path: '/president-chambre/dossiers')]
-//#[IsGranted('ROLE_PCJ')]
 #[IsGranted(new Expression('is_granted("ROLE_PCA") or is_granted("ROLE_PCJ") or is_granted("ROLE_PCS")'))]
 class PresidentChambreController extends AbstractController
 {
     #[Route(path: '/liste-recours', name: 'app_president_chambre')]
     public function index(DossierRepository $dossierRepository): Response
     {
-
         $structure = $this->getUser()->getStructure();
-        // dd($this->getUser()->getStructure()->getId());
-        //$this->g
+        
         return $this->render('president/recours.html.twig', [
             'dossiers' => $dossierRepository->findBy([
                 'etatDossier' => 'RECOURS',
                 'structure' => $structure->getId()
-//                'createdBy'=>$this->getUser(),
-//                'structure'=>$this->getUser()->getStructure()
             ]),
         ]);
     }
@@ -59,12 +53,11 @@ class PresidentChambreController extends AbstractController
     #[Route(path: '/autorisation-dossier/{id}', name: 'autorisation_ouverture_dossier', methods: ['GET', 'POST'])]
     public function autorisationOvertureDossier(Request $request, Dossier $dossier, DossierRepository $dossierRepository, UserRepository $userRepository): Response
     {
-
         $form = $this->createForm(AutorisationOuvertureType::class, $dossier);
         $form->handleRequest($request);
         $greffierEnChef = $userRepository->findOneBy(['titre' => 'GREFFIER EN CHEF'])->getFullName();
+        
         if ($form->isSubmitted() && $form->isValid()) {
-
             $dossier->setEtatDossier("AUTORISATION");
             $dossier->setAutorisation(true);
             $dossierRepository->add($dossier, true);
@@ -74,7 +67,7 @@ class PresidentChambreController extends AbstractController
         }
 
         return $this->render('president/autorisation_ouverture.html.twig', [
-            'form' => $form,
+            'form' => $form->createView(),
             'greffierEnChef' => $greffierEnChef,
             'dossier' => $dossier,
         ]);
@@ -86,9 +79,8 @@ class PresidentChambreController extends AbstractController
         $affecterSection = new AffecterSection();
         $affecterSection->setDossier($dossier);
         $structure = $this->getUser()->getStructure();
-//        dd($structure);
+
         $form = $this->createForm(OuvertureAffecterSectionType::class, $affecterSection, ['structure' => $structure]);
-        //   dd($request->);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -107,14 +99,14 @@ class PresidentChambreController extends AbstractController
             $userDossierRepository->add($greffier);
             $dossier->setAutorisation(true);
             $affecterSectionRepository->add($affecterSection, true);
-            $this->addFlash('success', 'L\'autorisation d\'ouverture du recours à été effectuée avec success et affecte à : ' . $form->get('section')->getData()->getName());
+            $this->addFlash('success', 'L\'autorisation d\'ouverture du recours à été effectuée avec success et affectée à : ' . $form->get('section')->getData()->getName());
 
             return $this->redirectToRoute('app_recours_autorisation');
         }
 
         return $this->render('president/affectation_ouverture.html.twig', [
             'affecter_section' => $affecterSection,
-            'form' => $form,
+            'form' => $form->createView(),
             'dossier' => $dossier,
         ]);
     }
@@ -122,18 +114,16 @@ class PresidentChambreController extends AbstractController
     #[Route(path: '/liste-recours-autorisation', name: 'app_recours_autorisation')]
     public function listeRecoursAutorise(DossierRepository $dossierRepository): Response
     {
-        $structure = $this->getUser()->getStructure();
         return $this->render('president/liste-autorisation.html.twig', [
             'dossiers' => $dossierRepository->findBy([
                 'etatDossier' => 'AUTORISATION',
-//                'createdBy'=>$this->getUser(),
                 'structure' => $this->getUser()->getStructure()
             ]),
         ]);
     }
 
     #[Route(path: '/dossiers-ouverts', name: 'pc_dossier_ouverture', methods: ['GET', 'POST'])]
-    public function ListeAffectations(DossierRepository $dossierRepository): \Symfony\Component\HttpFoundation\Response
+    public function ListeAffectations(DossierRepository $dossierRepository): Response
     {
         $structure = $this->getUser()->getStructure();
         return $this->render('dossier/dossier_ouvert_pc.html.twig', [
@@ -157,9 +147,8 @@ class PresidentChambreController extends AbstractController
     }
 
     #[Route(path: '/affectations-au-parquet/', name: 'pc_dossier_affectations_list')]
-    public function affectationsPG(#[CurrentUser] User $user, DossierRepository $dossierRepository): \Symfony\Component\HttpFoundation\Response
+    public function affectationsPG(#[CurrentUser] User $user, DossierRepository $dossierRepository): Response
     {
-
         return $this->render('president/liste_affectation_PG.html.twig', [
             'dossiers' => $dossierRepository->findBy(['statut' => 'Dossier au Rôle']),
         ]);
@@ -186,9 +175,8 @@ class PresidentChambreController extends AbstractController
         }
 
         return $this->render('president/affectationPCauPG.html.twig', [
-//            'affecter_structure' => $affecterStructure,
             'dossier' => $dossier,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -201,23 +189,22 @@ class PresidentChambreController extends AbstractController
         $form->handleRequest($request);
         $destinataire = $userDossierRepository->findOneBy([
             'dossier' => $dossier,
-            'profil' =>'CONSEILLER RAPPORTEUR'
+            'profil' => 'CONSEILLER RAPPORTEUR'
         ]);
+        
         if ($form->isSubmitted() && $form->isValid()) {
             $dossier->setEtatDossier('AVIS CR');
             $affecterUser->setExpediteur($this->getUser());
-           // $affecterUser->setDestinataire($destinataire);
             $affecterUser->setDestinataire($destinataire->getUser());
             $affecterUserRepository->add($affecterUser, true);
-//            $this->addFlash('success', 'le dossier a été bien transferé au conseilleur rapporteur : ' . $form->get('destinataire')->getData()->getUserInformations() . ' pour ouverture');
+            
+            $this->addFlash('success', 'Le dossier a été bien transféré au conseiller rapporteur.');
             return $this->redirectToRoute('admin_dossier_affections', ['id' => $dossier->getId()]);
         }
 
         return $this->render('president/affectation_conseiller_rapporteut.html.twig', [
-//            'affecter_structure' => $affecterStructure,
             'dossier' => $dossier,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
-
 }

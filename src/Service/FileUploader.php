@@ -1,79 +1,111 @@
 <?php
-
+// src/Service/FileUploader.php
 namespace App\Service;
 
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Psr\Log\LoggerInterface;
 
 class FileUploader
 {
-    private $targetDirectory;
-    private $slugger;
+    private array $uploadPaths;
+    private LoggerInterface $logger;
+    private SluggerInterface $slugger;
 
-    public function __construct($targetDirectory, SluggerInterface $slugger)
-    {
-        $this->targetDirectory = $targetDirectory;
+    public function __construct(
+        string $uploadDirectory,
+        string $uploadModels,
+        string $uploadRapports,
+        string $uploadPieceJointes,
+        string $uploadConsignation,
+        string $uploadCalendrier,
+        LoggerInterface $logger,
+        SluggerInterface $slugger
+    ) {
+        $this->uploadPaths = [
+            'models' => $uploadModels,
+            'rapports' => $uploadRapports,
+            'piecesJointes' => $uploadPieceJointes,
+            'consignations' => $uploadConsignation,
+            'calendrier' => $uploadCalendrier,
+            'default' => $uploadDirectory
+        ];
+        $this->logger = $logger;
         $this->slugger = $slugger;
     }
 
-    public function upload(UploadedFile $file, String $name=null,$path=null)
+    public function upload(UploadedFile $file, ?string $name = null, ?string $folder = 'default'): string
     {
-        if($name) {
-            $safeFilename = $this->slugger->slug($name);
-            $fileName = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
-        }
-        else {
-            $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-            $safeFilename = $this->slugger->slug($originalFilename);
-            $fileName = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
+        if (!array_key_exists($folder, $this->uploadPaths)) {
+            throw new \InvalidArgumentException("Dossier de destination invalide: $folder");
         }
 
+        $targetDir = $this->uploadPaths[$folder];
 
         try {
-            if ($path) {
-                $realpath = $this->getTargetDirectory().'/'.$path;
-                $file->move($realpath, $fileName);
-            }else {
-                $file->move($this->getTargetDirectory(), $fileName);
+            if (!is_dir($targetDir)) {
+                mkdir($targetDir, 0775, true);
             }
 
+            // Création du nom de fichier sécurisé
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeName = $name ? $this->slugger->slug($name) : $this->slugger->slug($originalName);
+            $fileName = $safeName . '-' . uniqid() . '.' . $file->guessExtension();
+
+            $file->move($targetDir, $fileName);
+
+            return $folder . '/' . $fileName;
+
         } catch (FileException $e) {
-
+            $this->logger->error('Erreur upload fichier', [
+                'error' => $e->getMessage(),
+                'folder' => $folder,
+                'file' => $file->getClientOriginalName()
+            ]);
+            throw new \RuntimeException("Échec de l'upload du fichier");
         }
-
-        return $fileName;
     }
 
-    public function getTargetDirectory()
+    public function removeFile(string $filePath): bool
     {
-        return $this->targetDirectory;
+        foreach ($this->uploadPaths as $path) {
+            $absolutePath = $path . '/' . $filePath;
+            if (file_exists($absolutePath)) {
+                return unlink($absolutePath);
+            }
+        }
+        return false;
     }
 
-    public  function slugify($text, string $divider = '-')
+    public function getUploadDirectory(string $type = 'default'): string
     {
-        // replace non letter or digits by divider
+        if (!array_key_exists($type, $this->uploadPaths)) {
+            throw new \InvalidArgumentException("Type de dossier inconnu: $type");
+        }
+        return $this->uploadPaths[$type];
+    }
+
+    public function slugify(string $text, string $divider = '-'): string
+    {
+        // Remplace les caractères non alphanumériques par le séparateur
         $text = preg_replace('~[^\pL\d]+~u', $divider, $text);
 
-        // transliterate
+        // Translitération
         $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
 
-        // remove unwanted characters
+        // Supprime les caractères indésirables
         $text = preg_replace('~[^-\w]+~', '', $text);
 
-        // trim
+        // Trim
         $text = trim($text, $divider);
 
-        // remove duplicate divider
+        // Supprime les doublons de séparateur
         $text = preg_replace('~-+~', $divider, $text);
 
-        // lowercase
+        // Minuscule
         $text = strtolower($text);
 
-        if (empty($text)) {
-            return 'n-a';
-        }
-
-        return $text;
+        return empty($text) ? 'n-a' : $text;
     }
 }

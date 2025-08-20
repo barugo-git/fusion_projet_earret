@@ -1,26 +1,91 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Dossier index{% endblock %}
+{% block title %}Paiement de consignation - {{ dossier.referenceDossier }}{% endblock %}
 
 {% block body %}
-    <div class="row">
-        <div class="col-lg-8 offset-lg-2">
-            <div class="card">
-                <div class="card-header">
+    <div class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-15">
+                <div class="card">
+                    <div class="card-header py-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-2">
+                                <i class="fas fa-file-invoice-dollar me-2"></i>
+                                {{ dossier.referenceDossier }}
+                            </h4>
+                        </div>
+                    </div>
 
-                    {% include 'partials/_intitule_dossier.html.twig' %} <br>
+                    <div class="card-body form-container">
+                        {% for message in app.flashes('error') %}
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
 
-                    <h4 class="card-title mb-0">Paiement de la consignation {{ dossier.referenceDossier }}</h4>
-                </div><!-- end card header -->
+                        {{ form_start(form, {'attr': {'id': 'upload-form', 'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
 
-                <div class="card-body">
-                    {{ form_start(form) }}
-                    {{ form_widget(form) }}
-                    <button class="btn  btn-success la-pull-right">{{ button_label|default('Constater la consignation') }}</button>
-                    {{ form_end(form) }}
+                        <div class="mb-4">
+                            <label class="form-label fw-bold required-field">Quittance de paiement</label>
+                            {{ form_widget(form.document, {'attr': {
+                                'class': 'form-control',
+                                'accept': 'application/pdf,image/*',
+                                'required': 'required'
+                            }}) }}
+                            <div class="form-text">Formats acceptés : PDF, JPG, PNG (Max 5MB)</div>
+                            {{ form_errors(form.document) }}
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-submit">
+                                <i class="fas fa-paper-plane me-2"></i> {{ button_label|default('Envoyer la quittance') }}
+                            </button>
+                        </div>
+
+                        {{ form_end(form) }}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('upload-form');
+            const fileInput = form.querySelector('input[type="file"]');
+            
+            form.addEventListener('submit', function(e) {
+                // Validation du fichier
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    e.preventDefault();
+                    alert('Veuillez sélectionner un fichier avant de soumettre');
+                    fileInput.classList.add('is-invalid');
+                    
+                    // Ajout d'un message d'erreur si nécessaire
+                    if (!document.getElementById('file-error')) {
+                        const errorDiv = document.createElement('div');
+                        errorDiv.id = 'file-error';
+                        errorDiv.className = 'invalid-feedback';
+                        errorDiv.textContent = 'Un fichier est requis';
+                        fileInput.parentNode.appendChild(errorDiv);
+                    }
+                }
+            });
+
+            // Réinitialiser l'état d'erreur quand un fichier est sélectionné
+            fileInput.addEventListener('change', function() {
+                if (fileInput.files && fileInput.files.length > 0) {
+                    fileInput.classList.remove('is-invalid');
+                    const errorDiv = document.getElementById('file-error');
+                    if (errorDiv) {
+                        errorDiv.remove();
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock %}

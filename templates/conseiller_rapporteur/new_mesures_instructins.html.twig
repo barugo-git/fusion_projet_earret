@@ -24,7 +24,7 @@
                     {% endfor %}
 
                     {{ form_start(form, {'attr': {'id': 'mesure_instruction_form'}}) }}
-                    
+
                     <div class="mb-4">
                         <div class="instruction-existante">
                             {{ form_label(form.instruction, 'Instruction', {'label_attr': {'class': 'form-label required'}}) }}
@@ -96,11 +96,11 @@
 
             toggleButton.addEventListener('click', function() {
                 const isCreatingNew = nouvelleInstructionFields.style.display === 'none';
-                
+
                 nouvelleInstructionFields.style.display = isCreatingNew ? 'block' : 'none';
                 instructionSelect.disabled = isCreatingNew;
                 instructionSelect.value = isCreatingNew ? '' : instructionSelect.value;
-                
+
                 if (isCreatingNew) {
                     toggleButton.innerHTML = '<i class="ri-arrow-left-line"></i> Revenir aux instructions existantes';
                     toggleButton.classList.remove('btn-primary');

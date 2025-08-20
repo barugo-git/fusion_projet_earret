@@ -109,4 +109,9 @@ class Representant
 
         return $this;
     }
+
+    public function getNomComplet(): string
+    {
+        return $this->nom . ' ' . $this->prenom;
+    }
 }

@@ -1,0 +1,200 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un Modèle de Rapport{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .detail-card {
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
+            border-bottom: none;
+            padding: 1.5rem;
+            margin: -2rem -2rem 2rem -2rem;
+        }
+        
+        /* Style des éléments de formulaire */
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #495057;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-label i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 0.75rem 1.25rem;
+            border: 1px solid #ced4da;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #3a7bd5;
+            box-shadow: 0 0 0 0.25rem rgba(58, 123, 213, 0.25);
+        }
+        
+        .form-text {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            color: #6c757d;
+        }
+
+        /* Boutons */
+        .btn-action {
+            border-radius: 50px;
+            padding: 0.75rem 1.75rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-action i {
+            margin-right: 0.5rem;
+        }
+        
+        .btn-outline-danger {
+            border: 1px solid #dc3545;
+            color: #dc3545;
+        }
+        
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        /* Disposition responsive */
+        @media (max-width: 768px) {
+            .detail-card {
+                padding: 1.5rem;
+            }
+            
+            .btn-action {
+                width: 100%;
+                margin-bottom: 0.75rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="detail-card card">
+                <div class="card-header text-white">
+                    <h1 class="mb-0 text-white">
+                        <i class="fas fa-file-circle-plus me-2"></i>Créer un Nouveau Modèle
+                    </h1>
+                </div>
+
+                {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+                <div class="form-group">
+                    {{ form_label(form.nomFichier, null, {'label': 'Nom du Modèle', 'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.nomFichier, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': 'EX : ADMINISTRATIVE_SECTION_1_DECHEANCE'
+                        }
+                    }) }}
+                    <small class="form-text">
+                        Ce nom sera utilisé pour identifier le modèle dans la liste
+                    </small>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        {{ form_label(form.structure, null, {'label': 'Structure', 'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.structure, {'attr': {'class': 'form-select'}}) }}
+                    </div>
+                    <div class="col-md-6 form-group">
+                        {{ form_label(form.section, null, {'label': 'Section', 'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.section, {'attr': {'class': 'form-select'}}) }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.typeRapport, null, {'label': 'Type de Rapport', 'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.typeRapport, {'attr': {'class': 'form-select'}}) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.fichier, null, {'label': 'Fichier DOCX', 'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.fichier, {'attr': {'class': 'form-control'}}) }}
+                    <small class="form-text">
+                        Formats acceptés : .docx (max 5MB). Le fichier est obligatoire pour la création.
+                    </small>
+                </div>
+
+                <div class="d-flex justify-content-between mt-5 button-group">
+                    <a href="{{ path('app_modele_rapport_index') }}" class="btn btn-outline-danger btn-action">
+                        <i class="fas fa-times"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-action">
+                        <i class="fas fa-save"></i> Créer le Modèle
+                    </button>
+                </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const structureSelect = document.getElementById("modele_rapport_structure");
+    const sectionSelect = document.getElementById("modele_rapport_section");
+
+    // Fonction pour charger les sections
+    const loadSections = (structureId) => {
+        if (!structureId) {
+            sectionSelect.innerHTML = '<option value="">Sélectionnez d\'abord une structure</option>';
+            return;
+        }
+
+        fetch(`/sections/${structureId}`)
+            .then(response => response.json())
+            .then(data => {
+                let options = '<option value="">Sélectionnez une section</option>';
+                data.forEach(section => {
+                    options += `<option value="${section.id}">${section.name}</option>`;
+                });
+                sectionSelect.innerHTML = options;
+            })
+            .catch(error => console.error("Erreur:", error));
+    };
+
+    // Écouteur de changement
+    structureSelect.addEventListener("change", function() {
+        loadSections(this.value);
+    });
+
+    // Initialisation si une structure est déjà sélectionnée
+    if (structureSelect.value) {
+        loadSections(structureSelect.value);
+    }
+});
+</script>
+{% endblock %}

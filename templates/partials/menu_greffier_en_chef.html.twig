@@ -2,15 +2,18 @@
     <a href="{{ path('greffier_chef_recours') }}" class="nav-link" data-key="t-analytics">
         <i class="ri-folder-add-fill"></i>
         Dossiers en attente d'ouverture
-
     </a>
 </li>
 <li class="nav-item">
     <a href="{{ path('greffier_chef_dossier_affectations_list') }}" class="nav-link" data-key="t-analytics">
         <i class="ri-folder-add-fill"></i>
         Liste des dossiers ouverts
-
     </a>
+</li>
+<li class="nav-item">
+    {% if is_granted('ROLE_GREFFIER_EN_CHEF') or is_granted('ROLE_GREFFIER') %}
+        <a href="{{ path('paiement_consignation_admin_list') }}" class="nav-link" data-key="t-analytics"> <i class="ri-folder-add-fill"></i> Gestion des consignations</a>
+    {% endif %}
 </li>
 
 {#<li class="nav-item">#}
@@ -20,7 +23,6 @@
 {#    </a>#}
 {#   #}
 {#    <div class="collapse menu-dropdown" id="sidebarDashboards">#}
-
 {#        <ul class="nav nav-sm flex-column">#}
 {#            <li class="nav-item">#}
 {#                <a href="{{ path('app_dossier_affectations_list') }}" class="nav-link" data-key="t-analytics"> Liste des affectations </a>#}
@@ -31,8 +33,6 @@
 {#            <li class="nav-item">#}
 {#                <a href="{{ path('admin_affectation_all') }}" class="nav-link" data-key="t-crm"> Toutes les affectations</a>#}
 {#            </li>#}
-
-
 {#        </ul>#}
 {#    </div>#}
 {#</li>#}
@@ -40,65 +40,50 @@
 {#    <a href="{{ path('admin_arret_list') }}" class="nav-link" data-key="t-analytics">#}
 {#        <i class="ri-folder-add-fill"></i>#}
 {#        Liste des arrêts#}
-
 {#    </a>#}
 {#</li>#}
-
 {#<li class="nav-item">#}
 {#    <a href="{{ path('greffier_audience_liste') }}" class="nav-link" data-key="t-analytics">#}
 {#        <i class="ri-folder-add-fill"></i>#}
 {#        Liste des audiences Programmées#}
-
 {#    </a>#}
 {#</li>#}
 {#<li class="nav-item">#}
 {#    <a href="#" class="nav-link" data-key="t-analytics">#}
 {#        <i class="ri-folder-add-fill"></i>#}
 {#        Liste des mesures d'instruction#}
-
 {#    </a>#}
 {#</li>#}
-
 {#<li class="nav-item">#}
 {#    <a href="#" class="nav-link" data-key="t-analytics">#}
 {#        <i class="ri-folder-add-fill"></i>#}
 {#        dossier en attente d'arrêts#}
-
 {#    </a>#}
 {#</li>#}
 {#<li class="nav-item">#}
 {#    <a href="#" class="nav-link" data-key="t-analytics">#}
 {#        <i class="ri-folder-add-fill"></i>#}
 {#        Dossier en attente de délibération#}
-
 {#    </a>#}
 {#</li>#}
 {#<li class="nav-item">#}
 {#    <a href="#" class="nav-link" data-key="t-analytics">#}
 {#        <i class="ri-folder-add-fill"></i>#}
 {#       Dossier Vide#}
-
 {#    </a>#}
 {#</li>#}
-
 {#<li class="nav-item">#}
 {#    <a href="#" class="nav-link" data-key="t-analytics">#}
 {#        <i class="ri-folder-add-fill"></i>#}
 {#        Enregistrer une requête spéciale#}
-
 {#    </a>#}
 {#</li>#}
-
-
 {#<li class="nav-item">#}
 {#    <a href="#" class="nav-link" data-key="t-analytics">#}
 {#        <i class="ri-folder-add-fill"></i>#}
 {#        Enregistrer un pouvoir en cassation#}
-
 {#    </a>#}
 {#</li>#}
-
-
 {#<li class="nav-item">#}
 {#    <a href="#" class="nav-link" data-key="t-analytics">#}
 {#        <i class="ri-folder-add-fill"></i>#}

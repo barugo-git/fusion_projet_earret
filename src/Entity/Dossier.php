@@ -27,7 +27,6 @@ class Dossier
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $typeDossier;
 
-
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $referenceDossier;
 
@@ -40,7 +39,6 @@ class Dossier
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $etatDossier;
 
-
     #[ORM\ManyToOne(targetEntity: Objet::class, inversedBy: 'dossiers')]
     private $objet;
 
@@ -50,10 +48,8 @@ class Dossier
     #[ORM\OneToMany(targetEntity: AffecterStructure::class, mappedBy: 'dossier')]
     private $structures;
 
-
     #[ORM\OneToMany(targetEntity: Arrets::class, mappedBy: 'dossier')]
     private $arrets;
-
 
     #[ORM\OneToMany(mappedBy: 'dossier', targetEntity: DossierPiecesJointes::class, cascade: ['persist'])]
     private $pieces;
@@ -66,7 +62,6 @@ class Dossier
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $updatedAt;
-
 
     #[ORM\ManyToOne(targetEntity: Structure::class, inversedBy: 'dossiers')]
     private $structure;
@@ -100,6 +95,7 @@ class Dossier
 
     #[ORM\Column(type: 'text', nullable: true)]
     private $annotation;
+
     #[ORM\OneToMany(targetEntity: AvisPaquet::class, mappedBy: 'dossier')]
     private $avisPaquets;
 
@@ -108,6 +104,7 @@ class Dossier
 
     #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'dossiersRequerant')]
     private ?Partie $requerant;
+
     #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'dossiersDefendeur')]
     private ?Partie $defendeur = null;
 
@@ -171,6 +168,12 @@ class Dossier
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $calendrier = null;
 
+    /**
+     * @ORM\OneToOne(targetEntity=Rapport::class, mappedBy="dossier")
+     */
+    #[ORM\OneToOne(targetEntity: Rapport::class, mappedBy: "dossier")]
+    private $rapport;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $rapportCR = null;
 
@@ -201,13 +204,24 @@ class Dossier
     #[ORM\OneToMany(mappedBy: 'dossier', targetEntity: Pieces::class)]
     private Collection $piecesDoc;
 
+    #[ORM\OneToOne(mappedBy: 'dossier', cascade: ['persist', 'remove'])]
+    private ?PaiementConsignation $paiementConsignation = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $PreuveConsignationRequerant = null;
+
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $DatePreuveConsignationRequerant = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $RecuConsignation = null;
+
+
     public function __construct()
     {
         $this->userDossiers = new ArrayCollection();
         $this->structures = new ArrayCollection();
-
         $this->arrets = new ArrayCollection();
-
         $this->pieces = new ArrayCollection();
         $this->audience = new ArrayCollection();
         $this->mesuresInstructions = new ArrayCollection();
@@ -232,6 +246,21 @@ class Dossier
     {
         $this->referenceEnregistrement = $referenceEnregistrement;
 
+        return $this;
+    }
+
+    public function getRapport(): ?Rapport
+    {
+        return $this->rapport;
+    }
+
+    public function setRapport(?Rapport $rapport): self
+    {
+        if ($rapport !== null && $rapport->getDossier() !== $this) {
+            $rapport->setDossier($this);
+        }
+
+        $this->rapport = $rapport;
         return $this;
     }
 
@@ -352,7 +381,6 @@ class Dossier
     public function removeUserDossier(UserDossier $userDossier): self
     {
         if ($this->userDossiers->removeElement($userDossier)) {
-            // set the owning side to null (unless already changed)
             if ($userDossier->getDossier() === $this) {
                 $userDossier->setDossier(null);
             }
@@ -382,7 +410,6 @@ class Dossier
     public function removeStructure(AffecterStructure $structure): self
     {
         if ($this->structures->removeElement($structure)) {
-            // set the owning side to null (unless already changed)
             if ($structure->getDossier() === $this) {
                 $structure->setDossier(null);
             }
@@ -390,7 +417,6 @@ class Dossier
 
         return $this;
     }
-
 
     /**
      * @return Collection<int, Arrets>
@@ -413,7 +439,6 @@ class Dossier
     public function removeArret(Arrets $arret): self
     {
         if ($this->arrets->removeElement($arret)) {
-            // set the owning side to null (unless already changed)
             if ($arret->getDossier() === $this) {
                 $arret->setDossier(null);
             }
@@ -421,7 +446,6 @@ class Dossier
 
         return $this;
     }
-
 
     public function getRequerant(): ?Partie
     {
@@ -434,7 +458,6 @@ class Dossier
 
         return $this;
     }
-
 
     /**
      * @return Collection<int, DossierPiecesJointes>
@@ -457,7 +480,6 @@ class Dossier
     public function removePiece(DossierPiecesJointes $piece): self
     {
         if ($this->pieces->removeElement($piece)) {
-            // set the owning side to null (unless already changed)
             if ($piece->getDossier() === $this) {
                 $piece->setDossier(null);
             }
@@ -489,7 +511,6 @@ class Dossier
 
         return $this;
     }
-
 
     public function getStructure(): ?Structure
     {
@@ -601,7 +622,6 @@ class Dossier
     public function removeMesuresInstruction(MesuresInstructions $mesuresInstruction): self
     {
         if ($this->mesuresInstructions->removeElement($mesuresInstruction)) {
-            // set the owning side to null (unless already changed)
             if ($mesuresInstruction->getDossier() === $this) {
                 $mesuresInstruction->setDossier(null);
             }
@@ -617,12 +637,10 @@ class Dossier
 
     public function setAffecterSection(?AffecterSection $affecterSection): self
     {
-        // unset the owning side of the relation if necessary
         if ($affecterSection === null && $this->affecterSection !== null) {
             $this->affecterSection->setDossier(null);
         }
 
-        // set the owning side of the relation if necessary
         if ($affecterSection !== null && $affecterSection->getDossier() !== $this) {
             $affecterSection->setDossier($this);
         }
@@ -668,7 +686,6 @@ class Dossier
         return $this;
     }
 
-
     public function getAnnotation(): ?string
     {
         return $this->annotation;
@@ -702,7 +719,6 @@ class Dossier
     public function removeAvisPaquet(AvisPaquet $avisPaquet): self
     {
         if ($this->avisPaquets->removeElement($avisPaquet)) {
-            // set the owning side to null (unless already changed)
             if ($avisPaquet->getDossier() === $this) {
                 $avisPaquet->setDossier(null);
             }
@@ -732,7 +748,6 @@ class Dossier
     public function removeDeliberation(DeliberationDossiers $deliberation): self
     {
         if ($this->deliberation->removeElement($deliberation)) {
-            // set the owning side to null (unless already changed)
             if ($deliberation->getDossier() === $this) {
                 $deliberation->setDossier(null);
             }
@@ -930,7 +945,6 @@ class Dossier
     public function removeMouvement(Mouvement $mouvement): static
     {
         if ($this->mouvements->removeElement($mouvement)) {
-            // set the owning side to null (unless already changed)
             if ($mouvement->getDossier() === $this) {
                 $mouvement->setDossier(null);
             }
@@ -972,7 +986,6 @@ class Dossier
     public function removeAffecterUser(AffecterUser $affecterUser): static
     {
         if ($this->affecterUsers->removeElement($affecterUser)) {
-            // set the owning side to null (unless already changed)
             if ($affecterUser->getDossier() === $this) {
                 $affecterUser->setDossier(null);
             }
@@ -995,28 +1008,28 @@ class Dossier
 
     public function getIntitule()
     {
-      $intitule = '';
-        if ($this->requerant->getType() =='moral'){
+        $intitule = '';
+        if ($this->requerant->getType() == 'moral') {
             $intitule = $this->requerant->getIntitule();
-        } else{
-            $intitule = $this->requerant->getNom() .' '. $this->requerant->getPrenoms();
+        } else {
+            $intitule = $this->requerant->getNom() . ' ' . $this->requerant->getPrenoms();
         }
 
-        if ($this->defendeur->getType() =='moral'){
-            $intitule .= ' contre '.$this->defendeur->getIntitule();
-        } else{
-            $intitule .= ' contre '. $this->defendeur->getNom() .' '. $this->defendeur->getPrenoms();
+        if ($this->defendeur && $this->defendeur->getType() == 'moral') {
+            $intitule .= ' contre ' . $this->defendeur->getIntitule();
+        } elseif ($this->defendeur) {
+            $intitule .= ' contre ' . $this->defendeur->getNom() . ' ' . $this->defendeur->getPrenoms();
         }
-        if ($this->referenceDossier){
-            $intitule .= ' ( '.$this->referenceDossier.')';
+        
+        if ($this->referenceDossier) {
+            $intitule .= ' ( ' . $this->referenceDossier . ')';
         }
         return $intitule;
     }
 
     public function getPathCalendrier(): ?string
     {
-        return 'https://' . $_SERVER['SERVER_NAME']. '/uploads/calendrier/' . $this->calendrier;
-
+        return 'https://' . $_SERVER['SERVER_NAME'] . '/uploads/calendrier/' . $this->calendrier;
     }
 
     public function getRapportCR(): ?string
@@ -1026,7 +1039,7 @@ class Dossier
 
     public function getRapportCRFichier(): ?string
     {
-        return 'https://' . $_SERVER['SERVER_NAME']. '/uploads/piecesJointes/' . $this->rapportCR;
+        return 'https://' . $_SERVER['SERVER_NAME'] . '/uploads/piecesJointes/' . $this->rapportCR;
     }
 
     public function setRapportCR(?string $rapportCR): static
@@ -1141,7 +1154,6 @@ class Dossier
     public function removePiecesDoc(Pieces $piecesDoc): static
     {
         if ($this->piecesDoc->removeElement($piecesDoc)) {
-            // set the owning side to null (unless already changed)
             if ($piecesDoc->getDossier() === $this) {
                 $piecesDoc->setDossier(null);
             }
@@ -1149,7 +1161,56 @@ class Dossier
 
         return $this;
     }
+
+    public function getPaiementConsignation(): ?PaiementConsignation
+    {
+        return $this->paiementConsignation;
+    }
+
+    public function setPaiementConsignation(PaiementConsignation $paiementConsignation): static
+    {
+        if ($paiementConsignation->getDossier() !== $this) {
+            $paiementConsignation->setDossier($this);
+        }
+
+        $this->paiementConsignation = $paiementConsignation;
+
+        return $this;
+    }
+
+    public function getPreuveConsignationRequerant(): ?string
+    {
+        return $this->PreuveConsignationRequerant;
+    }
+
+    public function setPreuveConsignationRequerant(?string $PreuveConsignationRequerant): static
+    {
+        $this->PreuveConsignationRequerant = $PreuveConsignationRequerant;
+
+        return $this;
+    }
+
+    public function getDatePreuveConsignationRequerant(): ?\DateTimeImmutable
+    {
+        return $this->DatePreuveConsignationRequerant;
+    }
+
+    public function setDatePreuveConsignationRequerant(?\DateTimeImmutable $DatePreuveConsignationRequerant): static
+    {
+        $this->DatePreuveConsignationRequerant = $DatePreuveConsignationRequerant;
+
+        return $this;
+    }
+
+    public function isRecuConsignation(): ?bool
+    {
+        return $this->RecuConsignation;
+    }
+
+    public function setRecuConsignation(?bool $RecuConsignation): static
+    {
+        $this->RecuConsignation = $RecuConsignation;
+
+        return $this;
+    }
 }
-
-
-

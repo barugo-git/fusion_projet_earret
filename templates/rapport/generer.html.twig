@@ -1,0 +1,495 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ is_new ? 'Créer' : 'Modifier' }} un rapport - {{ dossier.referenceDossier }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Style général */
+        .form-card {
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: none;
+            overflow: hidden;
+        }
+        
+        .form-header {
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+            border-radius: 12px 12px 0 0 !important;
+            padding: 1.5rem;
+            color: white;
+        }
+        
+        .form-body {
+            padding: 2rem;
+            background-color: #fff;
+        }
+        
+        /* Groupes de formulaire */
+        .form-group {
+            margin-bottom: 1.5rem;
+            padding: 1.25rem;
+            border-radius: 10px;
+            background: #f8f9fa;
+            border-left: 4px solid #3a7bd5;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group:hover {
+            background: #e9f0ff;
+            transform: translateX(5px);
+        }
+        
+        /* Champs de formulaire */
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #3a7bd5;
+            box-shadow: 0 0 0 0.2rem rgba(58, 123, 213, 0.25);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #3a7bd5;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-label i {
+            margin-right: 8px;
+        }
+        
+        /* Boutons */
+        .btn-action {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s;
+            min-width: 150px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-preview {
+            background-color: #3a7bd5;
+            border-color: #3a7bd5;
+            color: white;
+        }
+        
+        .btn-preview:hover {
+            background-color: #2c5fb3;
+            border-color: #2c5fb3;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .btn-save {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+        
+        .btn-save:hover {
+            background-color: #218838;
+            border-color: #218838;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .btn-cancel {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+        
+        .btn-cancel:hover {
+            background-color: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        /* Pied de formulaire */
+        .form-footer {
+            border-top: 1px solid #f0f0f0;
+            padding-top: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        /* Modal de confirmation */
+        .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+            color: white;
+            border-bottom: none;
+            padding: 1.5rem;
+        }
+        
+        .modal-title {
+            font-weight: 600;
+        }
+        
+        .modal-body {
+            padding: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            text-align: center;
+        }
+        
+        .modal-body i {
+            font-size: 3rem;
+            color: #ffc107;
+            margin-bottom: 1rem;
+        }
+        
+        .modal-footer {
+            border-top: none;
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            justify-content: center;
+        }
+        
+        .btn-modal-secondary {
+            background: white;
+            border: 1px solid #dee2e6;
+            color: #495057;
+            padding: 8px 20px;
+            margin-right: 10px;
+        }
+        
+        .btn-modal-danger {
+            background: #dc3545;
+            border: none;
+            padding: 8px 20px;
+            color: white;
+        }
+        
+        .btn-modal-danger:hover {
+            background: #bb2d3b;
+        }
+        
+        .btn-close {
+            filter: invert(1);
+        }
+
+        /* Styles pour les moyens */
+        .moyen-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3a7bd5;
+            counter-increment: moyen-counter;
+        }
+        
+        .remove-moyen {
+            position: absolute;
+            top: -20px;
+            right: -7px;
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .moyen-item::before {
+            content: counter(moyen-counter) ") ";
+            font-weight: bold;
+            color: #3a7bd5;
+            position: absolute;
+            left: 25px;
+            top: 25px;
+            z-index: 1;
+        }
+        
+        .moyens-list {
+            counter-reset: moyen-counter;
+        }
+
+        .moyen-textarea {
+            padding-left: 30px !important;
+            position: relative;
+        }
+        
+        .moyens-list {
+            counter-reset: moyen-counter;
+        }
+
+        /* Modal de confirmation de suppression */
+        .modal-delete .modal-header {
+            background: #dc3545;
+        }
+    </style>
+{% endblock %}
+
+
+{% block body %}
+<div class="container py-10">
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+            <div class="card form-card mb-5">
+                <div>
+                    <h2 class="card-header form-header text-white">
+                        <i class="fas fa-file-alt me-2"></i>
+                        {{ is_new ? 'Générer' : 'Modifier' }} un rapport pour le dossier {{ dossier.referenceDossier }}
+                    </h2>
+                </div>
+                <div class="p-2">
+                    <a href="{{ path('modele_rapport_convert_pdf', {'id': rapport.modeleRapport.id}) }}" class="btn btn-sm btn-info">
+                        <i class="fas fa-file-pdf me-1"></i> Voir le modèle utilisé
+                    </a>
+                </div>
+                
+                <div class="card-body form-body">
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                    
+                    <div class="row">
+                        {% for field in form %}
+                            {% if field.vars.name != '_token' and field.vars.name != 'moyens' %}
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        {{ form_label(field, null, {'label_attr': {'class': 'form-label'}}) }}
+                                        
+                                        {% if field.vars.choices is defined %}
+                                            {{ form_widget(field, {'attr': {'class': 'form-select'}}) }}
+                                        {% elseif field.vars.attr['data-type'] is defined and field.vars.attr['data-type'] == 'textarea' %}
+                                            {{ form_widget(field, {'attr': {'class': 'form-control', 'rows': 4}}) }}
+                                        {% elseif field.vars.attr['data-type'] is defined and field.vars.attr['data-type'] == 'number' %}
+                                            {{ form_widget(field, {'attr': {'class': 'form-control', 'step': '0.01'}}) }}
+                                        {% else %}
+                                            {{ form_widget(field, {'attr': {'class': 'form-control'}}) }}
+                                        {% endif %}
+                                        
+                                        <div class="invalid-feedback">
+                                            {{ form_errors(field) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if type_rapport == constant('App\\Entity\\Rapport::TYPE_FOND') %}
+                            <div class="col-12 mt-3">
+                                <div class="card">
+                                    <div class="modal-header text-white">
+                                        <h4 class="mb-0 text-white">Moyens invoqués</h4>
+                                    </div>
+                                    <div class="p-2">
+                                        <a href="{{ asset('uploads/' ~ dossier.urlMemoireAmpliatif) }}" 
+                                            class="btn btn-sm btn-info"
+                                            target="_blank">
+                                                <i class="fas fa-file-pdf me-1"></i> Voir le mémoire ampliatif
+                                            </a>
+                                    </div>
+                                    <div class="card-body">
+                                        {% for flashMessage in app.flashes('warning') %}
+                                            <div class="alert alert-warning">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                {{ flashMessage }}
+                                            </div>
+                                        {% endfor %}
+                                        
+                                        {% if form.moyens|length == 0 %}
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                Aucun moyen n'a été détecté. Veuillez les ajouter manuellement ci-dessous.
+                                            </div>
+                                        {% endif %}
+                                        
+                                        <ul class="moyens-list list-unstyled"
+                                            data-index="{{ form.moyens|length > 0 ? form.moyens|last.vars.name + 1 : 0 }}"
+                                            data-prototype="{{ form_widget(form.moyens.vars.prototype)|e('html_attr') }}">
+                                            {% for moyen in form.moyens %}
+                                                <li class="moyen-item">
+                                                    <div class="position-relative">
+                                                        {{ form_widget(moyen, {'attr': {'class': 'form-control moyen-textarea', 'rows': 3}}) }}
+                                                        <button type="button" class="btn btn-danger remove-moyen" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="invalid-feedback">
+                                                        {{ form_errors(moyen) }}
+                                                    </div>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                        <button type="button" class="btn btn-info me-2 add-moyen">
+                                            <i class="fas fa-plus me-2"></i>Ajouter un moyen
+                                        </button>
+                                        {{ form_errors(form.moyens) }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-cancel btn-action" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                            <i class="fas fa-times me-2"></i> Annuler
+                        </button>
+                        <div>
+                            <button type="submit" name="action" value="preview" class="btn btn-preview btn-action me-2">
+                                <i class="fas fa-eye me-2"></i> Prévisualiser
+                            </button>
+                            {% if not is_new %}
+                                <button type="submit" name="action" value="save" class="btn btn-save btn-action">
+                                    <i class="fas fa-save me-2"></i> Enregistrer
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmation d'annulation -->
+    <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-white" id="cancelModalLabel">Confirmation d'annulation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    <p class="lead">Êtes-vous sûr de vouloir annuler ?</p>
+                    <p>Toutes les modifications non enregistrées seront perdues.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-modal-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-arrow-left me-2"></i> Non, continuer
+                    </button>
+                    <a href="{{ is_new ? path('admin_dossier_details', {'id': dossier.id}) : path('rapport_show', {'id': rapport.id}) }}" class="btn btn-modal-danger">
+                        <i class="fas fa-times me-2"></i> Oui, annuler
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmation de suppression -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title text-white" id="confirmDeleteModalLabel">Confirmation de suppression</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    <p class="mb-0">Êtes-vous sûr de vouloir supprimer ce moyen ?</p>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-sm btn-danger" id="confirmDeleteButton">Supprimer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion de la modal de confirmation de suppression
+            const confirmDeleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'), {
+                backdrop: 'static',
+                keyboard: false
+            });
+            let currentItemToDelete = null;
+            
+            document.getElementById('confirmDeleteButton').addEventListener('click', function() {
+                if (currentItemToDelete) {
+                    currentItemToDelete.remove();
+                    confirmDeleteModal.hide();
+                }
+            });
+
+            // Gestion des moyens dynamiques
+            const addMoyenButton = document.querySelector('.add-moyen');
+            if (addMoyenButton) {
+                const collectionHolder = document.querySelector('.moyens-list');
+                const prototype = collectionHolder.dataset.prototype;
+                
+                addMoyenButton.addEventListener('click', function() {
+                    const index = collectionHolder.dataset.index;
+                    const newForm = prototype.replace(/__name__/g, index);
+                    
+                    const item = document.createElement('li');
+                    item.classList.add('moyen-item');
+                    item.innerHTML = `
+                        <div class="position-relative">
+                            <textarea class="form-control moyen-textarea" name="rapport[moyens][${index}]" rows="3" required></textarea>
+                            <button type="button" class="btn btn-danger remove-moyen" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback">Ce champ est obligatoire</div>
+                    `;
+                    
+                    collectionHolder.appendChild(item);
+                    collectionHolder.dataset.index = parseInt(index) + 1;
+                    
+                    // Gestion de la suppression avec confirmation
+                    item.querySelector('.remove-moyen').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        currentItemToDelete = item;
+                    });
+                });
+                
+                // Initialiser les boutons de suppression existants
+                document.querySelectorAll('.remove-moyen').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        currentItemToDelete = this.closest('li');
+                    });
+                });
+            }
+
+            // Validation du formulaire avant prévisualisation
+            const form = document.querySelector('form.needs-validation');
+            if (form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+
+                    // Validation spécifique des moyens pour les rapports Fond
+                    if ({{ type_rapport == constant('App\\Entity\\Rapport::TYPE_FOND') ? 'true' : 'false' }}) {
+                        const moyens = document.querySelectorAll('.moyens-list li');
+                        if (moyens.length === 0) {
+                            const errorDiv = document.createElement('div');
+                            errorDiv.className = 'invalid-feedback d-block';
+                            errorDiv.textContent = 'Au moins un moyen doit être ajouté';
+                            document.querySelector('.moyens-list').after(errorDiv);
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                    }
+
+                    form.classList.add('was-validated');
+                }, false);
+            }
+        });
+    </script>
+{% endblock %}

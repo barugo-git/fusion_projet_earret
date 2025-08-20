@@ -44,56 +44,63 @@ class AvocatGeneralController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/reposnse-mesures-instruction/instruction/{id}', name: 'avocat_mesures_instructions_reponse')]
-    public function reponseMesureInstructionAvocat(Request $request,  AffecterStructureRepository $affecterStructureRepository,DossierRepository $dossierRepository,
-                                              MesuresInstructions $mesuresInstructions, ReponseMesuresInstructionsRepository $reponseMesuresInstructionsRepository,FileUploader $fileUploader,EntityManagerInterface $entityManager)
-    {
-        $reponse = new ReponseMesuresInstructions();
-        $form = $this->createForm(ReponseMesureAGType::class, $reponse);
+   #[Route(path: '/reposnse-mesures-instruction/instruction/{id}', name: 'avocat_mesures_instructions_reponse')]
+public function reponseMesureInstructionAvocat(
+    Request $request,  
+    AffecterStructureRepository $affecterStructureRepository,
+    DossierRepository $dossierRepository,
+    MesuresInstructions $mesuresInstructions, 
+    ReponseMesuresInstructionsRepository $reponseMesuresInstructionsRepository,
+    FileUploader $fileUploader,
+    EntityManagerInterface $entityManager
+) {
+    $reponse = new ReponseMesuresInstructions();
+    $form = $this->createForm(ReponseMesureAGType::class, $reponse);
 
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $dossier = $mesuresInstructions->getDossier();
-//            $affecterStructure = new AffecterStructure();
-//            dd($this->getUser()->getStructure());
-//            $structureAffectante = $affecterStructureRepository->findOneBy(['structure'=>$this->getUser()->getStructure()])->getDe();
+    $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
+        $dossier = $mesuresInstructions->getDossier();
 
-//            $affecterStructure->setDossier($dossier);
+        // $affecterStructure = new AffecterStructure();
+        // $structureAffectante = $affecterStructureRepository->findOneBy(['structure'=>$this->getUser()->getStructure()])->getDe();
+        // $affecterStructure->setDossier($dossier);
 
-            $dossier->setEtatDossier("CONCLUSION EN COURS");
+        $dossier->setEtatDossier("CONCLUSION EN COURS");
 
-            $image = $form->get('document')->getData();
-            $fmane = $dossier->getReferenceDossier();
-            $fichier = $fileUploader->upload($image, $fmane, 'piecesJointes');
+        $image = $form->get('document')->getData();
+        $fmane = $dossier->getReferenceDossier();
+        $fichier = $fileUploader->upload($image, $fmane, 'piecesJointes');
 
-            $piece = new Pieces();
-            $piece->setUrl($fichier)
-                ->setDossier($dossier)
-                ->setAuteur($this->getUser())
-                ->setNaturePiece('RAPPORT AVOCAT GENERAL')
-                ->setCreatedAt(new  \DateTimeImmutable())
-                ->setDescriptionPiece($form->get('motif')->getData())
-            ;
-            $entityManager->persist($piece);
+        $piece = new Pieces();
+        $piece->setUrl($fichier)
+            ->setDossier($dossier)
+            ->setAuteur($this->getUser())
+            ->setNaturePiece('RAPPORT AVOCAT GENERAL')
+            ->setCreatedAt(new \DateTimeImmutable())
+            ->setDescriptionPiece($form->get('motif')->getData())
+        ;
+        $entityManager->persist($piece);
 
-//            $affecterStructure->setDe($this->getUser()->getStructure());
-//            $affecterStructureRepository->add($affecterStructure, true);
+        // Si besoin de persister l'affectation de structure :
+        // $affecterStructure->setDe($this->getUser()->getStructure());
+        // $affecterStructureRepository->add($affecterStructure, true);
 
-            $reponse->setMesure($mesuresInstructions);
-            $reponseMesuresInstructionsRepository->add($reponse, true);
+        $reponse->setMesure($mesuresInstructions);
+        $reponseMesuresInstructionsRepository->add($reponse, true);
 
-            $dossierRepository->add($dossier,true);
-//            $affecterStructure->setDe($this->getUser()->getStructure());
-//            $affecterStructureRepository->add($affecterStructure, true);
-            $this->addFlash('success', 'le rapport a ete bien envoyé au Procureur Général : ');
-            return $this->redirectToRoute('avocat_general_mesures_instructions_list', ['id' => $mesuresInstructions->getDossier()->getId()]);
+        $dossierRepository->add($dossier,true);
 
-        }
-        return $this->render('parquet/reponses_mesures_instructions.html.twig', [
-            'mesures' => $mesuresInstructions,
-            'form' => $form->createView(),
+        $this->addFlash('success', 'le rapport a ete bien envoyé au Procureur Général : ');
+        return $this->redirectToRoute('avocat_general_mesures_instructions_list', [
+            'id' => $mesuresInstructions->getDossier()->getId()
         ]);
     }
+
+    return $this->render('parquet/reponses_mesures_instructions.html.twig', [
+        'mesures' => $mesuresInstructions,
+        'form' => $form->createView(),
+    ]);
+}
 
     #[Route(path: '/reposnse-mesures-instruction/instruction/modification/{id}', name: 'avocat_general_mesures_instructions_reponse_edit')]
     public function reponsemesuresInstructionComplete(Request $request, DossierRepository $dossierRepository,

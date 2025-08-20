@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Cour Suprême - Plateforme de Festion des recours</title>
+    <title>Cour Suprême - Plateforme de Gestion des recours</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -11,45 +11,32 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
 
-    <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:slnt,wght@-10..0,100..900&display=swap"
           rel="stylesheet">
 
-    <!-- Icon Font Stylesheet -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
-    <!-- Libraries Stylesheet -->
     <link rel="stylesheet" href="{{ asset('Life/lib/animate/animate.min.css') }}"/>
     <link href="{{ asset('Life/lib/lightbox/css/lightbox.min.css') }}" rel="stylesheet">
     <link href="{{ asset('Life/lib/owlcarousel/assets/owl.carousel.min.css') }}" rel="stylesheet">
 
 
-    <!-- Customized Bootstrap Stylesheet -->
     <link href="{{ asset('Life/css/bootstrap.min.css') }}" rel="stylesheet">
 
-    <!-- Template Stylesheet -->
     <link href="{{ asset('Life/css/style.css') }}" rel="stylesheet">
 </head>
 
 <body>
 
-<!-- Spinner Start -->
 <div id="spinner"
      class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
     <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
         <span class="sr-only">Loading...</span>
     </div>
 </div>
-<!-- Spinner End -->
-
-<!-- Topbar Start -->
-
-<!-- Topbar End -->
-
-<!-- Navbar & Hero Start -->
 <div class="container-fluid nav-bar px-0 px-lg-4 py-lg-0">
     <div class="container">
         <nav class="navbar navbar-expand-lg navbar-light">
@@ -67,6 +54,7 @@
                     <a href="{{ path('app_index_front') }}" class="nav-item nav-link active">Accueil</a>
                     <a href="{{ path('front_requerant') }}" class="nav-item nav-link"> Nouveau Recours</a>
                     <a href="{{ path('front_recours_status') }}" class="nav-item nav-link">Statut de mon Recours</a>
+                    <a href="{{ path('paiement_consignation_index') }}" class="nav-item nav-link">Consignation</a>
                     <a href="{{ path('app_contacter') }}" class="nav-item nav-link">Contact</a>
 
                 </div>
@@ -75,9 +63,6 @@
         </nav>
     </div>
 </div>
-<!-- Navbar & Hero End -->
-
-<!-- Modal Search Start -->
 <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content rounded-0">
@@ -96,10 +81,6 @@
         </div>
     </div>
 </div>
-<!-- Modal Search End -->
-
-
-<!-- Carousel Start -->
 <div class="header-carousel owl-carousel">
     <div class="header-carousel-item bg-primary">
         <div class="carousel-caption">
@@ -110,8 +91,11 @@
                             <h4 class="text-white text-uppercase fw-bold mb-4">Bienvenue sur la plateforme de gestion
                                 des recours</h4>
                             <h1 class="display-1 text-white mb-4">de la Cour suprême du Bénin.</h1>
-                            <p class="mb-5 fs-5">Vous pouvez enregistrer vos recours et suivre le statut de votre
-                                recours sur cette plateforme.
+                            <p class="mb-5 fs-5">
+                                1- Le paiement de la consignation se fait à porté de main sur la plateforme
+                            </p>
+                            <p class="mb-5 fs-5">
+                                2- Suivez en temp réelle vos informations en vérifiant le statut de votre recours
                             </p>
                             <div class="d-flex justify-content-center justify-content-md-start flex-shrink-0 mb-4">
                                 <a class="btn btn-light rounded-pill py-3 px-4 px-md-5 me-2"
@@ -131,35 +115,7 @@
             </div>
         </div>
     </div>
-    {#    <div class="header-carousel-item bg-primary"> #}
-    {#        <div class="carousel-caption"> #}
-    {#            <div class="container"> #}
-    {#                <div class="row gy-4 gy-lg-0 gx-0 gx-lg-5 align-items-center"> #}
-    {#                    <div class="col-lg-5 animated fadeInLeft"> #}
-    {#                        <div class="calrousel-img"> #}
-    {#                            <img src="{{ asset('Life/img/carousel-2.png') }}" class="img-fluid w-100" alt=""> #}
-    {#                        </div> #}
-    {#                    </div> #}
-    {#                    <div class="col-lg-7 animated fadeInRight"> #}
-    {#                        <div class="text-sm-center text-md-end"> #}
-    {#                            <h4 class="text-white text-uppercase fw-bold mb-4">Welcome To LifeSure</h4> #}
-    {#                            <h1 class="display-1 text-white mb-4">Life Insurance Makes You Happy</h1> #}
-    {#                            <p class="mb-5 fs-5">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy... #}
-    {#                            </p> #}
-    {#                            <div class="d-flex justify-content-center justify-content-md-end flex-shrink-0 mb-4"> #}
-    {#                                <a class="btn btn-light rounded-pill py-3 px-4 px-md-5 me-2" href="#"><i class="fas fa-play-circle me-2"></i> Watch Video</a> #}
-    {#                                <a class="btn btn-dark rounded-pill py-3 px-4 px-md-5 ms-2" href="#">Learn More</a> #}
-    {#                            </div> #}
-    {#                        </div> #}
-    {#                    </div> #}
-    {#                </div> #}
-    {#            </div> #}
-    {#        </div> #}
-    {#    </div> #}
 </div>
-<!-- Carousel End -->
-
-<!-- Feature Start -->
 <div class="container-fluid feature bg-light py-5">
     <div class="container py-5">
         <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style="max-width: 800px;">
@@ -180,21 +136,8 @@
                     <p class="mb-4">
                         Entrez vos informations et les informations du défendeur.
                     </p>
-
-                    {#                    <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Learn More</a> #}
                 </div>
             </div>
-            {#            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.4s"> #}
-            {#                <div class="feature-item p-4 pt-0"> #}
-            {#                    <div class="feature-icon p-4 mb-4"> #}
-            {#                        <i class="fas fa-info-circle fa-3x"></i> #}
-            {#                    </div> #}
-            {#                    <h4 class="mb-4">Informations du Défendeur</h4> #}
-            {#                    <p class="mb-4"> #}
-            {#                    </p> #}
-
-            {#                </div> #}
-            {#            </div> #}
             <div class="col-md-6 col-lg-6 col-xl-4 wow fadeInUp" data-wow-delay="0.6s">
                 <div class="feature-item p-4 pt-0">
                     <div class="feature-icon p-4 mb-4">
@@ -203,7 +146,6 @@
                     <h4 class="mb-4">Informations sur le recours</h4>
                     <p class="mb-4">
                         Saisissez les informations de votre recours avec les pièces justificatives.
-
                     </p>
                 </div>
             </div>
@@ -216,15 +158,11 @@
                     <p class="mb-4">
                         ⁠Suivez l'évolution de votre recours grâce au numéro de suivi.
                     </p>
-
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- Feature End -->
-
-<!-- About Start -->
 <div class="container-fluid bg-light about pb-5">
     <div class="container pb-5">
         <div class="row g-5">
@@ -254,11 +192,6 @@
                         juridictionnel, la Cour suprême est la plus haute juridiction de l’Etat du Bénin en matière
                         administrative, judiciaire et aussi le contentieux des élections locales.
                     </p>
-
-                    {#                    <p class="text-dark"><i class="fa fa-check text-primary me-3"></i>We can save your money.</p> #}
-                    {#                    <p class="text-dark"><i class="fa fa-check text-primary me-3"></i>Production or trading of good</p> #}
-                    {#                    <p class="text-dark mb-4"><i class="fa fa-check text-primary me-3"></i>Our life insurance is flexible</p> #}
-                    {#                    <a class="btn btn-primary rounded-pill py-3 px-5" href="#">More Information</a> #}
                 </div>
             </div>
             <div class="col-xl-6 wow fadeInRight" data-wow-delay="0.2s">
@@ -312,95 +245,6 @@
         </div>
     </div>
 </div>
-<!-- About End -->
-
-<!-- Service Start -->
-{# <div class="container-fluid service py-5"> #}
-{#    <div class="container py-5"> #}
-{#        <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style="max-width: 800px;"> #}
-{#            <h4 class="text-primary">Our Services</h4> #}
-{#            <h1 class="display-4 mb-4">We Provide Best Services</h1> #}
-{#            <p class="mb-0">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Tenetur adipisci facilis cupiditate recusandae aperiam temporibus corporis itaque quis facere, numquam, ad culpa deserunt sint dolorem autem obcaecati, ipsam mollitia hic. #}
-{#            </p> #}
-{#        </div> #}
-{#        <div class="row g-4 justify-content-center"> #}
-{#            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.2s"> #}
-{#                <div class="service-item"> #}
-{#                    <div class="service-img"> #}
-{#                        <img src="{{ asset('Life/img/blog-1.png') }}" class="img-fluid rounded-top w-100" alt=""> #}
-{#                        <div class="service-icon p-3"> #}
-{#                            <i class="fa fa-users fa-2x"></i> #}
-{#                        </div> #}
-{#                    </div> #}
-{#                    <div class="service-content p-4"> #}
-{#                        <div class="service-content-inner"> #}
-{#                            <a href="#" class="d-inline-block h4 mb-4">Life Insurance</a> #}
-{#                            <p class="mb-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis, eum!</p> #}
-{#                            <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Read More</a> #}
-{#                        </div> #}
-{#                    </div> #}
-{#                </div> #}
-{#            </div> #}
-{#            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.4s"> #}
-{#                <div class="service-item"> #}
-{#                    <div class="service-img"> #}
-{#                        <img src="{{ asset('Life/img/blog-2.png') }}" class="img-fluid rounded-top w-100" alt=""> #}
-{#                        <div class="service-icon p-3"> #}
-{#                            <i class="fa fa-hospital fa-2x"></i> #}
-{#                        </div> #}
-{#                    </div> #}
-{#                    <div class="service-content p-4"> #}
-{#                        <div class="service-content-inner"> #}
-{#                            <a href="#" class="d-inline-block h4 mb-4">Health Insurance</a> #}
-{#                            <p class="mb-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis, eum!</p> #}
-{#                            <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Read More</a> #}
-{#                        </div> #}
-{#                    </div> #}
-{#                </div> #}
-{#            </div> #}
-{#            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.6s"> #}
-{#                <div class="service-item"> #}
-{#                    <div class="service-img"> #}
-{#                        <img src="img/blog-3.png" class="img-fluid rounded-top w-100" alt=""> #}
-{#                        <div class="service-icon p-3"> #}
-{#                            <i class="fa fa-car fa-2x"></i> #}
-{#                        </div> #}
-{#                    </div> #}
-{#                    <div class="service-content p-4"> #}
-{#                        <div class="service-content-inner"> #}
-{#                            <a href="#" class="d-inline-block h4 mb-4">Car Insurance</a> #}
-{#                            <p class="mb-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis, eum!</p> #}
-{#                            <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Read More</a> #}
-{#                        </div> #}
-{#                    </div> #}
-{#                </div> #}
-{#            </div> #}
-{#            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.8s"> #}
-{#                <div class="service-item"> #}
-{#                    <div class="service-img"> #}
-{#                        <img src="img/blog-4.png" class="img-fluid rounded-top w-100" alt=""> #}
-{#                        <div class="service-icon p-3"> #}
-{#                            <i class="fa fa-home fa-2x"></i> #}
-{#                        </div> #}
-{#                    </div> #}
-{#                    <div class="service-content p-4"> #}
-{#                        <div class="service-content-inner"> #}
-{#                            <a href="#" class="d-inline-block h4 mb-4">Home Insurance</a> #}
-{#                            <p class="mb-4">Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis, eum!</p> #}
-{#                            <a class="btn btn-primary rounded-pill py-2 px-4" href="#">Read More</a> #}
-{#                        </div> #}
-{#                    </div> #}
-{#                </div> #}
-{#            </div> #}
-{#            <div class="col-12 text-center wow fadeInUp" data-wow-delay="0.2s"> #}
-{#                <a class="btn btn-primary rounded-pill py-3 px-5" href="#">More Services</a> #}
-{#            </div> #}
-{#        </div> #}
-{#    </div> #}
-{# </div> #}
-<!-- Service End -->
-
-<!-- FAQs Start -->
 <div class="container-fluid faq-section py-5">
     <div class="container py-5">
         <div class="row g-5 align-items-center">
@@ -408,7 +252,6 @@
                 <div class="h-100">
                     <div class="mb-5">
                         <h4 class="text-primary">Quelques questions importantes (FAQ)</h4>
-                        {#                        <h1 class="display-4 mb-0">Questions fréquemment posées.</h1> #}
                     </div>
                     <div class="accordion" id="accordionExample">
                         <div class="accordion-item">
@@ -540,24 +383,9 @@
         </div>
     </div>
 </div>
-<!-- FAQs End -->
-
-<!-- Blog Start -->
-
-<!-- Testimonial End -->
-
-
-<!-- Footer Start -->
-
-<!-- Footer End -->
-
-<!-- Copyright Start -->
 <div class="container-fluid copyright py-4">
-    <div class="container text-center"> <!-- Ajout de la classe text-center pour centrer le contenu -->
-        <div class="row g-4 align-items-center justify-content-center">
-            <!-- Ajout de justify-content-center pour centrer la rangée -->
+    <div class="container text-center"> <div class="row g-4 align-items-center justify-content-center">
             <div class="col-12">
-                <!-- Modification pour utiliser toute la largeur et éviter de diviser en deux colonnes -->
                 <a class="border-bottom text-white" href="https://coursupreme.bj">&copy; Cour suprême du Bénin</a>
                 <span class="text-body"> | Tous Droits réservés</span>
             </div>
@@ -565,14 +393,9 @@
     </div>
 </div>
 
-<!-- Copyright End -->
-
-
-<!-- Back to Top -->
 <a href="#" class="btn btn-primary btn-lg-square rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>
 
 
-<!-- JavaScript Libraries -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ asset('Life/lib/wow/wow.min.js') }}"></script>
@@ -583,7 +406,6 @@
 <script src="{{ asset('Life/lib/owlcarousel/owl.carousel.min.js') }}"></script>
 
 
-<!-- Template Javascript -->
 <script src="{{ asset('Life/js/main.js') }}"></script>
 </body>
 

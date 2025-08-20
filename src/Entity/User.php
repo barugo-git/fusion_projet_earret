@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\UuidV7 as Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Table(name: '`user`')]
+#[ORM\Table(name: 'user')]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[UniqueEntity(fields: ['email'], message: "Un autre utilisateur s'est déjà inscrit avec cette adresse email, merci de la modifier")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -38,9 +38,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank(message: 'Veuillez renseigner un mot de passe.')]
     private $password;
 
-
     #[Assert\EqualTo(propertyPath: 'password', message: "Vous n'avez pas correctement confirmé votre mot de passe !")]
     public $passwordConfirm;
+    
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Vous devez renseigner le nom de famille')]
     private $nom;
@@ -72,18 +72,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Arrets::class, mappedBy: 'CreatedBy')]
     private $arrets;
 
-
     #[ORM\Column(type: 'boolean')]
     private $isVerified = false;
 
     #[ORM\JoinColumn(nullable: false)]
     #[ORM\ManyToOne(targetEntity: Structure::class, inversedBy: 'users')]
     private $structure;
-
+    /**
+     * @ORM\ManyToMany(targetEntity=Section::class, inversedBy="users")
+     */
     #[ORM\JoinColumn(nullable: false)]
     #[ORM\ManyToOne(targetEntity: Section::class, inversedBy: 'users')]
     private $sections;
-
 
     #[ORM\OneToMany(targetEntity: MesuresInstructions::class, mappedBy: 'conseillerRapporteur')]
     private $instructionsCR;
@@ -133,21 +133,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'auteur', targetEntity: Pieces::class)]
     private Collection $pieces;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $photo;
+
+        /**
+     * @ORM\OneToMany(targetEntity=Rapport::class, mappedBy="created_by")
+     */
+    private $rapports;
 
 
     public function __construct()
     {
         $this->dossier = new ArrayCollection();
         $this->arrets = new ArrayCollection();
-
-;
         $this->instructionsCR = new ArrayCollection();
         $this->instructionGreffier = new ArrayCollection();
         $this->Greffiers = new ArrayCollection();
         $this->affecterConseil = new ArrayCollection();
         $this->logs = new ArrayCollection();
         $this->passwordChangeRequired = true;
-        $this->users = new ArrayCollection();
         $this->dossiers = new ArrayCollection();
         $this->affecterUsers = new ArrayCollection();
         $this->affecterUsersExpediteur = new ArrayCollection();
@@ -168,54 +172,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(?string $email): self
     {
         $this->email = $email;
-
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
     }
 
-    public function getUserInformations(): string {
+    public function getUserInformations(): string
+    {
         return $this->getPrenoms() ." ". $this->getNom();
     }
 
-    /**
-     * @deprecated since Symfony 5.3, use getUserIdentifier instead
-     */
     public function getUsername(): string
     {
         return (string) $this->email;
     }
 
-    /**
-     * @see UserInterface
-     */
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
-
         return array_unique($roles);
     }
 
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
-
         return $this;
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -224,28 +211,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(?string $password): self
     {
         $this->password = $password;
-
         return $this;
     }
 
-    /**
-     * Returning a salt is only needed, if you are not using a modern
-     * hashing algorithm (e.g. bcrypt or sodium) in your security.yaml.
-     *
-     * @see UserInterface
-     */
     public function getSalt(): ?string
     {
         return null;
     }
 
-    /**
-     * @see UserInterface
-     */
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
     }
 
     public function getNom(): ?string
@@ -256,7 +232,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setNom(?string $nom): self
     {
         $this->nom = $nom;
-
         return $this;
     }
 
@@ -268,7 +243,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPrenoms(?string $prenoms): self
     {
         $this->prenoms = $prenoms;
-
         return $this;
     }
 
@@ -280,7 +254,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTelephone(?string $telephone): self
     {
         $this->telephone = $telephone;
-
         return $this;
     }
 
@@ -292,7 +265,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setActif(?bool $actif): self
     {
         $this->actif = $actif;
-
         return $this;
     }
 
@@ -304,7 +276,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastLogin(?\DateTimeInterface $lastLogin): self
     {
         $this->lastLogin = $lastLogin;
-
         return $this;
     }
 
@@ -316,7 +287,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTitre(?string $titre): self
     {
         $this->titre = $titre;
-
         return $this;
     }
 
@@ -328,7 +298,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setToken(?string $token): self
     {
         $this->token = $token;
-
         return $this;
     }
 
@@ -346,19 +315,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->dossier[] = $dossier;
             $dossier->setUser($this);
         }
-
         return $this;
     }
 
     public function removeDossier(UserDossier $dossier): self
     {
         if ($this->dossier->removeElement($dossier)) {
-            // set the owning side to null (unless already changed)
             if ($dossier->getUser() === $this) {
                 $dossier->setUser(null);
             }
         }
-
         return $this;
     }
 
@@ -376,23 +342,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->arrets[] = $arret;
             $arret->setCreatedBy($this);
         }
-
         return $this;
     }
 
     public function removeArret(Arrets $arret): self
     {
         if ($this->arrets->removeElement($arret)) {
-            // set the owning side to null (unless already changed)
             if ($arret->getCreatedBy() === $this) {
                 $arret->setCreatedBy(null);
             }
         }
-
         return $this;
     }
-
-
 
     public function isVerified(): bool
     {
@@ -402,10 +363,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsVerified(bool $isVerified): self
     {
         $this->isVerified = $isVerified;
-
         return $this;
     }
-    public function getFullName() {
+
+    public function getFullName(): string
+    {
         return "{$this->prenoms} {$this->nom}";
     }
 
@@ -417,7 +379,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setStructure(?Structure $structure): self
     {
         $this->structure = $structure;
-
         return $this;
     }
 
@@ -435,23 +396,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->affecterConseil[] = $affecterConseil;
             $affecterConseil->setConseillerRapporteur($this);
         }
-
         return $this;
     }
 
     public function removeAffecterConseil(AffecterSection $affecterConseil): self
     {
         if ($this->affecterConseil->removeElement($affecterConseil)) {
-            // set the owning side to null (unless already changed)
             if ($affecterConseil->getConseillerRapporteur() === $this) {
                 $affecterConseil->setConseillerRapporteur(null);
             }
         }
-
         return $this;
     }
-
-
 
     /**
      * @return Collection<int, MesuresInstructions>
@@ -467,19 +423,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->instructionsCR[] = $instructionsCR;
             $instructionsCR->setConseillerRapporteur($this);
         }
-
         return $this;
     }
 
     public function removeInstructionsCR(MesuresInstructions $instructionsCR): self
     {
         if ($this->instructionsCR->removeElement($instructionsCR)) {
-            // set the owning side to null (unless already changed)
             if ($instructionsCR->getConseillerRapporteur() === $this) {
                 $instructionsCR->setConseillerRapporteur(null);
             }
         }
-
         return $this;
     }
 
@@ -497,19 +450,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->instructionGreffier[] = $instructionGreffier;
             $instructionGreffier->setGreffier($this);
         }
-
         return $this;
     }
 
     public function removeInstructionGreffier(MesuresInstructions $instructionGreffier): self
     {
         if ($this->instructionGreffier->removeElement($instructionGreffier)) {
-            // set the owning side to null (unless already changed)
             if ($instructionGreffier->getGreffier() === $this) {
                 $instructionGreffier->setGreffier(null);
             }
         }
-
         return $this;
     }
 
@@ -525,18 +475,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setGreffier(?AffecterSection $Greffier): self
     {
-        // unset the owning side of the relation if necessary
         if ($Greffier === null && $this->Greffier !== null) {
             $this->Greffier->setGreffier(null);
         }
 
-        // set the owning side of the relation if necessary
         if ($Greffier !== null && $Greffier->getGreffier() !== $this) {
             $Greffier->setGreffier($this);
         }
-
         $this->Greffier = $Greffier;
-
         return $this;
     }
 
@@ -554,19 +500,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->Greffiers[] = $greffier;
             $greffier->setGreffier($this);
         }
-
         return $this;
     }
 
     public function removeGreffier(AffecterSection $greffier): self
     {
         if ($this->Greffiers->removeElement($greffier)) {
-            // set the owning side to null (unless already changed)
             if ($greffier->getGreffier() === $this) {
                 $greffier->setGreffier(null);
             }
         }
-
         return $this;
     }
 
@@ -584,22 +527,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->logs[] = $log;
             $log->setUser($this);
         }
-
         return $this;
     }
 
     public function removeLog(Log $log): self
     {
         if ($this->logs->removeElement($log)) {
-            // set the owning side to null (unless already changed)
             if ($log->getUser() === $this) {
                 $log->setUser(null);
             }
         }
-
         return $this;
     }
-
 
     public function getSections(): ?Section
     {
@@ -609,7 +548,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setSections(?Section $sections): self
     {
         $this->sections = $sections;
-
         return $this;
     }
 
@@ -621,7 +559,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPasswordChangeRequired(bool $passwordChangeRequired): static
     {
         $this->passwordChangeRequired = $passwordChangeRequired;
-
         return $this;
     }
 
@@ -647,19 +584,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->affecterUsers->add($affecterUser);
             $affecterUser->setDestinataire($this);
         }
-
         return $this;
     }
 
     public function removeAffecterUser(AffecterUser $affecterUser): static
     {
         if ($this->affecterUsers->removeElement($affecterUser)) {
-            // set the owning side to null (unless already changed)
             if ($affecterUser->getDestinataire() === $this) {
                 $affecterUser->setDestinataire(null);
             }
         }
-
         return $this;
     }
 
@@ -677,19 +611,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->affecterUsersExpediteur->add($affecterUsersExpediteur);
             $affecterUsersExpediteur->setExpediteur($this);
         }
-
         return $this;
     }
 
     public function removeAffecterUsersExpediteur(AffecterUser $affecterUsersExpediteur): static
     {
         if ($this->affecterUsersExpediteur->removeElement($affecterUsersExpediteur)) {
-            // set the owning side to null (unless already changed)
             if ($affecterUsersExpediteur->getExpediteur() === $this) {
                 $affecterUsersExpediteur->setExpediteur(null);
             }
         }
-
         return $this;
     }
 
@@ -707,19 +638,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->mouvements->add($mouvement);
             $mouvement->setUser($this);
         }
-
         return $this;
     }
 
     public function removeMouvement(Mouvement $mouvement): static
     {
         if ($this->mouvements->removeElement($mouvement)) {
-            // set the owning side to null (unless already changed)
             if ($mouvement->getUser() === $this) {
                 $mouvement->setUser(null);
             }
         }
-
         return $this;
     }
 
@@ -737,20 +665,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->pieces->add($piece);
             $piece->setAuteur($this);
         }
-
         return $this;
     }
 
     public function removePiece(Pieces $piece): static
     {
         if ($this->pieces->removeElement($piece)) {
-            // set the owning side to null (unless already changed)
             if ($piece->getAuteur() === $this) {
                 $piece->setAuteur(null);
             }
         }
-
         return $this;
     }
 
+    public function getPhoto(): ?string
+    {
+        return $this->photo;
+    }
+
+    public function setPhoto(?string $photo): self
+    {
+        $this->photo = $photo;
+        return $this;
+    }
 }

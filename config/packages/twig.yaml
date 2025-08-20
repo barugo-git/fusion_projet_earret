@@ -3,6 +3,10 @@ twig:
     form_themes: ['bootstrap_5_layout.html.twig']
     paths:
         'public/css': styles
+
 when@test:
     twig:
         strict_variables: true
+
+    tests:
+        date: 'DateTimeInterface'

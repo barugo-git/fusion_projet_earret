@@ -4,23 +4,23 @@
 
 {% block body %}
     <div class="row">
-        <div class="col-lg-8 offset-lg-2">
+        <div class="col-lg-12">
             <div class="card">
                 <div class="card-header">
-
                     {% include 'partials/_intitule_dossier.html.twig' %} <br>
-
                     <h4 class="card-title mb-0">Production du mémoire ampliatif du dossier {{ dossier.referenceDossier }}</h4>
-                </div><!-- end card header -->
-
-                <div class="card-body">
+                </div><div class="card-body">
                     {{ form_start(form) }}
+                    {{ form_errors(form) }} {# Affiche les erreurs globales du formulaire #}
                     {{ form_widget(form) }}
-                    <button class="btn  btn-success la-pull-right">{{ button_label|default('Enregistrer le memoire ampliatif') }}</button>
+                    <div class="d-flex justify-content-center">
+                        <button class="btn btn-success">
+                            {{ button_label|default('Enregistrer le mémoire ampliatif') }}
+                        </button>
+                    </div>
                     {{ form_end(form) }}
                 </div>
             </div>
         </div>
     </div>
-
 {% endblock %}

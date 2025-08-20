@@ -1,0 +1,161 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du paiement - Consignation{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="card border-0 shadow-lg">
+        <div class="card-header bg-gradient-primary text-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="h4 mb-0 text-white">
+                    <i class="bx bx-receipt me-2"></i> Détails du paiement
+                </h2>
+                <span class="badge bg-light text-primary fs-6">#{{ paiement.idTransaction }}</span>
+            </div>
+        </div>
+        
+        <div class="card-body p-4">
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="info-card bg-light p-4 rounded-3 h-100">
+                        <h4 class="text-primary mb-4">
+                            <i class="bx bx-credit-card me-2"></i> Informations paiement
+                        </h4>
+                        <dl class="row">
+                            <dt class="col-sm-5 text-muted">Montant:</dt>
+                            <dd class="col-sm-7 fw-bold">{{ paiement.montant|format_currency('XOF') }}</dd>
+                            
+                            <dt class="col-sm-5 text-muted">Date paiement:</dt>
+                            <dd class="col-sm-7">{{ paiement.datePaiement|date('d/m/Y à H:i') }}</dd>
+                            
+                            <dt class="col-sm-5 text-muted">Agrégateur utiliser:</dt>
+                            <dd class="col-sm-7">
+                                <span class="badge bg-primary">{{ 'FedaPay' }}</span>
+                            </dd>
+
+                            <dt class="col-sm-5 text-muted">Mode paiement:</dt>
+                            <dd class="col-sm-7">
+                                <span class="badge bg-primary">{{ paiement.modePaiement }}</span>
+                            </dd>
+                            
+                        </dl>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="info-card bg-light p-4 rounded-3 h-100">
+                        <h4 class="text-primary mb-4">
+                            <i class="bx bx-folder me-2"></i> Informations dossier
+                        </h4>
+                        <dl class="row">
+                            <dt class="col-sm-5 text-muted">Code suivi:</dt>
+                            <dd class="col-sm-7 fw-bold">{{ paiement.dossier.codeSuivi }}</dd>
+                            
+                            <dt class="col-sm-5 text-muted">Référence Dossier:</dt>
+                            <dd class="col-sm-7">{{ paiement.dossier.referenceDossier }}</dd>
+
+                            <dt class="col-sm-5 text-muted">Réquérant</dt>
+                            <dd class="col-sm-7">{{ paiement.dossier.requerant.nom ~ ' ' ~ paiement.dossier.requerant.prenoms }}</dd>
+
+                            <dt class="col-sm-5 text-muted">Arrêt attaquée</dt>
+                            <dd class="col-sm-7">{{ paiement.dossier.arreteAttaquee }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded-3">
+                        <div class="d-flex gap-3">
+                            {% set pdf_path = 'uploads/consignations/' ~ paiement.preuveConsignation|split('/')|last %}
+                            <a href="{{ asset(pdf_path) }}" target="_blank" class="btn btn-danger">
+                                <i class="bx bx-user-check me-2"></i>  Voir la preuve PDF
+                            </a>
+                            
+                            {% if paiement.dossier.PreuveConsignationRequerant %}
+                                {% set pdf_requerant = 'uploads/piecesJointes/' ~ paiement.dossier.PreuveConsignationRequerant|split('/')|last %}
+                                <a href="{{ asset(pdf_requerant) }}" 
+                                   target="_blank" 
+                                   class="btn btn-success btn-lg px-4">
+                                    <i class="bx bx-user-check me-2"></i> Preuve du requérant
+                                </a>
+                            {% endif %}
+                        </div>
+                        
+                        <a href="{{ path('paiement_consignation_admin_list') }}" 
+                           class="btn btn-outline-primary btn-lg">
+                            <i class="bx bx-arrow-back me-2"></i> Retour
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+        }
+        
+        .info-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-left: 4px solid #3a7bd5;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .badge {
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-lg {
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            border: none;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #02aab0, #00cdac);
+            border: none;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .card {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Animation au chargement
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.info-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+        });
+    </script>
+{% endblock %}

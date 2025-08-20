@@ -3,5 +3,13 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
 login_check:
     path: /login_check
+
+get_sections:
+    path: /sections/{structureId}
+    controller: App\Controller\ModeleRapportController::getSections
+    methods: GET
+    requirements:
+        structureId: "[0-9a-fA-F-]{36}"  # UUID format sans échappement

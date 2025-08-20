@@ -16,9 +16,6 @@ class AffecterSection
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private ?Uuid $id = null;
 
-
-
-
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $dateAffectation;
 
@@ -28,14 +25,8 @@ class AffecterSection
     #[ORM\Column(type: 'integer', nullable: true)]
     private $delaiTraitement;
 
-
-
-
-
     #[ORM\OneToOne(targetEntity: Dossier::class, inversedBy: 'affecterSection', cascade: ['persist', 'remove'])]
     private $dossier;
-
-
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'Greffiers')]
     private $greffier;
@@ -46,16 +37,10 @@ class AffecterSection
     #[ORM\ManyToOne(targetEntity: Section::class)]
     private $section;
 
-
-
     public function getId(): ?Uuid
     {
         return $this->id;
     }
-
-
-
-
 
     public function getDateAffectation(): ?\DateTimeInterface
     {
@@ -65,7 +50,6 @@ class AffecterSection
     public function setDateAffectation(?\DateTimeInterface $dateAffectation): self
     {
         $this->dateAffectation = $dateAffectation;
-
         return $this;
     }
 
@@ -77,7 +61,6 @@ class AffecterSection
     public function setMotif(?string $Motif): self
     {
         $this->Motif = $Motif;
-
         return $this;
     }
 
@@ -89,10 +72,8 @@ class AffecterSection
     public function setDelaiTraitement(?int $delaiTraitement): self
     {
         $this->delaiTraitement = $delaiTraitement;
-
         return $this;
     }
-
 
     public function getDossier(): ?Dossier
     {
@@ -102,11 +83,8 @@ class AffecterSection
     public function setDossier(?Dossier $dossier): self
     {
         $this->dossier = $dossier;
-
         return $this;
     }
-
-
 
     public function getGreffier(): ?User
     {
@@ -116,7 +94,6 @@ class AffecterSection
     public function setGreffier(?User $greffier): self
     {
         $this->greffier = $greffier;
-
         return $this;
     }
 
@@ -128,7 +105,6 @@ class AffecterSection
     public function setConseillerRapporteur(?User $conseillerRapporteur): self
     {
         $this->conseillerRapporteur = $conseillerRapporteur;
-
         return $this;
     }
 
@@ -140,7 +116,6 @@ class AffecterSection
     public function setSection(?Section $section): self
     {
         $this->section = $section;
-
         return $this;
     }
 }

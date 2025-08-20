@@ -39,37 +39,12 @@ class ReponseMesuresInstructionsRepository extends ServiceEntityRepository
         }
     }
 
-    //    /**
-    //     * @return ReponseMesuresInstructions[] Returns an array of ReponseMesuresInstructions objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('r.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?ReponseMesuresInstructions
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
-
     public function findNonTerminees(): array
     {
         return $this->createQueryBuilder('r')
-            ->leftJoin('r.mesureInstruction', 'm')
+            ->leftJoin('r.mesure', 'm') // J'ai corrigé 'mesureInstruction' en 'mesure'
             ->andWhere('r.dateNotification IS NOT NULL')
-            ->andWhere('r.dateReponse IS NULL')
+            ->andWhere('r.reponse IS NULL') // J'ai corrigé 'dateReponse' en 'reponse'
             ->andWhere('m.termine = false')
             ->getQuery()
             ->getResult();

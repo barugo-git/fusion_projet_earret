@@ -44,8 +44,7 @@ class MesuresInstructionsType extends ApplicationType
                     'placeholder' => 'Saisissez vos observations ici...',
                     'rows' => 4
                 ]
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

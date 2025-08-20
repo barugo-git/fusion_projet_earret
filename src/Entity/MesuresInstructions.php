@@ -28,9 +28,10 @@ class MesuresInstructions
 
     #[ORM\ManyToOne(inversedBy: 'mesuresInstructions')]
     private ?Instructions $instruction = null;
+    
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface  $createdAt;
-
+    
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $date;
 
@@ -55,13 +56,10 @@ class MesuresInstructions
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $Observations = null;
 
-
-
     public function __construct()
     {
-        $this->createdAt = new \DateTime(); // Date de création = maintenant
-        $this->termineAt = new \DateTime(); // Empêche NULL
-
+        $this->createdAt = new \DateTime();
+        $this->termineAt = new \DateTime();
     }
 
     public function getId(): ?Uuid
@@ -77,7 +75,6 @@ class MesuresInstructions
     public function setDossier(?Dossier $dossier): self
     {
         $this->dossier = $dossier;
-
         return $this;
     }
 
@@ -89,7 +86,6 @@ class MesuresInstructions
     public function setConseillerRapporteur(?User $conseillerRapporteur): self
     {
         $this->conseillerRapporteur = $conseillerRapporteur;
-
         return $this;
     }
 
@@ -101,7 +97,17 @@ class MesuresInstructions
     public function setGreffier(?User $greffier): self
     {
         $this->greffier = $greffier;
+        return $this;
+    }
 
+    public function getInstruction(): ?Instructions
+    {
+        return $this->instruction;
+    }
+
+    public function setInstruction(?Instructions $instruction): static
+    {
+        $this->instruction = $instruction;
         return $this;
     }
 
@@ -113,7 +119,6 @@ class MesuresInstructions
     public function setCreatedAt(?\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
-
         return $this;
     }
 
@@ -125,7 +130,6 @@ class MesuresInstructions
     public function setDate(?\DateTimeInterface $date): self
     {
         $this->date = $date;
-
         return $this;
     }
 
@@ -136,18 +140,15 @@ class MesuresInstructions
 
     public function setReponses(?ReponseMesuresInstructions $reponses): self
     {
-        // unset the owning side of the relation if necessary
         if ($reponses === null && $this->reponses !== null) {
             $this->reponses->setMesure(null);
         }
 
-        // set the owning side of the relation if necessary
         if ($reponses !== null && $reponses->getMesure() !== $this) {
             $reponses->setMesure($this);
         }
 
         $this->reponses = $reponses;
-
         return $this;
     }
 
@@ -159,7 +160,6 @@ class MesuresInstructions
     public function setPartiesConcernes(?string $partiesConcernes): self
     {
         $this->partiesConcernes = $partiesConcernes;
-
         return $this;
     }
 
@@ -171,7 +171,6 @@ class MesuresInstructions
     public function setNature(?string $nature): self
     {
         $this->nature = $nature;
-
         return $this;
     }
 
@@ -183,51 +182,28 @@ class MesuresInstructions
     public function setTermine(?bool $termine): static
     {
         $this->termine = $termine;
-
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isAlerteEnvoyee()
+    public function isAlerteEnvoyee(): ?bool
     {
         return $this->alerteEnvoyee;
     }
 
-    /**
-     * @param bool $alerteEnvoyee
-     */
-    public function setAlerteEnvoyee($alerteEnvoyee)
+    public function setAlerteEnvoyee(?bool $alerteEnvoyee): static
     {
         $this->alerteEnvoyee = $alerteEnvoyee;
+        return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getTermineAt()
+    public function getTermineAt(): ?\DateTimeInterface
     {
         return $this->termineAt;
     }
 
-    /**
-     * @param \DateTimeInterface|null $termineAt
-     */
-    public function setTermineAt($termineAt)
+    public function setTermineAt(?\DateTimeInterface $termineAt): static
     {
         $this->termineAt = $termineAt;
-    }
-
-    public function getInstruction(): ?Instructions
-    {
-        return $this->instruction;
-    }
-
-    public function setInstruction(?Instructions $instruction): static
-    {
-        $this->instruction = $instruction;
-
         return $this;
     }
 
@@ -239,23 +215,14 @@ class MesuresInstructions
     public function setObservations(?string $Observations): static
     {
         $this->Observations = $Observations;
-
         return $this;
     }
 
-
- public function getDelais()
- {
-     if ($this->instruction){
-         return $this->instruction->getDelais();
-     }
-
-     return null;
-
- }
-
-
-
-
-
+    public function getDelais(): ?int
+    {
+        if ($this->instruction){
+            return $this->instruction->getDelais();
+        }
+        return null;
+    }
 }

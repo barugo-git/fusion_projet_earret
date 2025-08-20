@@ -1,0 +1,434 @@
+{% extends 'base.html.twig' %}
+    {% block title %}Dossier {{ rapport.dossier.referenceDossier }}{% endblock %}
+    {% block stylesheets %}
+        {{ parent() }}
+            <style>
+                :root {
+                    --primary-color: #4e73df;
+                    --primary-light: #e8f0fe;
+                    --secondary-color: #858796;
+                }
+                
+                body {
+                    background-color: #f8f9fc;
+                }
+                
+                /* Dossier Header */
+                .dossier-card {
+                    border: none;
+                }
+                
+                .dossier-header {
+                    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+                }
+                
+                .dossier-title {
+                    font-weight: 700;
+                    font-size: 1.75rem;
+                }
+                
+                .btn-pill {
+                    border-radius: 50px;
+                    padding: 0.5rem 1.25rem;
+                }
+                
+                .meta-item {
+                    display: flex;
+                    align-items: center;
+                    padding: 0.5rem 0;
+                }
+                
+                /* Data Section */
+                .section-header {
+                    padding-bottom: 1rem;
+                    border-bottom: 1px solid #e3e6f0;
+                }
+                
+                .icon-wrapper {
+                    width: 45px;
+                    height: 45px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                
+                .bg-primary-light {
+                    background-color: var(--primary-light);
+                }
+                
+                .data-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 1.5rem;
+                }
+                
+                .data-table tr:nth-child(even) {
+                    background-color: #f9fafc;
+                }
+                
+                .data-table tr:hover {
+                    background-color: #f1f5fd;
+                }
+                
+                .data-table th {
+                    text-align: left;
+                    padding: 1rem;
+                    color: var(--secondary-color);
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    font-size: 0.8rem;
+                    letter-spacing: 0.5px;
+                    border-bottom: 2px solid #e3e6f0;
+                }
+                
+                .data-table td {
+                    padding: 1rem;
+                    vertical-align: top;
+                    border-bottom: 1px solid #e3e6f0;
+                }
+                
+                .data-label {
+                    font-weight: 600;
+                    color: #4a4a4a;
+                    min-width: 200px;
+                }
+                
+                .preformatted-text {
+                    background: #f1f3f9;
+                    padding: 0.75rem 1rem;
+                    border-radius: 0.5rem;
+                    font-family: inherit;
+                    white-space: pre-wrap;
+                    line-height: 1.6;
+                    display: block;
+                    margin: 0.5rem 0;
+                }
+                
+                .chips-container {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 0.5rem;
+                }
+                
+                .chip {
+                    background: #e9ecef;
+                    padding: 0.35rem 0.75rem;
+                    border-radius: 50px;
+                    font-size: 0.85rem;
+                }
+                
+                /* Moyens Section */
+                .moyens-container {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1.5rem;
+                    margin-top: 2rem;
+                }
+                
+                .moyen-item {
+                    display: flex;
+                    background: white;
+                    border-radius: 0.5rem;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                    overflow: hidden;
+                    border: 1px solid #e3e6f0;
+                }
+                
+                .moyen-number {
+                    background: var(--primary-color);
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-width: 60px;
+                    font-weight: bold;
+                    font-size: 1.5rem;
+                    font-family: 'Georgia', serif;
+                }
+                
+                .moyen-content {
+                    padding: 1.5rem;
+                    flex-grow: 1;
+                }
+                
+                .moyen-text {
+                    line-height: 1.8;
+                    color: #4a4a4a;
+                    white-space: pre-wrap;
+                }
+                
+                /* Modal */
+                .icon-circle {
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 auto;
+                }
+                
+                .download-icon i {
+                    font-size: 2.5rem;
+                }
+                
+                /* Badges */
+                .badge-oui {
+                    background-color: #d1fae5;
+                    color: #065f46;
+                }
+                
+                .badge-non {
+                    background-color: #fee2e2;
+                    color: #b91c1c;
+                }
+                
+                @media (max-width: 768px) {
+                    .dossier-title {
+                        font-size: 1.5rem;
+                    }
+                    
+                    .data-table {
+                        display: block;
+                        overflow-x: auto;
+                    }
+                }
+            </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container py-5">
+        {# Dossier Header - Card Style #}
+        <div class="dossier-card bg-white rounded-4 shadow-lg overflow-hidden mb-5">
+            <div class="dossier-header bg-gradient-primary p-4 text-white">
+                <div class="d-flex align-items-center justify-content-between flex-wrap">
+                    <div class="d-flex align-items-center mb-3 mb-md-0">
+                        <i class="fas fa-folder-open fa-3x me-4"></i>
+                        <div>
+                            <h1 class="dossier-title mb-1 text-white">Dossier {{ rapport.dossier.referenceDossier }}</h1>
+                            <div class="d-flex align-items-center flex-wrap">
+                                <span class="badge bg-white text-primary rounded-pill me-2 mb-1">
+                                    <i class="fas fa-tag me-1"></i> {{ rapport.typeRapport }}
+                                </span>
+                                <span class="badge bg-white text-primary rounded-pill me-2 mb-1">
+                                    <i class="fas fa-layer-group me-1"></i> {{ rapport.modeleRapport.section.name }}
+                                </span>
+                                <span class="badge bg-white text-primary rounded-pill mb-1">
+                                    <i class="fas fa-building me-1"></i> {{ rapport.modeleRapport.section.Structure.name }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex flex-wrap gap-3">
+                        <button class="btn btn-light btn-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#downloadModal">
+                            <i class="fas fa-download me-2"></i> Télécharger
+                        </button>
+                        {% if is_granted('ROLE_CONSEILLER') %}
+                        <a href="{{ path('rapport_modifier', {'id': rapport.id}) }}" class="btn btn-light btn-pill px-4 shadow-sm">
+                            <i class="fas fa-edit me-2"></i> Modifier
+                        </a>
+                        {% endif %}
+                        <a href="{{ path('admin_dossier_details', {'id': rapport.dossier.id}) }}" class="btn btn-outline-light btn-pill px-4">
+                            <i class="fas fa-arrow-left me-2"></i> Retour
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dossier-meta p-4">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="meta-item mb-3">
+                            <i class="fas fa-user-tie text-primary me-2"></i>
+                            <span class="fw-bold">Conseiller :</span>
+                            <span>{{ rapport.createdBy.Fullname }}</span>
+                        </div>
+                        <div class="meta-item mb-3">
+                            <i class="fas fa-file-word text-primary me-2"></i>
+                            <span class="fw-bold">Modèle :</span>
+                            <span>{{ rapport.modeleRapport.nomFichier }}</span>
+                        </div>
+                        <div class="btn btn-light btn-pill px-4 shadow-sm mb-3">
+                            <span>
+                                <a href="{{ path('rapport_convert_pdf', {'referenceDossier': rapport.dossier.referenceDossier}) }}">
+                                    <i class="fas fa-file-pdf me-1"></i> Voir le PDF
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                       <div class="meta-item mb-3">
+                            <i class="fas fa-user-tie text-primary me-2"></i>
+                            <span class="fw-bold">Greffier en charge :</span>
+                            <span>{{ rapport.dossier.affecterSection.greffier.fullName }}</span>
+                        </div>
+                        <div class="meta-item mb-3">
+                            <i class="fas fa-calendar-alt text-primary me-2"></i>
+                            <span class="fw-bold">Créé le :</span>
+                            <span>{{ rapport.createdAt|date('d/m/Y à H:i') }}</span>
+                        </div>
+                        {% if rapport.updateAt %}
+                        <div class="meta-item">
+                            <i class="fas fa-sync-alt text-primary me-2"></i>
+                            <span class="fw-bold">Modifié le :</span>
+                            <span>{{ rapport.updateAt|date('d/m/Y à H:i') }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Data Section - Table Layout #}
+        <div class="data-section bg-white rounded-4 shadow-sm p-4 mb-5">
+            <div class="section-header d-flex align-items-center mb-4">
+                <div class="icon-wrapper bg-primary-light me-3">
+                    <i class="fas fa-database text-primary"></i>
+                </div>
+                <h2 class="section-title mb-0">Données du rapport</h2>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Champ</th>
+                            <th>Valeur</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                {% for key, value in rapport.donnees %}
+                    {% if key != 'moyens' %}
+                    <tr>
+                        <td class="data-label">
+                            {{ key|replace({'_': ' '})|title }}
+                        </td>
+                        <td class="data-value">
+                            {% if value is same as(true) %}
+                                <span class="badge badge-oui rounded-pill px-3 py-1">
+                                    <i class="fas fa-check me-1"></i> Oui
+                                </span>
+                            {% elseif value is same as(false) %}
+                                <span class="badge badge-non rounded-pill px-3 py-1">
+                                    <i class="fas fa-times me-1"></i> Non
+                                </span>
+                            {% elseif value is iterable and value is not empty %}
+                                <div class="chips-container">
+                                    {% for item in value %}
+                                        <span class="chip">
+                                            {% if item matches '/^\\d{4}-\\d{2}-\\d{2}(T|\\s)\\d{2}:\\d{2}:\\d{2}/' %}
+                                                {{ item|date('d F Y') }}
+                                            {% else %}
+                                                {{ item }}
+                                            {% endif %}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            {% elseif value is null or value is empty %}
+                                <span class="text-muted">Non renseigné</span>
+                            {% elseif value matches '/^\\d{4}-\\d{2}-\\d{2}(T|\\s)\\\\d{2}:\\d{2}:\\d{2}/' %}
+                                {{ value|date('d F Y') }}
+                            {% elseif '\n' in value %}
+                                <div class="preformatted-text">{{ value }}</div>
+                            {% else %}
+                                {{ value }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# Moyens Section - Elegant Design #}
+        {% if rapport.typeRapport == 'Fond' and rapport.donnees.moyens is defined and rapport.donnees.moyens|length > 0 %}
+        <div class="moyens-section bg-white rounded-4 shadow-sm p-4">
+            <div class="section-header d-flex align-items-center mb-4">
+                <div class="icon-wrapper bg-primary-light me-3">
+                    <i class="fas fa-gavel text-primary"></i>
+                </div>
+                <h2 class="section-title mb-0">Moyen(s) invoqué(s)</h2>
+            </div>
+            
+            <div class="moyens-container">
+                {% for moyen in rapport.donnees.moyens %}
+                <div class="moyen-item">
+                    <div class="moyen-number">
+                        <span>{{ loop.index }}</span>
+                    </div>
+                    <div class="moyen-content">
+                        <div class="moyen-text">
+                            {{ moyen }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {# Download Modal - Modern Design #}
+<div class="modal fade" id="downloadModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white border-0">
+                <h5 class="modal-title text-white">Télécharger le rapport</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-5">
+                <div class="download-icon mb-4">
+                    <div class="icon-circle bg-primary-light">
+                        <i class="fas fa-file-download text-primary"></i>
+                    </div>
+                </div>
+                <h4 class="mb-3">Dossier {{ rapport.dossier.referenceDossier }}</h4>
+                <p class="text-muted">Prêt à télécharger le rapport final ? </p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Annuler</button>
+                <a href="{{ path('rapport_download', {'id': rapport.id}) }}" 
+                   id="downloadBtn" 
+                   class="btn btn-primary rounded-pill px-4">
+                   <i class="fas fa-download me-2"></i> Télécharger
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animation for download icon
+            const downloadIcon = document.querySelector('.download-icon i');
+            if (downloadIcon) {
+                setInterval(() => {
+                    downloadIcon.style.transform = 'translateY(-5px)';
+                    setTimeout(() => {
+                        downloadIcon.style.transform = 'translateY(0)';
+                    }, 500);
+                }, 2000);
+            }
+
+            // Gestion du téléchargement et fermeture du modal
+            const downloadBtn = document.getElementById('downloadBtn');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', function(e) {
+                    // Fermer le modal immédiatement
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('downloadModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                    
+                });
+            }
+        });
+    </script>
+{% endblock %}
+{% endblock %}

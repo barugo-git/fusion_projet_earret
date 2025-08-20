@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Dossier;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -39,261 +40,209 @@ class DossierRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Dossier[] Returns an array of Dossier objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('d.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Dossier
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
-
-
-
-    public function ListedesDossiersParPeriodet($datedeb,$dateFin)
+    public function ListedesDossiersParPeriodet($datedeb, $dateFin)
     {
         $qb = $this->createQueryBuilder('d')
             ->andWhere('d.etatDossier is NULL')
             ->andWhere('d.dateEnregistrement  BETWEEN :from AND :to')
             ->setParameter('from', $datedeb)
-            ->setParameter('to', $dateFin)
-
-        ;
-
-
-
+            ->setParameter('to', $dateFin);
 
         return $qb->getQuery()->getResult();
-
-
     }
 
-    public function ListedesDossiersCreeParPeriodet($datedeb,$dateFin)
+    public function ListedesDossiersCreeParPeriodet($datedeb, $dateFin)
     {
         $qb = $this->createQueryBuilder('d')
             ->andWhere('d.etatDossier = :etat')
             ->andWhere('d.dateEnregistrement  BETWEEN :from AND :to')
             ->setParameter('from', $datedeb)
             ->setParameter('to', $dateFin)
-            ->setParameter('etat',"OUVERT")
-
-        ;
-
-
-
+            ->setParameter('etat', "OUVERT");
 
         return $qb->getQuery()->getResult();
-
-
     }
 
-    public function recoursAutoriseParGreffierChef($greffier){
+    public function recoursAutoriseParGreffierChef($greffier)
+    {
         return $this->createQueryBuilder('d')
-            ->leftJoin('d.affecterSection','a')
+            ->leftJoin('d.affecterSection', 'a')
             ->andWhere('d.etatDossier  = :etat')
             ->andWhere('a.greffier = :greffer')
             ->andWhere('d.autorisation = true')
-           ->setParameter('greffer', $greffier)
-           ->setParameter('etat',"AUTORISATION")
+            ->setParameter('greffer', $greffier)
+            ->setParameter('etat', "AUTORISATION")
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
     }
 
-    public function recourstransfererParGreffierChef($greffier){
+    public function recourstransfererParGreffierChef($greffier)
+    {
         return $this->createQueryBuilder('d')
-            ->leftJoin('d.affecterUsers','a')
+            ->leftJoin('d.affecterUsers', 'a')
             ->andWhere('d.etatDossier  = :etat')
             ->andWhere('a.destinataire = :greffer')
             ->andWhere('d.autorisation = true')
             ->setParameter('greffer', $greffier->getId()->toBinary())
-            ->setParameter('etat',"AUTORISATION")
+            ->setParameter('etat', "AUTORISATION")
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
     }
+
     /**
-         * @return Dossier[] Returns an array of Dossier objects
+     * @return Dossier[] Returns an array of Dossier objects
      */
     public function recoursAffecteParStructure($structure)
     {
         return $this->createQueryBuilder('d')
-            ->innerJoin('d.structures','s')
-            ->innerJoin('s.structure','st')
-//            ->andWhere('d.etatDossier  = :etat')
+            ->innerJoin('d.structures', 's')
+            ->innerJoin('s.structure', 'st')
             ->andWhere('st.codeStructure = :code')
-////            ->setParameter('etat',"AUTORISATION")
-            ->setParameter('code',$structure)
+            ->setParameter('code', $structure)
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
     }
 
     public function dossierAAffecteAuPC()
     {
         return $this->createQueryBuilder('d')
-            ->innerJoin('d.structures','s')
-            ->innerJoin('s.structure','st')
-            ->innerJoin('d.piecesDoc','p')
+            ->innerJoin('d.structures', 's')
+            ->innerJoin('s.structure', 'st')
+            ->innerJoin('d.piecesDoc', 'p')
             ->andWhere('d.etatDossier  = :etat')
             ->andWhere('st.codeStructure = :code')
             ->andWhere('p.naturePiece= :nature')
-            ->setParameter('etat',"CONCLUSION EN COURS")
-            ->setParameter('code','PG')
-            ->setParameter('nature','RAPPORT AVOCAT GENERAL')
+            ->setParameter('etat', "CONCLUSION EN COURS")
+            ->setParameter('code', 'PG')
+            ->setParameter('nature', 'RAPPORT AVOCAT GENERAL')
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
     }
 
     public function dossierAAffecteAuPG()
     {
         return $this->createQueryBuilder('d')
-            ->innerJoin('d.structures','s')
-            ->innerJoin('s.structure','st')
+            ->innerJoin('d.structures', 's')
+            ->innerJoin('s.structure', 'st')
             ->andWhere('d.etatDossier  != :etat')
             ->andWhere('st.codeStructure = :code')
-            ->setParameter('etat',"CONCLUSION EN COURS")
-            ->setParameter('code','PG')
-//            ->setParameter('code',$structure)
+            ->setParameter('etat', "CONCLUSION EN COURS")
+            ->setParameter('code', 'PG')
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
     }
 
-    public function recoursAffecteParAG($user){
+    public function recoursAffecteParAG($user)
+    {
         return $this->createQueryBuilder('d')
-
-            ->innerJoin('d.mesuresInstructions','m')
-            ->innerJoin('d.structures','s')
-            ->innerJoin('m.greffier','g')
-            ->innerJoin('s.structure','st')
-//            ->innerJoin('s.structure','st')
+            ->innerJoin('d.mesuresInstructions', 'm')
+            ->innerJoin('d.structures', 's')
+            ->innerJoin('m.greffier', 'g')
+            ->innerJoin('s.structure', 'st')
             ->andWhere('g.id  = :user')
             ->andWhere('st.codeStructure = :code')
-////            ->setParameter('etat',"AUTORISATION")
-            ->setParameter('code','PG')
-            ->setParameter('user',$user->getId()->toBinary())
+            ->setParameter('code', 'PG')
+            ->setParameter('user', $user->getId()->toBinary())
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
     }
-    public function listeGreffierRecours(){
+
+    public function listeGreffierRecours()
+    {
         return $this->createQueryBuilder('d')
-            ->leftJoin('d.userDossiers','u')
+            ->leftJoin('d.userDossiers', 'u')
             ->andWhere('d.etatDossier  = :etat')
             ->andWhere('u.nature = :nature')
             ->andWhere('u.profil = :profil')
             ->setParameter('profil', "GREFFE")
-            ->setParameter('etat',"AFFECTE")
-            ->setParameter('nature',"AFFECTATION")
+            ->setParameter('etat', "AFFECTE")
+            ->setParameter('nature', "AFFECTATION")
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
     }
 
-    public function listeDossierOuvert(){
+    public function listeDossierOuvert()
+    {
         return $this->createQueryBuilder('d')
-            ->innerJoin('d.affecterSection','u')
+            ->innerJoin('d.affecterSection', 'u')
             ->andWhere('d.etatDossier  = :etat')
-            ->setParameter('etat',"OUVERT")
-//            ->andWhere('d.etatDossier  <> :etat')
-//            ->setParameter('etat',Null)
+            ->setParameter('etat', "OUVERT")
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
     }
 
-    public function listeDossierOuvertParGreffier($greffier){
+    public function listeDossierOuvertParGreffier($greffier)
+    {
         return $this->createQueryBuilder('d')
-            ->innerJoin('d.affecterSection','u')
+            ->innerJoin('d.affecterSection', 'u')
             ->andWhere('d.etatDossier  = :etat')
             ->andWhere('u.greffier = :greffer')
             ->setParameter('greffer', $greffier->getId()->toBinary())
-            ->setParameter('etat',"OUVERT")
-//            ->andWhere('d.etatDossier  <> :etat')
-//            ->setParameter('etat',Null)
+            ->setParameter('etat', "OUVERT")
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
     }
-
 
     public function listeDossierOuvertEtauRoleParGreffier($greffier)
     {
         return $this->createQueryBuilder('d')
             ->innerJoin('d.affecterSection', 'u')
-            ->andWhere('d.etatDossier =:etat')
-            ->orWhere('d.statut =:etat1')// Correction ici : IN doit être avec des parenthèses
-            ->andWhere('u.greffier =:greffer')
+            ->andWhere('d.etatDossier = :etat')
+            ->orWhere('d.statut = :etat1')
+            ->andWhere('u.greffier = :greffer')
             ->setParameter('greffer', $greffier->getId()->toBinary())
             ->setParameter('etat', "OUVERT")
-            ->setParameter('etat1',"Dossier au Rôle")
-            ->orderBy('d.createdAt', 'DESC') // Ajout d'un tri par date
+            ->setParameter('etat1', "Dossier au Rôle")
+            ->orderBy('d.createdAt', 'DESC')
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
     }
 
-
-    public function listeDossierPourAvisParties($greffier){
+    public function listeDossierPourAvisParties($greffier)
+    {
         return $this->createQueryBuilder('d')
-            ->innerJoin('d.affecterSection','u')
+            ->innerJoin('d.affecterSection', 'u')
             ->andWhere('d.etatDossier  = :etat')
             ->andWhere('u.greffier = :greffer')
             ->setParameter('greffer', $greffier->getId()->toBinary())
-            ->setParameter('etat',"AVIS GREFFE")
-//            ->andWhere('d.etatDossier  <> :etat')
-//            ->setParameter('etat',Null)
+            ->setParameter('etat', "AVIS GREFFE")
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
     }
 
-
-    public function listeDossierOuvertParConseillerRapporteur($conseilRapporteur){
+    public function listeDossierOuvertParConseillerRapporteur($conseilRapporteur)
+    {
         return $this->createQueryBuilder('d')
-            ->innerJoin('d.affecterSection','u')
+            ->innerJoin('d.affecterSection', 'u')
             ->andWhere('d.autorisation = true')
             ->andWhere('d.etatDossier  = :etat')
             ->andWhere('u.conseillerRapporteur = :cr')
             ->setParameter('cr', $conseilRapporteur->getId()->toBinary())
-            ->setParameter('etat',"OUVERT")
-//            ->andWhere('d.etatDossier  <> :etat')
-//            ->setParameter('etat',Null)
+            ->setParameter('etat', "OUVERT")
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
     }
 
-    public function listeConclusionPGParConseillerRapporteur($conseilRapporteur){
+    public function listeConclusionPGParConseillerRapporteur($conseilRapporteur)
+    {
         return $this->createQueryBuilder('d')
-            ->innerJoin('d.affecterSection','u')
+            ->innerJoin('d.affecterSection', 'u')
             ->andWhere('d.autorisation = true')
             ->andWhere('d.etatDossier  = :etat')
             ->andWhere('u.conseillerRapporteur = :cr')
             ->setParameter('cr', $conseilRapporteur->getId()->toBinary())
-            ->setParameter('etat',"AVIS CR")
-//            ->andWhere('d.etatDossier  <> :etat')
-//            ->setParameter('etat',Null)
+            ->setParameter('etat', "AVIS CR")
             ->getQuery()
-            ->getResult()
-            ;
+            ->getResult();
+    }
+
+    public function findDossiersByAffectedUser(User $user): array
+    {
+        return $this->createQueryBuilder('d')
+            ->innerJoin('d.affecterSection', 'a')
+            ->where('a.greffier = :user OR a.conseillerRapporteur = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
     }
 }

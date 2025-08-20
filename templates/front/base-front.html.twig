@@ -3,8 +3,7 @@
 
     {{ include('partials/title-meta.html.twig', {title: 'Cour suprême|e-arret'}) }}
 
-    <!--Swiper slider css-->
-{#    <link href="assets/libs/swiper/swiper-bundle.min.css" rel="stylesheet" type="text/css" />#}
+    {# <link href="assets/libs/swiper/swiper-bundle.min.css" rel="stylesheet" type="text/css" /> #}
 
     {{ include('partials/head-css.html.twig') }}
 
@@ -29,32 +28,23 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ path('front_recours_status') }}">Statut de mon recours</a>
                     </li>
-
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('paiement_consignation_index') }}">Consignation</a>
+                    </li>
                 </ul>
             </div>
-
         </div>
-
     </nav>
-    <!-- end navbar -->
-
-
     {% block body %}
-
-
-
     {% endblock %}
-    <!--start back-to-top-->
     <button onclick="topFunction()" class="btn btn-info btn-icon landing-back-top" id="back-to-top">
         <i class="ri-arrow-up-line"></i>
     </button>
-    <!--end back-to-top-->
-</div>
+    </div>
 
 {{ include('partials/vendor-scripts.html.twig') }}
 
 {% block javascripts %}
 {% endblock %}
 </body>
-
 </html>

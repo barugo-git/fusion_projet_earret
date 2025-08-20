@@ -222,7 +222,6 @@ class Partie
     }
 
 
-
     public function getStatus(): ?string
     {
         return $this->status;
@@ -323,5 +322,10 @@ class Partie
         }
 
         return $this;
+    }
+
+    public function getNomComplet(): string
+    {
+        return $this->nom . ' ' . $this->prenoms;
     }
 }

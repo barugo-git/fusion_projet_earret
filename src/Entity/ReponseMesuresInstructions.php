@@ -24,8 +24,8 @@ class ReponseMesuresInstructions
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $DateMiseDirective;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private $DateNotification;
+    #[ORM\Column(type: 'datetime_immutable')]
+    private ?\DateTimeImmutable $dateNotification = null;
 
     #[ORM\Column(type: 'boolean', nullable: true)]
     private $reponsePartie;
@@ -46,7 +46,6 @@ class ReponseMesuresInstructions
     public function setMesure(?MesuresInstructions $mesure): self
     {
         $this->mesure = $mesure;
-
         return $this;
     }
 
@@ -58,7 +57,6 @@ class ReponseMesuresInstructions
     public function setReponse(?string $reponse): self
     {
         $this->reponse = $reponse;
-
         return $this;
     }
 
@@ -70,19 +68,17 @@ class ReponseMesuresInstructions
     public function setDateMiseDirective(?\DateTimeInterface $DateMiseDirective): self
     {
         $this->DateMiseDirective = $DateMiseDirective;
-
         return $this;
     }
 
-    public function getDateNotification(): ?\DateTimeInterface
+    public function getDateNotification(): ?\DateTimeImmutable
     {
-        return $this->DateNotification;
+        return $this->dateNotification;
     }
 
-    public function setDateNotification(?\DateTimeInterface $DateNotification): self
+    public function setDateNotification(\DateTimeImmutable $dateNotification): self
     {
-        $this->DateNotification = $DateNotification;
-
+        $this->dateNotification = $dateNotification;
         return $this;
     }
 
@@ -94,7 +90,6 @@ class ReponseMesuresInstructions
     public function setReponsePartie(?bool $reponsePartie): self
     {
         $this->reponsePartie = $reponsePartie;
-
         return $this;
     }
 
@@ -106,7 +101,6 @@ class ReponseMesuresInstructions
     public function setTermine(?bool $termine): self
     {
         $this->termine = $termine;
-
         return $this;
     }
 }

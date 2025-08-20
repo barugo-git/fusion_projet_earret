@@ -1,0 +1,7 @@
+{# templates/paiement_consignation/preuve_consignation.html.twig #}
+<h1>Preuve de Consignation</h1>
+<p>ID Transaction : {{ transaction.id }}</p>
+<p>Montant : {{ transaction.amount / 100 }} FCFA</p>
+<p>Date : {{ transaction.created_at|date('d/m/Y H:i') }}</p>
+<p>Mode de Paiement : {{ transaction.payment_method }}</p>
+<p>Statut : {{ transaction.status }}</p>
