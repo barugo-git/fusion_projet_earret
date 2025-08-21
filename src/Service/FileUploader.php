@@ -36,38 +36,41 @@ class FileUploader
     }
 
     public function upload(UploadedFile $file, ?string $name = null, ?string $folder = 'default'): string
-    {
-        if (!array_key_exists($folder, $this->uploadPaths)) {
-            throw new \InvalidArgumentException("Dossier de destination invalide: $folder");
-        }
-
-        $targetDir = $this->uploadPaths[$folder];
-
-        try {
-            if (!is_dir($targetDir)) {
-                mkdir($targetDir, 0775, true);
-            }
-
-            // Création du nom de fichier sécurisé
-            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-            $safeName = $name ? $this->slugger->slug($name) : $this->slugger->slug($originalName);
-            $fileName = $safeName . '-' . uniqid() . '.' . $file->guessExtension();
-
-            $file->move($targetDir, $fileName);
-
-            return $folder . '/' . $fileName;
-
-        } catch (FileException $e) {
-            $this->logger->error('Erreur upload fichier', [
-                'error' => $e->getMessage(),
-                'folder' => $folder,
-                'file' => $file->getClientOriginalName()
-            ]);
-            throw new \RuntimeException("Échec de l'upload du fichier");
-        }
+{
+    if (!array_key_exists($folder, $this->uploadPaths)) {
+        throw new \InvalidArgumentException("Dossier de destination invalide: $folder");
     }
 
-    public function removeFile(string $filePath): bool
+    $targetDir = $this->uploadPaths[$folder];
+
+    try {
+        if (!is_dir($targetDir)) {
+            if (!mkdir($targetDir, 0775, true) && !is_dir($targetDir)) {
+                throw new \RuntimeException("Impossible de créer le dossier: $targetDir");
+            }
+        }
+
+        // Création du nom de fichier sécurisé
+        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeName = $name ? $this->slugger->slug($name) : $this->slugger->slug($originalName);
+        $fileName = $safeName . '-' . uniqid() . '.' . $file->guessExtension();
+
+        $file->move($targetDir, $fileName);
+
+        // Retourne le chemin relatif accessible depuis public/
+        return $fileName;
+
+    } catch (\Throwable $e) { // capture tout
+        $this->logger->error('Erreur upload fichier', [
+            'error' => $e->getMessage(),
+            'folder' => $folder,
+            'file' => $file->getClientOriginalName(),
+            'targetDir' => $targetDir
+        ]);
+        throw new \RuntimeException("Échec de l'upload du fichier : " . $e->getMessage());
+    }
+}
+public function removeFile(string $filePath): bool
     {
         foreach ($this->uploadPaths as $path) {
             $absolutePath = $path . '/' . $filePath;

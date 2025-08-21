@@ -543,8 +543,123 @@ class GreffierController extends AbstractController
                 ->from(new Address('juridiction@coursupreme.bj', 'Cour Suprême'));
         }
 
-        return $this->render('greffe/publie_calendrier.html.twig', [
+        return $this->render('greffe/publiercalendrier.html.twig', [
             'form' => $form->createView(),
         ]);
     }
+
+    #[Route(path: '/arret/{id}', name: 'greffier_arret_new', methods: ['GET', 'POST'])]
+    public function arrets( #[CurrentUser] User    $user,Dossier  $dossier, Request $request, ArretsRepository $arretsRepository,
+        FileUploader $fileUploader, MailerInterface $mailer, DossierRepository $dossierRepository): Response
+    {
+        $arret = new Arrets();
+        $form = $this->createForm(ArretResumeType::class, $arret);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $arret->setDossier($dossier);
+            $file_arret = $form->get('arret_file')->getData();
+            $fichier = $fileUploader->upload($file_arret, null);
+            $dossier->setStatut('Dossier vidé : Arrêt disponible');
+            $arret->setArret($fichier);
+            $dossier->setEtatDossier("ARRETS");
+            $arretsRepository->add($arret, true);
+            // $audienceRepository->add($audience, true);
+            //     $smsMessage = "L'audience du  dossier : " . $dossier->getReferenceDossier() . " a été programmé le : " . $audience->getDateAudience()->format("Y-m-d H:i:s");
+//            dd($smsMessage);
+            $requerant_mail = $dossier->getRequerant()->getEmail();
+            $request_telephone = $dossier->getRequerant()->getTelephone();
+            $defendeur_mail = $dossier->getDefendeur()->getEmail();
+            $defendeur_telephone = $dossier->getDefendeur()->getTelephone();
+
+
+
+              $email = (new TemplatedEmail())
+                   ->from(new Address('moussabaka@openkanz.com', 'Cour Suprême'))
+                   ->to(new Address($requerant_mail))
+                   // ->priority(Email::PRIORITY_HIGH)
+                   ->subject('Arrêt du dossier : ' . $dossier->getReferenceDossier())
+                   ->priority(Email::PRIORITY_HIGH)
+
+                   // path of the Twig template to render
+                   ->htmlTemplate('mailer/auience_mail_front.html.twig')
+
+                   // pass variables (name => value) to the template
+                   ->context([
+                       'dossier' => $dossier,
+                       'arret' => $arret->getArret(),
+                       'nom' => $dossier->getRequerant()->getNom()
+
+                   ]);
+
+               $mailer->send($email);
+
+
+           /* if ($defendeuail) {
+                $email = (new TemplatedEmail())
+                    ->from('xxxxx@fuprobenin.org')
+                    ->to(new Address($defendeur_mail))
+                    // ->priority(Email::PRIORITY_HIGH)
+                    ->subject('Programmation de l\'audience du dossier : ' . $dossier->getReferenceDossier())
+                    ->priority(Email::PRIORITY_HIGH)
+
+                    // path of the Twig template to render
+                    ->htmlTemplate('mailer/partie_audience.html.twig')
+
+                    // pass variables (name => value) to the template
+                    ->context([
+                        'dossier' => $dossier,
+                        'audience' => $audience,
+                        'nom' => $dossier->getDefendeur()->getNom()
+
+                    ]);
+
+                $mailer->send($email);
+            }
+
+            foreach ($dossier->getUserDossiers() as $membre) {
+                if ($membre->getUSer()->getEmail()) {
+                    $email = (new TemplatedEmail())
+                        ->from('xxxxx@fuprobenin.org')
+                        ->to(new Address($membre->getUSer()->getEmail()))
+                        // ->priority(Email::PRIORITY_HIGH)
+                        ->subject('Programmation de l\'audience du dossier : ' . $dossier->getReferenceDossier())
+                        ->priority(Email::PRIORITY_HIGH)
+
+                        // path of the Twig template to render
+                        ->htmlTemplate('mailer/partie_audience.html.twig')
+
+                        // pass variables (name => value) to the template
+                        ->context([
+                            'dossier' => $dossier,
+                            'audience' => $audience,
+                            'nom' => $membre->getUSer()->getNom()
+
+                        ]);
+
+                    $mailer->send($email);
+              }
+            }
+
+
+            /*         if ($request_telephone) {
+                         $this->envoiSMS($smsMessage, $request_telephone);
+
+                     }
+                     if ($defendeur_telephone) {
+                         $this->envoiSMS($smsMessage, $defendeur_telephone);
+
+                     }*/
+            $this->addFlash('success', 'L\'audience du dossier : ' . $dossier->getReferenceDossier() . ' a été programmé avec succes');
+            return $this->redirectToRoute('admin_arret_list', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('greffe/publicationarret.html.twig', [
+            'arret' => $arret,
+            'dossier' => $dossier,
+            'form' => $form,
+        ]);
+    }
+
+
 }

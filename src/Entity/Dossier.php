@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+
+
 use App\Repository\DossierRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -19,91 +21,91 @@ class Dossier
     private ?Uuid $id = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $referenceEnregistrement;
+    private ?string $referenceEnregistrement = null;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private $dateEnregistrement;
-
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $typeDossier;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dateEnregistrement = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $referenceDossier;
+    private ?string $typeDossier = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $intituleObjet;
+    private ?string $referenceDossier = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $referenceDossierComplet;
+    private ?string $intituleObjet = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $etatDossier;
+    private ?string $referenceDossierComplet = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $etatDossier = null;
 
     #[ORM\ManyToOne(targetEntity: Objet::class, inversedBy: 'dossiers')]
-    private $objet;
+    private ?Objet $objet = null;
 
     #[ORM\OneToMany(targetEntity: UserDossier::class, mappedBy: 'dossier', cascade: ['persist'])]
-    private $userDossiers;
+    private Collection $userDossiers;
 
     #[ORM\OneToMany(targetEntity: AffecterStructure::class, mappedBy: 'dossier')]
-    private $structures;
+    private Collection $structures;
 
     #[ORM\OneToMany(targetEntity: Arrets::class, mappedBy: 'dossier')]
-    private $arrets;
+    private Collection $arrets;
 
     #[ORM\OneToMany(mappedBy: 'dossier', targetEntity: DossierPiecesJointes::class, cascade: ['persist'])]
-    private $pieces;
+    private Collection $pieces;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private $dateOuverture;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dateOuverture = null;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private $createdAt;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private $updatedAt;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\ManyToOne(targetEntity: Structure::class, inversedBy: 'dossiers')]
-    private $structure;
+    private ?Structure $structure = null;
 
     #[ORM\ManyToMany(targetEntity: Audience::class, inversedBy: 'dossiers', cascade: ['persist'])]
-    private $audience;
+    private Collection $audience;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $nature;
+    private ?string $nature = null;
 
     #[ORM\ManyToOne(targetEntity: Provenance::class, inversedBy: 'dossiers')]
-    private $provenance;
+    private ?Provenance $provenance = null;
 
     #[ORM\Column(type: 'boolean', nullable: true)]
-    private $autorisation;
+    private ?bool $autorisation = null;
 
     #[ORM\OneToMany(targetEntity: MesuresInstructions::class, mappedBy: 'dossier')]
-    private $mesuresInstructions;
+    private Collection $mesuresInstructions;
 
     #[ORM\OneToOne(targetEntity: AffecterSection::class, mappedBy: 'dossier', cascade: ['persist', 'remove'])]
-    private $affecterSection;
+    private ?AffecterSection $affecterSection = null;
 
     #[ORM\Column(type: 'boolean', nullable: true)]
-    private $clos;
+    private ?bool $clos = null;
 
-    #[ORM\Column(type: 'date', nullable: true)]
-    private $dateCloture;
-
-    #[ORM\Column(type: 'text', nullable: true)]
-    private $motifCloture;
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dateCloture = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private $annotation;
+    private ?string $motifCloture = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $annotation = null;
 
     #[ORM\OneToMany(targetEntity: AvisPaquet::class, mappedBy: 'dossier')]
-    private $avisPaquets;
+    private Collection $avisPaquets;
 
     #[ORM\OneToMany(mappedBy: 'dossier', targetEntity: DeliberationDossiers::class)]
-    private $deliberation;
+    private Collection $deliberation;
 
     #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'dossiersRequerant')]
-    private ?Partie $requerant;
+    private ?Partie $requerant = null;
 
     #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'dossiersDefendeur')]
     private ?Partie $defendeur = null;
@@ -147,32 +149,23 @@ class Dossier
     #[ORM\Column(nullable: true)]
     private ?bool $externe = false;
 
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private $dateAutorisation;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $dateAutorisation = null;
 
-    /**
-     * @var Collection<int, Mouvement>
-     */
-    #[ORM\OneToMany(mappedBy: 'Dossier', targetEntity: Mouvement::class)]
+    #[ORM\OneToMany(mappedBy: 'dossier', targetEntity: Mouvement::class)]
     private Collection $mouvements;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $statut = null;
 
-    /**
-     * @var Collection<int, AffecterUser>
-     */
     #[ORM\OneToMany(mappedBy: 'dossier', targetEntity: AffecterUser::class)]
     private Collection $affecterUsers;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $calendrier = null;
 
-    /**
-     * @ORM\OneToOne(targetEntity=Rapport::class, mappedBy="dossier")
-     */
     #[ORM\OneToOne(targetEntity: Rapport::class, mappedBy: "dossier")]
-    private $rapport;
+    private ?Rapport $rapport = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $rapportCR = null;
@@ -198,9 +191,6 @@ class Dossier
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $finMesuresInstructionAt = null;
 
-    /**
-     * @var Collection<int, Pieces>
-     */
     #[ORM\OneToMany(mappedBy: 'dossier', targetEntity: Pieces::class)]
     private Collection $piecesDoc;
 
@@ -236,6 +226,8 @@ class Dossier
     {
         return $this->id;
     }
+
+
 
     public function getReferenceEnregistrement(): ?string
     {
@@ -560,10 +552,7 @@ class Dossier
         return $this;
     }
 
-    public function __toString()
-    {
-        return $this->intituleObjet;
-    }
+ 
 
     public function getNature(): ?string
     {
@@ -1212,5 +1201,10 @@ class Dossier
         $this->RecuConsignation = $RecuConsignation;
 
         return $this;
+    }
+
+     public function __toString(): string
+    {
+        return $this->intituleObjet ?? 'Dossier';
     }
 }
