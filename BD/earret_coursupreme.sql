@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : ven. 22 août 2025 à 13:57
+-- Généré le : ven. 22 août 2025 à 14:13
 -- Version du serveur : 9.3.0
 -- Version de PHP : 8.4.11
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données : `projetamir_db`
+-- Base de données : `test`
 --
 
 -- --------------------------------------------------------
@@ -852,18 +852,6 @@ INSERT INTO `departement` (`id`, `lib_dep`) VALUES
 -- --------------------------------------------------------
 
 --
--- Structure de la table `doctrine_migration_versions`
---
-
-CREATE TABLE `doctrine_migration_versions` (
-  `version` varchar(191) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `executed_at` datetime DEFAULT NULL,
-  `execution_time` int DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
-
--- --------------------------------------------------------
-
---
 -- Structure de la table `dossier`
 --
 
@@ -892,15 +880,12 @@ CREATE TABLE `dossier` (
   `motif_cloture` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `arrete_attaquee` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `consignation` tinyint(1) DEFAULT NULL,
-  `recu_consignation` tinyint(1) DEFAULT NULL,
   `memoire_ampliatif` tinyint(1) DEFAULT NULL,
   `date_memoire_ampliatif` datetime DEFAULT NULL,
   `memoire_en_defense` tinyint(1) DEFAULT NULL,
   `date_memoire_en_defense` datetime DEFAULT NULL,
   `date_consignation` date DEFAULT NULL,
-  `date_preuve_consignation_requerant` date DEFAULT NULL COMMENT '(DC2Type:date_immutable)',
   `preuve_consignation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `preuve_consignation_requerant` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `url_memoire_ampliatif` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `url_memoire_en_defense` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `code_suivi` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -916,7 +901,10 @@ CREATE TABLE `dossier` (
   `observation_fichier_defendeur` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `rapport_description_cr` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `fin_mesures_instruction` tinyint(1) DEFAULT NULL,
-  `fin_mesures_instruction_at` datetime DEFAULT NULL
+  `fin_mesures_instruction_at` datetime DEFAULT NULL,
+  `recu_consignation` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `date_preuve_consignation_requerant` datetime DEFAULT NULL,
+  `preuve_consignation_requerant` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -946,6 +934,33 @@ CREATE TABLE `dossier_pieces_jointes` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `instructions`
+--
+
+CREATE TABLE `instructions` (
+  `id` binary(16) NOT NULL COMMENT '(DC2Type:uuid)',
+  `libelle` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `delais` int DEFAULT NULL,
+  `active` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `instructions`
+--
+
+INSERT INTO `instructions` (`id`, `libelle`, `delais`, `active`) VALUES
+(0x01962afe01bf7bbc90d545da6ff939fe, 'Paiement de consignation', 15, 1),
+(0x01962e59901f7c81bd335b318626ed9e, 'Production de mémoire ampliatif', 60, 1),
+(0x01962e5a1ac6770ead0951e7eba0094f, 'Mise en demeure pour production de mémoire ampliantif', 30, 1),
+(0x01962e72374a7e80913aa005ef40c8e9, 'Constitution d\'avocats', 2, 1),
+(0x01962e78160a77d9bc0401459d074bcf, 'Communiquer les noms des conseils', 2, 1),
+(0x01962e7f2b9773dfafa6ab077ed02a84, 'Communiquer les clonclusions du parquet aux deux parties', 30, 1),
+(0x01962eb9fa6071a08977e7a78b258b48, 'Produire les conclusions du Parquet', 10, 1),
+(0x01962f7d4bb8722192ca53e7f09d5a51, 'test', 1, 1);
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `log`
 --
 
@@ -971,14 +986,17 @@ CREATE TABLE `mesures_instructions` (
   `dossier_id` binary(16) DEFAULT NULL COMMENT '(DC2Type:uuid)',
   `conseiller_rapporteur_id` binary(16) DEFAULT NULL COMMENT '(DC2Type:uuid)',
   `greffier_id` binary(16) NOT NULL COMMENT '(DC2Type:uuid)',
-  `instruction` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `delais` int NOT NULL,
-  `created_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL,
   `date` datetime DEFAULT NULL,
   `parties_concernes` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nature` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `termine` tinyint(1) DEFAULT NULL,
-  `termine_at` datetime DEFAULT NULL
+  `termine_at` datetime NOT NULL,
+  `alerte_envoyee` tinyint(1) DEFAULT NULL,
+  `instruction_id` binary(16) DEFAULT NULL COMMENT '(DC2Type:uuid)',
+  `observations` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `instruction` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `delais` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1034,16 +1052,6 @@ CREATE TABLE `mouvement` (
   `dossier_id` binary(16) DEFAULT NULL COMMENT '(DC2Type:uuid)',
   `statut_id` binary(16) DEFAULT NULL COMMENT '(DC2Type:uuid)',
   `date_mouvement` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Structure de la table `nom_fichier`
---
-
-CREATE TABLE `nom_fichier` (
-  `id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1132,16 +1140,6 @@ CREATE TABLE `pieces` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `preuve_consignation_requerant`
---
-
-CREATE TABLE `preuve_consignation_requerant` (
-  `id` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
 -- Structure de la table `provenance`
 --
 
@@ -1183,7 +1181,7 @@ CREATE TABLE `reponse_mesures_instructions` (
   `mesure_id` binary(16) DEFAULT NULL COMMENT '(DC2Type:uuid)',
   `reponse` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `date_mise_directive` datetime DEFAULT NULL,
-  `date_notification` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+  `date_notification` datetime DEFAULT NULL,
   `reponse_partie` tinyint(1) DEFAULT NULL,
   `termine` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1282,6 +1280,21 @@ CREATE TABLE `statut` (
   `libelle` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Déchargement des données de la table `statut`
+--
+
+INSERT INTO `statut` (`id`, `libelle`) VALUES
+(0x019244e462f67503849247a2a4ce3b54, 'Consignation et production de mémoire ampliatif'),
+(0x019244e4e99079f78845234ccb9e0e77, 'Communication de dossier  au Parquet Général pour production de conclusions'),
+(0x019244e589327b368e7e93b96aebf286, 'Communication de conclusions aux parties ayant préalablement produit un mémoireossiers en attente des observations des parties'),
+(0x019244e70d367422a778709a35473109, 'Dossier au rapport'),
+(0x01924c13b5557dc7b4e877c9045cc194, 'Dossiers audiencé'),
+(0x0196a2c8b1ec7d928b25f6f5832f37ab, 'Dossier vidé'),
+(0x0196abecbbee7f2a9c4b1d4185a02716, 'Dossier renvoyé à l\'instruction'),
+(0x0196abed837478df84a003158161817f, 'Arrêt signé et dossier communiqué au greffe des arrêts pour notification'),
+(0x0196abef5a2270edb19e0f4fe3d79f29, 'Communication de mémoire ampliatif pour production de mémoire en défense');
+
 -- --------------------------------------------------------
 
 --
@@ -1326,34 +1339,35 @@ CREATE TABLE `user` (
   `titre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_verified` tinyint(1) NOT NULL,
-  `password_change_required` tinyint(1) NOT NULL
+  `password_change_required` tinyint(1) NOT NULL,
+  `photo` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Déchargement des données de la table `user`
 --
 
-INSERT INTO `user` (`id`, `structure_id`, `sections_id`, `email`, `roles`, `password`, `nom`, `prenoms`, `telephone`, `actif`, `last_login`, `titre`, `token`, `is_verified`, `password_change_required`) VALUES
-(0x0191ae5bdf5e74168ee884cbf400a848, 0x0191ae4735af763ba31742744906c8cf, 0x0191ae4c55177898bbfb0184686c1b32, 'akarimou@coursupreme.bj', '[\"ROLE_SUPER_ADMIN\"]', '$2y$13$Jq1OyXvPmH9jVIbMRsbgcu9WL/QR152s9/dsG4u4zh3SyGZtC3KFi', 'KARIMOU AMADOU', 'Abdoul Nassirou', '97719794', 1, NULL, 'AUTRES AGENTS', NULL, 0, 0),
-(0x019247db9589746e82c0b0a473ef9bd3, 0x0191ae417a7373ec9e2d67ba9adab788, 0x019247da5132794aa006f669ea980f71, 'pcj@gmail.com', '[\"ROLE_PCJ\"]', '$2y$13$OhV.SQt9kd4hsFrw3ZZknuDbvHI1ejzgIYi2Arx1.442HEB1u2Zlq', 'PCJ', 'PCJ', '55555555', 1, NULL, 'PRESIDENT DE STRUCTURE', NULL, 0, 0),
-(0x019247decd437f328344f05ee9731722, 0x0191ce9931287240af7cef77ed00541a, 0x0191cec4ab23725291e516a97cf8479c, 'bo@gmail.com', '[\"ROLE_BUREAU_ORIENTATION\"]', '$2y$13$FwkhdwkwnFI/ZvJO.8NoVescAsg2n2L9dPdewVqYbxeEd5yV8iy1a', 'BO', 'BO', '66666666', 1, NULL, 'AUTRES AGENTS', NULL, 0, 0),
-(0x019247e18da472258c9b2ffb0ac456f7, 0x0191ce9931287240af7cef77ed00541a, 0x0191cec4ab23725291e516a97cf8479c, 'gec@gmail.com', '[\"ROLE_GREFFIER_EN_CHEF\"]', '$2y$13$p0/B56tzXQ3gJ2vnYmFiZuowdVLXwFrFNcbMEZ/2dqJSRgGI34Flq', 'GEC', 'Gec', '22222222', 1, NULL, 'GREFFIER EN CHEF', NULL, 0, 0),
-(0x019247e3bd727123b8a3cbedf6b2da9a, 0x0191ae417a7373ec9e2d67ba9adab788, 0x019247d9aed4773ca611df385483f6bf, 'cr@gmail.com', '[\"ROLE_CONSEILLER\"]', '$2y$13$k14kYH9sngHTpePWQy0qJOWE/2dt7e84eVvzaNu9uJZI52MXawOVa', 'RAPPORTEUR', 'Conseiller', '222222', 1, NULL, 'CONSEILLER', NULL, 0, 0),
-(0x019247e59b0875bcbbf0a4a9e3e43d55, 0x0191ae417a7373ec9e2d67ba9adab788, 0x019247d9aed4773ca611df385483f6bf, 'greffier1cj@gmail.com', '[\"ROLE_GREFFIER\"]', '$2y$13$M7DGyFykSfdbTM7xkaxVV.1848UHm7L8PX0U1xvnS5z10ssJRKzM6', 'GREFFIER', 'CJ', '11111111', 1, NULL, 'GREFFIER', NULL, 0, 0),
-(0x01926c99522e7199b98627e2811e830d, 0x0191ae4201167fab94810a32b44f2ec4, 0x01926c9761d877b9a4a31281f6f9b131, 'pca@gmail.com', '[\"ROLE_PCA\"]', '$2y$13$JnWFJ77oRIpZxRx11to0M.dtkS2/A34BUpEILOZSQBssPerAoSlKa', 'PCA', 'PCA', '97771222', 1, NULL, 'PRESIDENT DE STRUCTURE', NULL, 0, 0),
-(0x01926c9aaf887863b3ea7bd16dd11dec, 0x0191ae4201167fab94810a32b44f2ec4, 0x0191ae4b392b7cd2a8b7e5d1c3a35640, 'greffier1ca@gmail.com', '[\"ROLE_GREFFIER\"]', '$2y$13$V5gGn7TAaUJ.dWupMyYDwOJu4L0UKyaAIwY9bX0VQjDEKWbN85pcm', 'Greffier', 'CA', '12121212', 1, NULL, 'GREFFIER', NULL, 0, 0),
-(0x01926d02517577f5b25c975f840c6c67, 0x0191ae4201167fab94810a32b44f2ec4, 0x0191ae4b392b7cd2a8b7e5d1c3a35640, 'crca@gmail.com', '[\"ROLE_CONSEILLER\"]', '$2y$13$79P37Rjc3DaSTvLP5rkLLODdT3FDMOoMnVAzuv59WQBSZbzKrxvgC', 'cr', 'CA', '11111111', 1, NULL, 'CONSEILLER', NULL, 0, 0),
-(0x0192b3ce60507473afadd28e50c30437, 0x0191ae417a7373ec9e2d67ba9adab788, 0x0191ae4aed3b7c9082409530f8a470d8, 'crcj@gmail.com', '[\"ROLE_CONSEILLER\"]', '$2y$13$ZX/V/DPv..NM8/tJxjrR6uYBtpvgkDI8WUWNnfcKeZL8xKXK4y2O.', 'CONSEILLER', 'Rapporeur', '61510059', 1, NULL, 'CONSEILLER', NULL, 0, 0),
-(0x0192b3d0796673feb54bbbec0868c022, 0x0191ae417a7373ec9e2d67ba9adab788, 0x0191ae4aed3b7c9082409530f8a470d8, 'greffiercj@gmail.com', '[\"ROLE_GREFFIER\"]', '$2y$13$69WWE.xnZQR4XnhDmDgwNeDqWiREXkO5K2GWyVDnhblvMG1SBIpBy', 'Greffier', 'CJ', '97719794', 1, NULL, 'GREFFIER', NULL, 0, 0),
-(0x0194835d29a875f180f18b99267cf632, 0x0191ae4735af763ba31742744906c8cf, 0x0191ae4c55177898bbfb0184686c1b32, 'abdoul.ousmane@coursupreme.bj', '[\"ROLE_SUPER_ADMIN\"]', '$2y$13$S0.y9Ygm7IHz0BldMimZxeNqAlU.lDNssQD6uAxU78yWN7nVSI30K', 'OUSMANE', 'Abdoul Matine', '0197210388', 1, NULL, 'AUTRES AGENTS', NULL, 0, 0),
-(0x019483b39f8c7ae6926901a9664bebca, 0x0191ae417a7373ec9e2d67ba9adab788, 0x019247d9aed4773ca611df385483f6bf, 'wilfrid.araba@coursupreme.bj', '[\"ROLE_CONSEILLER\"]', '$2y$13$0oyEW38U0LPkYiqlCfUuIeYZ4p7Ikyiqcg00pJmPLmiRN4bTYIjhm', 'ARABA', 'Wilfrid', '11111111', 1, NULL, 'CONSEILLER', NULL, 0, 0),
-(0x019488fa678f7082b35c3a62a09c50ee, 0x0191ae417a7373ec9e2d67ba9adab788, 0x0191ae4aed3b7c9082409530f8a470d8, 'aisanoussi@coursupreme.bj', '[\"ROLE_CONSEILLER\"]', '$2y$13$hsAT.p3hVZ2CWCsD3GILrOI35/JhylCIxK6WxrP1yDoqVxq6EDKom', 'SANOUSSI', 'Ismaël Anselme', '11111111111', 1, NULL, 'CONSEILLER', NULL, 0, 0),
-(0x01948900efb571268e22fa213a704571, 0x0191ae417a7373ec9e2d67ba9adab788, 0x0191ae49b7c374339114c93d422afabe, 'olawani@coursupreme.bj', '[\"ROLE_CONSEILLER\"]', '$2y$13$W..T/2lenzZnh6DpTdduOOHTEEdXAwCPd7xl3AG4BLiUK.fGqWWeW', 'LAWANI Olatoundji', 'Badirou', '1111111111', 1, NULL, 'CONSEILLER', NULL, 0, 1),
-(0x01948912f0167f72911f0e2b0f72dc79, 0x0191ae417a7373ec9e2d67ba9adab788, 0x019247d9aed4773ca611df385483f6bf, 'ladjado@coursupreme.bj', '[\"ROLE_GREFFIER\"]', '$2y$13$1TKClauoRLPffC0wox/2uuW3lRY74WzfuF0DWRxgu402g7APH7OPC', 'ADJADO', 'Oussou Léonce', '111111111', 1, NULL, 'GREFFIER', NULL, 0, 1),
-(0x0194891796857eccaed88aab5733c771, 0x0191ae417a7373ec9e2d67ba9adab788, 0x0191ae49b7c374339114c93d422afabe, 'kaffewe@coursupreme.bj', '[\"ROLE_GREFFIER\"]', '$2y$13$h0f3Hv4v4SgI4e.qM18VVeqD/pgON66Z0.6LifshHxc7QQsjZYKJS', 'AFFEWE', 'Kodjihounkan Appolinaire', '111111111', 1, NULL, 'GREFFIER', NULL, 0, 1),
-(0x0194892208b47baf9650aaeaf92f3394, 0x0191ae417a7373ec9e2d67ba9adab788, 0x019247d9aed4773ca611df385483f6bf, 'helene.nahum@coursupreme.bj', '[\"ROLE_GREFFIER\"]', '$2y$13$otlANf.wOPjoEIEo9VGBXODPsethDUgqumKw4yeNXoKmb8vQEJ8uK', 'NAHUM', 'Hélène', '111111111', 1, NULL, 'GREFFIER', NULL, 0, 1),
-(0x0194896af3ce7ec4a25e609cd899bd90, 0x0191ae4201167fab94810a32b44f2ec4, 0x0191ae4b392b7cd2a8b7e5d1c3a35640, 'apinassirou@gmail.com', '[\"ROLE_PROCUREUR_GENERAL\"]', '$2y$13$TE2wWnsgu1uTO7juhJ7hheuJWHGk/4SIR0DJNyWuG1lKDohV4xzHK', 'TEST', 'TESt', '11111111', NULL, NULL, 'AVOCAT GENERAL', NULL, 0, 1),
-(0x0194897883f176a6a7b27c6b2af8ef00, 0x0194896f56e8727e944341a5550a573f, 0x01948971cb937a7ea50221480581bfe8, 'djidonou.afaton@coursupreme.bj', '[\"ROLE_PROCUREUR_GENERAL\"]', '$2y$13$RQ0IoMGV0BGs48gjFTGS0eIz/ek9OVa2oOfT2IxJBwb01PlECjQia', 'AFATON', 'Djidonou Saturnin', '11111111', 1, NULL, 'PROCUREUR GENERAL', NULL, 0, 0);
+INSERT INTO `user` (`id`, `structure_id`, `sections_id`, `email`, `roles`, `password`, `nom`, `prenoms`, `telephone`, `actif`, `last_login`, `titre`, `token`, `is_verified`, `password_change_required`, `photo`) VALUES
+(0x0191ae5bdf5e74168ee884cbf400a848, 0x0191ae4735af763ba31742744906c8cf, 0x0191ae4c55177898bbfb0184686c1b32, 'akarimou@coursupreme.bj', '[\"ROLE_SUPER_ADMIN\"]', '$2y$13$Jq1OyXvPmH9jVIbMRsbgcu9WL/QR152s9/dsG4u4zh3SyGZtC3KFi', 'KARIMOU AMADOU', 'Abdoul Nassirou', '97719794', 1, NULL, 'AUTRES AGENTS', NULL, 0, 0, NULL),
+(0x019247db9589746e82c0b0a473ef9bd3, 0x0191ae417a7373ec9e2d67ba9adab788, 0x019247da5132794aa006f669ea980f71, 'pcj@gmail.com', '[\"ROLE_PCJ\"]', '$2y$13$OhV.SQt9kd4hsFrw3ZZknuDbvHI1ejzgIYi2Arx1.442HEB1u2Zlq', 'PCJ', 'PCJ', '55555555', 1, NULL, 'PRESIDENT DE STRUCTURE', NULL, 0, 0, NULL),
+(0x019247decd437f328344f05ee9731722, 0x0191ce9931287240af7cef77ed00541a, 0x0191cec4ab23725291e516a97cf8479c, 'bo@gmail.com', '[\"ROLE_BUREAU_ORIENTATION\"]', '$2y$13$FwkhdwkwnFI/ZvJO.8NoVescAsg2n2L9dPdewVqYbxeEd5yV8iy1a', 'BO', 'BO', '66666666', 1, NULL, 'AUTRES AGENTS', NULL, 0, 0, NULL),
+(0x019247e18da472258c9b2ffb0ac456f7, 0x0191ce9931287240af7cef77ed00541a, 0x0191cec4ab23725291e516a97cf8479c, 'gec@gmail.com', '[\"ROLE_GREFFIER_EN_CHEF\"]', '$2y$13$p0/B56tzXQ3gJ2vnYmFiZuowdVLXwFrFNcbMEZ/2dqJSRgGI34Flq', 'GEC', 'Gec', '22222222', 1, NULL, 'GREFFIER EN CHEF', NULL, 0, 0, NULL),
+(0x019247e3bd727123b8a3cbedf6b2da9a, 0x0191ae417a7373ec9e2d67ba9adab788, 0x019247d9aed4773ca611df385483f6bf, 'cr@gmail.com', '[\"ROLE_CONSEILLER\"]', '$2y$13$k14kYH9sngHTpePWQy0qJOWE/2dt7e84eVvzaNu9uJZI52MXawOVa', 'RAPPORTEUR', 'Conseiller', '222222', 1, NULL, 'CONSEILLER', NULL, 0, 0, NULL),
+(0x019247e59b0875bcbbf0a4a9e3e43d55, 0x0191ae417a7373ec9e2d67ba9adab788, 0x019247d9aed4773ca611df385483f6bf, 'greffier1cj@gmail.com', '[\"ROLE_GREFFIER\"]', '$2y$13$M7DGyFykSfdbTM7xkaxVV.1848UHm7L8PX0U1xvnS5z10ssJRKzM6', 'GREFFIER', 'CJ', '11111111', 1, NULL, 'GREFFIER', NULL, 0, 0, NULL),
+(0x01926c99522e7199b98627e2811e830d, 0x0191ae4201167fab94810a32b44f2ec4, 0x01926c9761d877b9a4a31281f6f9b131, 'pca@gmail.com', '[\"ROLE_PCA\"]', '$2y$13$JnWFJ77oRIpZxRx11to0M.dtkS2/A34BUpEILOZSQBssPerAoSlKa', 'PCA', 'PCA', '97771222', 1, NULL, 'PRESIDENT DE STRUCTURE', NULL, 0, 0, NULL),
+(0x01926c9aaf887863b3ea7bd16dd11dec, 0x0191ae4201167fab94810a32b44f2ec4, 0x0191ae4b392b7cd2a8b7e5d1c3a35640, 'greffier1ca@gmail.com', '[\"ROLE_GREFFIER\"]', '$2y$13$V5gGn7TAaUJ.dWupMyYDwOJu4L0UKyaAIwY9bX0VQjDEKWbN85pcm', 'Greffier', 'CA', '12121212', 1, NULL, 'GREFFIER', NULL, 0, 0, NULL),
+(0x01926d02517577f5b25c975f840c6c67, 0x0191ae4201167fab94810a32b44f2ec4, 0x0191ae4b392b7cd2a8b7e5d1c3a35640, 'crca@gmail.com', '[\"ROLE_CONSEILLER\"]', '$2y$13$79P37Rjc3DaSTvLP5rkLLODdT3FDMOoMnVAzuv59WQBSZbzKrxvgC', 'cr', 'CA', '11111111', 1, NULL, 'CONSEILLER', NULL, 0, 0, NULL),
+(0x0192b3ce60507473afadd28e50c30437, 0x0191ae417a7373ec9e2d67ba9adab788, 0x0191ae4aed3b7c9082409530f8a470d8, 'crcj@gmail.com', '[\"ROLE_CONSEILLER\"]', '$2y$13$ZX/V/DPv..NM8/tJxjrR6uYBtpvgkDI8WUWNnfcKeZL8xKXK4y2O.', 'CONSEILLER', 'Rapporeur', '61510059', 1, NULL, 'CONSEILLER', NULL, 0, 0, NULL),
+(0x0192b3d0796673feb54bbbec0868c022, 0x0191ae417a7373ec9e2d67ba9adab788, 0x0191ae4aed3b7c9082409530f8a470d8, 'greffiercj@gmail.com', '[\"ROLE_GREFFIER\"]', '$2y$13$69WWE.xnZQR4XnhDmDgwNeDqWiREXkO5K2GWyVDnhblvMG1SBIpBy', 'Greffier', 'CJ', '97719794', 1, NULL, 'GREFFIER', NULL, 0, 0, NULL),
+(0x0194835d29a875f180f18b99267cf632, 0x0191ae4735af763ba31742744906c8cf, 0x0191ae4c55177898bbfb0184686c1b32, 'abdoul.ousmane@coursupreme.bj', '[\"ROLE_SUPER_ADMIN\"]', '$2y$13$Sfoy0milV1NFtQhgBxBwrOZZxGVEWhfd.k6ls0DTW7HjedLAz1yEa', 'OUSMANE', 'Abdoul Matine', '0197210388', 1, NULL, 'AUTRES AGENTS', NULL, 0, 1, NULL),
+(0x019483b39f8c7ae6926901a9664bebca, 0x0191ae417a7373ec9e2d67ba9adab788, 0x019247d9aed4773ca611df385483f6bf, 'wilfrid.araba@coursupreme.bj', '[\"ROLE_CONSEILLER\"]', '$2y$13$0oyEW38U0LPkYiqlCfUuIeYZ4p7Ikyiqcg00pJmPLmiRN4bTYIjhm', 'ARABA', 'Wilfrid', '11111111', 1, NULL, 'CONSEILLER', NULL, 0, 0, NULL),
+(0x019488fa678f7082b35c3a62a09c50ee, 0x0191ae417a7373ec9e2d67ba9adab788, 0x0191ae4aed3b7c9082409530f8a470d8, 'aisanoussi@coursupreme.bj', '[\"ROLE_CONSEILLER\"]', '$2y$13$hsAT.p3hVZ2CWCsD3GILrOI35/JhylCIxK6WxrP1yDoqVxq6EDKom', 'SANOUSSI', 'Ismaël Anselme', '11111111111', 1, NULL, 'CONSEILLER', NULL, 0, 0, NULL),
+(0x01948900efb571268e22fa213a704571, 0x0191ae417a7373ec9e2d67ba9adab788, 0x0191ae49b7c374339114c93d422afabe, 'olawani@coursupreme.bj', '[\"ROLE_CONSEILLER\"]', '$2y$13$W..T/2lenzZnh6DpTdduOOHTEEdXAwCPd7xl3AG4BLiUK.fGqWWeW', 'LAWANI Olatoundji', 'Badirou', '1111111111', 1, NULL, 'CONSEILLER', NULL, 0, 1, NULL),
+(0x01948912f0167f72911f0e2b0f72dc79, 0x0191ae417a7373ec9e2d67ba9adab788, 0x019247d9aed4773ca611df385483f6bf, 'ladjado@coursupreme.bj', '[\"ROLE_GREFFIER\"]', '$2y$13$1TKClauoRLPffC0wox/2uuW3lRY74WzfuF0DWRxgu402g7APH7OPC', 'ADJADO', 'Oussou Léonce', '111111111', 1, NULL, 'GREFFIER', NULL, 0, 1, NULL),
+(0x0194891796857eccaed88aab5733c771, 0x0191ae417a7373ec9e2d67ba9adab788, 0x0191ae49b7c374339114c93d422afabe, 'kaffewe@coursupreme.bj', '[\"ROLE_GREFFIER\"]', '$2y$13$h0f3Hv4v4SgI4e.qM18VVeqD/pgON66Z0.6LifshHxc7QQsjZYKJS', 'AFFEWE', 'Kodjihounkan Appolinaire', '111111111', 1, NULL, 'GREFFIER', NULL, 0, 1, NULL),
+(0x0194892208b47baf9650aaeaf92f3394, 0x0191ae417a7373ec9e2d67ba9adab788, 0x019247d9aed4773ca611df385483f6bf, 'helene.nahum@coursupreme.bj', '[\"ROLE_GREFFIER\"]', '$2y$13$otlANf.wOPjoEIEo9VGBXODPsethDUgqumKw4yeNXoKmb8vQEJ8uK', 'NAHUM', 'Hélène', '111111111', 1, NULL, 'GREFFIER', NULL, 0, 1, NULL),
+(0x0194896af3ce7ec4a25e609cd899bd90, 0x0191ae4201167fab94810a32b44f2ec4, 0x0191ae4b392b7cd2a8b7e5d1c3a35640, 'apinassirou@gmail.com', '[\"ROLE_PROCUREUR_GENERAL\"]', '$2y$13$TE2wWnsgu1uTO7juhJ7hheuJWHGk/4SIR0DJNyWuG1lKDohV4xzHK', 'TEST', 'TESt', '11111111', NULL, NULL, 'AVOCAT GENERAL', NULL, 0, 1, NULL),
+(0x0194897883f176a6a7b27c6b2af8ef00, 0x0194896f56e8727e944341a5550a573f, 0x01948971cb937a7ea50221480581bfe8, 'djidonou.afaton@coursupreme.bj', '[\"ROLE_PROCUREUR_GENERAL\"]', '$2y$13$RQ0IoMGV0BGs48gjFTGS0eIz/ek9OVa2oOfT2IxJBwb01PlECjQia', 'AFATON', 'Djidonou Saturnin', '11111111', 1, NULL, 'PROCUREUR GENERAL', NULL, 0, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -1372,6 +1386,29 @@ CREATE TABLE `user_dossier` (
   `delai` int DEFAULT NULL,
   `nature` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `user_dossier`
+--
+
+INSERT INTO `user_dossier` (`id`, `user_id`, `dossier_id`, `many_to_one`, `profil`, `instructions`, `date_affectation`, `delai`, `nature`) VALUES
+(0x0194843fed47733ab2f54d4358c522dd, 0x019247e59b0875bcbbf0a4a9e3e43d55, 0x0194843582e077fea1bc68f937e43c87, NULL, 'GREFFIER EN CHEF', NULL, '2025-01-20 15:06:09', NULL, NULL),
+(0x0194846e516c7d5f8f410cf345f9be81, 0x019247e59b0875bcbbf0a4a9e3e43d55, 0x019484568c83775ebc5d838133d4004b, NULL, 'GREFFIER EN CHEF', NULL, '2025-01-20 15:56:49', NULL, NULL),
+(0x01948aa35fcd7670b80e16f37b3c4a9e, 0x0192b3d0796673feb54bbbec0868c022, 0x01948a9a6c08738094178aadd3c64b6c, NULL, 'GREFFIER EN CHEF', NULL, '2025-01-21 20:52:30', NULL, NULL),
+(0x01948fce06e4778995dc8edd9d7d2cb4, 0x0192b3d0796673feb54bbbec0868c022, 0x01948fc2fc4879b69eafe1d132da1314, NULL, 'GREFFIER', NULL, '2025-01-22 20:57:11', NULL, NULL),
+(0x019538e6d1b67853bbb84ff289dc7281, 0x0194896af3ce7ec4a25e609cd899bd90, 0x01948fc2fc4879b69eafe1d132da1314, NULL, 'AVOCAT GENERAL', NULL, '2025-02-24 17:00:05', NULL, 'AFFECTATION'),
+(0x019550bdfbe97b46a8389e052f3f8c0a, 0x01926d02517577f5b25c975f840c6c67, 0x019550b822167f56943b32f24d369189, NULL, 'CONSEILLER RAPPORTEUR', NULL, '2025-03-01 08:06:22', NULL, NULL),
+(0x019550bdfbe97b46a8389e052fafc742, 0x01926c9aaf887863b3ea7bd16dd11dec, 0x019550b822167f56943b32f24d369189, NULL, 'GREFFIER', NULL, '2025-03-01 08:06:22', NULL, NULL),
+(0x01959e15df8c7ade801e74950c327cb6, 0x019247e3bd727123b8a3cbedf6b2da9a, 0x0194843582e077fea1bc68f937e43c87, NULL, 'CONSEILLER RAPPORTEUR', NULL, '2025-03-16 08:33:08', NULL, NULL),
+(0x01959e15df8c7ade801e74950c519146, 0x019247e59b0875bcbbf0a4a9e3e43d55, 0x0194843582e077fea1bc68f937e43c87, NULL, 'GREFFIER', NULL, '2025-03-16 08:33:08', NULL, NULL),
+(0x01962af44fc07da398f106dff0248d40, 0x01926d02517577f5b25c975f840c6c67, 0x01962aee94647f158702c4f220272b5e, NULL, 'CONSEILLER RAPPORTEUR', NULL, '2025-04-12 17:02:56', NULL, NULL),
+(0x01962af44fc175c991e66af4f0863773, 0x01926c9aaf887863b3ea7bd16dd11dec, 0x01962aee94647f158702c4f220272b5e, NULL, 'GREFFIER', NULL, '2025-04-12 17:02:56', NULL, NULL),
+(0x01969729e1ff7f99a578b040bbcf2333, 0x01926c99522e7199b98627e2811e830d, 0x019697232b3f719bbcf23f47af0b6b7e, NULL, 'CONSEILLER RAPPORTEUR', NULL, '2025-05-03 17:20:26', NULL, NULL),
+(0x01969729e1ff7f99a578b040bbfbb9a3, 0x01926c9aaf887863b3ea7bd16dd11dec, 0x019697232b3f719bbcf23f47af0b6b7e, NULL, 'GREFFIER', NULL, '2025-05-03 17:20:26', NULL, NULL),
+(0x0196a2ef2b177a378b1be39083047471, 0x01926d02517577f5b25c975f840c6c67, 0x01963842fd5170959095318b8da93122, NULL, 'CONSEILLER RAPPORTEUR', NULL, '2025-05-06 00:11:45', NULL, NULL),
+(0x0196a2ef2b177a378b1be39083f14d57, 0x01926c9aaf887863b3ea7bd16dd11dec, 0x01963842fd5170959095318b8da93122, NULL, 'GREFFIER', NULL, '2025-05-06 00:11:45', NULL, NULL),
+(0x0198c369600b76609eab4a1f90f73976, 0x01926d02517577f5b25c975f840c6c67, 0x0198c361c8cb71aaa7225b92b26936be, NULL, 'CONSEILLER RAPPORTEUR', NULL, '2025-08-19 19:38:39', NULL, NULL),
+(0x0198c369600b76609eab4a1f91b43352, 0x01926c9aaf887863b3ea7bd16dd11dec, 0x0198c361c8cb71aaa7225b92b26936be, NULL, 'GREFFIER', NULL, '2025-08-19 19:38:39', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -2542,12 +2579,6 @@ ALTER TABLE `departement`
   ADD PRIMARY KEY (`id`);
 
 --
--- Index pour la table `doctrine_migration_versions`
---
-ALTER TABLE `doctrine_migration_versions`
-  ADD PRIMARY KEY (`version`);
-
---
 -- Index pour la table `dossier`
 --
 ALTER TABLE `dossier`
@@ -2575,6 +2606,12 @@ ALTER TABLE `dossier_pieces_jointes`
   ADD KEY `IDX_4B2B8238611C0C56` (`dossier_id`);
 
 --
+-- Index pour la table `instructions`
+--
+ALTER TABLE `instructions`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Index pour la table `log`
 --
 ALTER TABLE `log`
@@ -2588,7 +2625,8 @@ ALTER TABLE `mesures_instructions`
   ADD PRIMARY KEY (`id`),
   ADD KEY `IDX_3514FE2611C0C56` (`dossier_id`),
   ADD KEY `IDX_3514FE29D18E664` (`conseiller_rapporteur_id`),
-  ADD KEY `IDX_3514FE22EDDA160` (`greffier_id`);
+  ADD KEY `IDX_3514FE22EDDA160` (`greffier_id`),
+  ADD KEY `IDX_3514FE262A10F76` (`instruction_id`);
 
 --
 -- Index pour la table `modele_rapport`
@@ -2606,12 +2644,6 @@ ALTER TABLE `mouvement`
   ADD KEY `IDX_5B51FC3EA76ED395` (`user_id`),
   ADD KEY `IDX_5B51FC3E611C0C56` (`dossier_id`),
   ADD KEY `IDX_5B51FC3EF6203804` (`statut_id`);
-
---
--- Index pour la table `nom_fichier`
---
-ALTER TABLE `nom_fichier`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- Index pour la table `objet`
@@ -2640,12 +2672,6 @@ ALTER TABLE `pieces`
   ADD PRIMARY KEY (`id`),
   ADD KEY `IDX_B92D7472611C0C56` (`dossier_id`),
   ADD KEY `IDX_B92D747260BB6FE6` (`auteur_id`);
-
---
--- Index pour la table `preuve_consignation_requerant`
---
-ALTER TABLE `preuve_consignation_requerant`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- Index pour la table `provenance`
@@ -2762,12 +2788,6 @@ ALTER TABLE `modele_rapport`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
--- AUTO_INCREMENT pour la table `nom_fichier`
---
-ALTER TABLE `nom_fichier`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT pour la table `paiement_consignation`
 --
 ALTER TABLE `paiement_consignation`
@@ -2777,12 +2797,6 @@ ALTER TABLE `paiement_consignation`
 -- AUTO_INCREMENT pour la table `pieces`
 --
 ALTER TABLE `pieces`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT pour la table `preuve_consignation_requerant`
---
-ALTER TABLE `preuve_consignation_requerant`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
@@ -2796,6 +2810,188 @@ ALTER TABLE `rapport`
 --
 ALTER TABLE `village`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5305;
+
+--
+-- Contraintes pour les tables déchargées
+--
+
+--
+-- Contraintes pour la table `affecter_section`
+--
+ALTER TABLE `affecter_section`
+  ADD CONSTRAINT `FK_B82094952EDDA160` FOREIGN KEY (`greffier_id`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `FK_B8209495611C0C56` FOREIGN KEY (`dossier_id`) REFERENCES `dossier` (`id`),
+  ADD CONSTRAINT `FK_B82094959D18E664` FOREIGN KEY (`conseiller_rapporteur_id`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `FK_B8209495D823E37A` FOREIGN KEY (`section_id`) REFERENCES `section` (`id`);
+
+--
+-- Contraintes pour la table `affecter_structure`
+--
+ALTER TABLE `affecter_structure`
+  ADD CONSTRAINT `FK_FD63FCBA2534008B` FOREIGN KEY (`structure_id`) REFERENCES `structure` (`id`),
+  ADD CONSTRAINT `FK_FD63FCBA3F683D83` FOREIGN KEY (`de_id`) REFERENCES `structure` (`id`),
+  ADD CONSTRAINT `FK_FD63FCBA611C0C56` FOREIGN KEY (`dossier_id`) REFERENCES `dossier` (`id`);
+
+--
+-- Contraintes pour la table `affecter_user`
+--
+ALTER TABLE `affecter_user`
+  ADD CONSTRAINT `FK_50D5A33210335F61` FOREIGN KEY (`expediteur_id`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `FK_50D5A332611C0C56` FOREIGN KEY (`dossier_id`) REFERENCES `dossier` (`id`),
+  ADD CONSTRAINT `FK_50D5A332A4F84F6E` FOREIGN KEY (`destinataire_id`) REFERENCES `user` (`id`);
+
+--
+-- Contraintes pour la table `arrets`
+--
+ALTER TABLE `arrets`
+  ADD CONSTRAINT `FK_FC0D335B611C0C56` FOREIGN KEY (`dossier_id`) REFERENCES `dossier` (`id`),
+  ADD CONSTRAINT `FK_FC0D335BB03A8386` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`);
+
+--
+-- Contraintes pour la table `arrondissement`
+--
+ALTER TABLE `arrondissement`
+  ADD CONSTRAINT `FK_3A3B64C4131A4F72` FOREIGN KEY (`commune_id`) REFERENCES `commune` (`id`);
+
+--
+-- Contraintes pour la table `audience`
+--
+ALTER TABLE `audience`
+  ADD CONSTRAINT `FK_FDCD941881703196` FOREIGN KEY (`date_date_id`) REFERENCES `date` (`id`);
+
+--
+-- Contraintes pour la table `avis_paquet`
+--
+ALTER TABLE `avis_paquet`
+  ADD CONSTRAINT `FK_672321A0611C0C56` FOREIGN KEY (`dossier_id`) REFERENCES `dossier` (`id`);
+
+--
+-- Contraintes pour la table `commune`
+--
+ALTER TABLE `commune`
+  ADD CONSTRAINT `FK_E2E2D1EECCF9E01E` FOREIGN KEY (`departement_id`) REFERENCES `departement` (`id`);
+
+--
+-- Contraintes pour la table `conseiller_partie`
+--
+ALTER TABLE `conseiller_partie`
+  ADD CONSTRAINT `FK_C90F7691E075F7A4` FOREIGN KEY (`partie_id`) REFERENCES `partie` (`id`);
+
+--
+-- Contraintes pour la table `deliberation_dossiers`
+--
+ALTER TABLE `deliberation_dossiers`
+  ADD CONSTRAINT `FK_53ED245B611C0C56` FOREIGN KEY (`dossier_id`) REFERENCES `dossier` (`id`);
+
+--
+-- Contraintes pour la table `dossier`
+--
+ALTER TABLE `dossier`
+  ADD CONSTRAINT `FK_3D48E0372534008B` FOREIGN KEY (`structure_id`) REFERENCES `structure` (`id`),
+  ADD CONSTRAINT `FK_3D48E03730AA44A2` FOREIGN KEY (`defendeur_id`) REFERENCES `partie` (`id`),
+  ADD CONSTRAINT `FK_3D48E0374A93DAA5` FOREIGN KEY (`requerant_id`) REFERENCES `partie` (`id`),
+  ADD CONSTRAINT `FK_3D48E037B03A8386` FOREIGN KEY (`created_by_id`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `FK_3D48E037C24AFBDB` FOREIGN KEY (`provenance_id`) REFERENCES `provenance` (`id`),
+  ADD CONSTRAINT `FK_3D48E037F520CF5A` FOREIGN KEY (`objet_id`) REFERENCES `objet` (`id`);
+
+--
+-- Contraintes pour la table `dossier_audience`
+--
+ALTER TABLE `dossier_audience`
+  ADD CONSTRAINT `FK_D58D766F611C0C56` FOREIGN KEY (`dossier_id`) REFERENCES `dossier` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `FK_D58D766F848CC616` FOREIGN KEY (`audience_id`) REFERENCES `audience` (`id`) ON DELETE CASCADE;
+
+--
+-- Contraintes pour la table `dossier_pieces_jointes`
+--
+ALTER TABLE `dossier_pieces_jointes`
+  ADD CONSTRAINT `FK_4B2B8238611C0C56` FOREIGN KEY (`dossier_id`) REFERENCES `dossier` (`id`);
+
+--
+-- Contraintes pour la table `log`
+--
+ALTER TABLE `log`
+  ADD CONSTRAINT `FK_8F3F68C5A76ED395` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+
+--
+-- Contraintes pour la table `mesures_instructions`
+--
+ALTER TABLE `mesures_instructions`
+  ADD CONSTRAINT `FK_3514FE22EDDA160` FOREIGN KEY (`greffier_id`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `FK_3514FE2611C0C56` FOREIGN KEY (`dossier_id`) REFERENCES `dossier` (`id`),
+  ADD CONSTRAINT `FK_3514FE262A10F76` FOREIGN KEY (`instruction_id`) REFERENCES `instructions` (`id`),
+  ADD CONSTRAINT `FK_3514FE29D18E664` FOREIGN KEY (`conseiller_rapporteur_id`) REFERENCES `user` (`id`);
+
+--
+-- Contraintes pour la table `mouvement`
+--
+ALTER TABLE `mouvement`
+  ADD CONSTRAINT `FK_5B51FC3E611C0C56` FOREIGN KEY (`dossier_id`) REFERENCES `dossier` (`id`),
+  ADD CONSTRAINT `FK_5B51FC3EA76ED395` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `FK_5B51FC3EF6203804` FOREIGN KEY (`statut_id`) REFERENCES `statut` (`id`);
+
+--
+-- Contraintes pour la table `partie`
+--
+ALTER TABLE `partie`
+  ADD CONSTRAINT `FK_59B1F3D924DD2B5` FOREIGN KEY (`localite_id`) REFERENCES `arrondissement` (`id`);
+
+--
+-- Contraintes pour la table `pieces`
+--
+ALTER TABLE `pieces`
+  ADD CONSTRAINT `FK_B92D747260BB6FE6` FOREIGN KEY (`auteur_id`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `FK_B92D7472611C0C56` FOREIGN KEY (`dossier_id`) REFERENCES `dossier` (`id`);
+
+--
+-- Contraintes pour la table `reponse_mesures_instructions`
+--
+ALTER TABLE `reponse_mesures_instructions`
+  ADD CONSTRAINT `FK_E64881E843AB22FA` FOREIGN KEY (`mesure_id`) REFERENCES `mesures_instructions` (`id`);
+
+--
+-- Contraintes pour la table `representant`
+--
+ALTER TABLE `representant`
+  ADD CONSTRAINT `FK_80D5DBC9E075F7A4` FOREIGN KEY (`partie_id`) REFERENCES `partie` (`id`);
+
+--
+-- Contraintes pour la table `reset_password_request`
+--
+ALTER TABLE `reset_password_request`
+  ADD CONSTRAINT `FK_7CE748AA76ED395` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+
+--
+-- Contraintes pour la table `salle`
+--
+ALTER TABLE `salle`
+  ADD CONSTRAINT `FK_4E977E5C2534008B` FOREIGN KEY (`structure_id`) REFERENCES `structure` (`id`);
+
+--
+-- Contraintes pour la table `section`
+--
+ALTER TABLE `section`
+  ADD CONSTRAINT `FK_2D737AEF2534008B` FOREIGN KEY (`structure_id`) REFERENCES `structure` (`id`);
+
+--
+-- Contraintes pour la table `user`
+--
+ALTER TABLE `user`
+  ADD CONSTRAINT `FK_8D93D6492534008B` FOREIGN KEY (`structure_id`) REFERENCES `structure` (`id`),
+  ADD CONSTRAINT `FK_8D93D649577906E4` FOREIGN KEY (`sections_id`) REFERENCES `section` (`id`);
+
+--
+-- Contraintes pour la table `user_dossier`
+--
+ALTER TABLE `user_dossier`
+  ADD CONSTRAINT `FK_6545FE3D611C0C56` FOREIGN KEY (`dossier_id`) REFERENCES `dossier` (`id`),
+  ADD CONSTRAINT `FK_6545FE3DA76ED395` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+
+--
+-- Contraintes pour la table `village`
+--
+ALTER TABLE `village`
+  ADD CONSTRAINT `FK_4E6C7FAA407DBC11` FOREIGN KEY (`arrondissement_id`) REFERENCES `arrondissement` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
