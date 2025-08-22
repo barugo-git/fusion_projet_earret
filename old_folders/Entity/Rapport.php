@@ -29,6 +29,11 @@ class Rapport
     #[ORM\JoinColumn(nullable: false)]
     private ?ModeleRapport $modeleRapport = null;
 
+
+    /**
+ * @ORM\OneToOne(targetEntity=Dossier::class, inversedBy="rapport")
+ * @ORM\JoinColumn(nullable=false)
+ */
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Dossier $dossier = null;
