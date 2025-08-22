@@ -108,8 +108,9 @@ class Instructions
         return $this;
     }
 
-    public function getLibelleInstruction(): ?string {
-        return $this->libelle."  ".$this->getDelais()." jours";
+    public function getLibelleInstruction(): ?string
+    {
+        return $this->libelle . "  " . $this->getDelais() . " jours";
     }
 
     public function __toString(): string
@@ -117,6 +118,4 @@ class Instructions
         // TODO: Implement __toString() method.
         return $this->libelle;
     }
-
-
 }

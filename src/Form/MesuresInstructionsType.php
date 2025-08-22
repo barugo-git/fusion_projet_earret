@@ -14,9 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MesuresInstructionsType extends ApplicationType
 {
-    public function __construct(private readonly InstructionsRepository $instructionsRepository)
-    {
-    }
+    public function __construct(private readonly InstructionsRepository $instructionsRepository) {}
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -31,7 +29,9 @@ class MesuresInstructionsType extends ApplicationType
                     'class' => 'instruction-select'
                 ]
             ])
-            ->add('partiesConcernes', ChoiceType::class, $this->getConfiguration("Parties concernées", "Sélectionnez les parties concernées par la mesure",
+            ->add('partiesConcernes', ChoiceType::class, $this->getConfiguration(
+                "Parties concernées",
+                "Sélectionnez les parties concernées par la mesure",
                 ['choices' => [
                     'Requérant' => 'Requérant',
                     'Défendeur' => 'Défendeur',
@@ -44,7 +44,8 @@ class MesuresInstructionsType extends ApplicationType
                     'placeholder' => 'Saisissez vos observations ici...',
                     'rows' => 4
                 ]
-            ]);
+            ])
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void

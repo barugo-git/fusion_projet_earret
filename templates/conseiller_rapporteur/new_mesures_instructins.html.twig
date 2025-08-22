@@ -1,132 +1,134 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouvelle mesure d'instruction{% endblock %}
+{% block title %}Nouvelle mesure d'instruction
+{% endblock %}
 
 {% block body %}
-    <div class="row">
-        <div class="col-lg-8 offset-lg-2">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title mb-0">Nouvelle mesures d'instruction au dossier {{ dossier.referenceDossier }}</h4>
-                </div>
+	<div class="row">
+		<div class="col-lg-8 offset-lg-2">
+			<div class="card">
+				<div class="card-header">
+					<h4 class="card-title mb-0">Nouvelle mesures d'instruction au dossier
+						{{ dossier.referenceDossier }}</h4>
+				</div>
 
-                <div class="card-body">
-                    {% for message in app.flashes('error') %}
-                        <div class="alert alert-danger">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
+				<div class="card-body">
+					{% for message in app.flashes('error') %}
+						<div class="alert alert-danger">
+							{{ message }}
+						</div>
+					{% endfor %}
 
-                    {% for message in app.flashes('success') %}
-                        <div class="alert alert-success">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
+					{% for message in app.flashes('success') %}
+						<div class="alert alert-success">
+							{{ message }}
+						</div>
+					{% endfor %}
 
-                    {{ form_start(form, {'attr': {'id': 'mesure_instruction_form'}}) }}
+					{{ form_start(form, {'attr': {'id': 'mesure_instruction_form'}}) }}
 
-                    <div class="mb-4">
-                        <div class="instruction-existante">
-                            {{ form_label(form.instruction, 'Instruction', {'label_attr': {'class': 'form-label required'}}) }}
-                            {{ form_widget(form.instruction, {
+					<div class="mb-4">
+						<div class="instruction-existante">
+							{{ form_label(form.instruction, 'Instruction', {'label_attr': {'class': 'form-label required'}}) }}
+							{{ form_widget(form.instruction, {
                                 'attr': {
                                     'class': 'form-select instruction-select',
                                     'required': false
                                 }
                             }) }}
-                            <div class="mt-2">
-                                <button type="button" class="btn btn-primary" id="toggleNewInstruction">
-                                    <i class="ri-add-line"></i> Autre instruction
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+							<div class="mt-2">
+								<button type="button" class="btn btn-primary" id="toggleNewInstruction">
+									<i class="ri-add-line"></i>
+									Autre instruction
+								</button>
+							</div>
+						</div>
+					</div>
 
-                    <div id="nouvelleInstructionFields" style="display: none;">
-                        <div class="mb-3">
-                            <label class="form-label required">Nouvelle instruction</label>
-                            <input type="text" name="nouvelle_instruction" class="form-control" id="nouvelle_instruction">
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label required">Délai (en jours)</label>
-                            <input type="number" name="delai_nouvelle_instruction" class="form-control" id="delai_nouvelle_instruction" min="1">
-                        </div>
-                    </div>
+					<div id="nouvelleInstructionFields" style="display: none;">
+						<div class="mb-3">
+							<label class="form-label required">Nouvelle instruction</label>
+							<input type="text" name="nouvelle_instruction" class="form-control" id="nouvelle_instruction">
+						</div>
+						<div class="mb-4">
+							<label class="form-label required">Délai (en jours)</label>
+							<input type="number" name="delai_nouvelle_instruction" class="form-control" id="delai_nouvelle_instruction" min="1">
+						</div>
+					</div>
 
-                    <div class="mb-4">
-                        {{ form_label(form.partiesConcernes, 'Parties concernées', {'label_attr': {'class': 'form-label required'}}) }}
-                        {{ form_widget(form.partiesConcernes, {'attr': {'class': 'form-select'}}) }}
-                    </div>
+					<div class="mb-4">
+						{{ form_label(form.partiesConcernes, 'Parties concernées', {'label_attr': {'class': 'form-label required'}}) }}
+						{{ form_widget(form.partiesConcernes, {'attr': {'class': 'form-select'}}) }}
+					</div>
 
-                    <div class="mb-4">
-                        {{ form_label(form.observations, 'Observations', {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.observations, {
+					<div class="mb-4">
+						{{ form_label(form.observations, 'Observations', {'label_attr': {'class': 'form-label'}}) }}
+						{{ form_widget(form.observations, {
                             'attr': {
                                 'class': 'form-control',
                                 'rows': 4,
                                 'placeholder': 'Saisissez vos observations ici...'
                             }
                         }) }}
-                    </div>
+					</div>
 
-                    <div class="text-end mt-4">
-                        <a href="{{ path('greffier_mesures_instructions_dossier_list', {'id': dossier.id}) }}" class="btn btn-light me-2">Annuler</a>
-                        <button type="submit" class="btn btn-success">
-                            <i class="ri-save-line"></i> Enregistrer
-                        </button>
-                    </div>
+					<div class="text-end mt-4">
+						<a href="{{ path('greffier_mesures_instructions_dossier_list', {'id': dossier.id}) }}" class="btn btn-light me-2">Annuler</a>
+						<button type="submit" class="btn btn-success">
+							<i class="ri-save-line"></i>
+							Enregistrer
+						</button>
+					</div>
 
-                    {{ form_end(form, {'render_rest': false}) }}
-                </div>
-            </div>
-        </div>
-    </div>
+					{{ form_end(form, {'render_rest': false}) }}
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('mesure_instruction_form');
-            const instructionSelect = document.querySelector('.instruction-select');
-            const toggleButton = document.getElementById('toggleNewInstruction');
-            const nouvelleInstructionFields = document.getElementById('nouvelleInstructionFields');
-            const nouvelleInstructionInput = document.getElementById('nouvelle_instruction');
-            const delaiNouvelleInstructionInput = document.getElementById('delai_nouvelle_instruction');
+	{{ parent() }}
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+const form = document.getElementById('mesure_instruction_form');
+const instructionSelect = document.querySelector('.instruction-select');
+const toggleButton = document.getElementById('toggleNewInstruction');
+const nouvelleInstructionFields = document.getElementById('nouvelleInstructionFields');
+const nouvelleInstructionInput = document.getElementById('nouvelle_instruction');
+const delaiNouvelleInstructionInput = document.getElementById('delai_nouvelle_instruction');
 
-            toggleButton.addEventListener('click', function() {
-                const isCreatingNew = nouvelleInstructionFields.style.display === 'none';
+toggleButton.addEventListener('click', function () {
+const isCreatingNew = nouvelleInstructionFields.style.display === 'none';
 
-                nouvelleInstructionFields.style.display = isCreatingNew ? 'block' : 'none';
-                instructionSelect.disabled = isCreatingNew;
-                instructionSelect.value = isCreatingNew ? '' : instructionSelect.value;
+nouvelleInstructionFields.style.display = isCreatingNew ? 'block' : 'none';
+instructionSelect.disabled = isCreatingNew;
+instructionSelect.value = isCreatingNew ? '' : instructionSelect.value;
 
-                if (isCreatingNew) {
-                    toggleButton.innerHTML = '<i class="ri-arrow-left-line"></i> Revenir aux instructions existantes';
-                    toggleButton.classList.remove('btn-primary');
-                    toggleButton.classList.add('btn-secondary');
-                } else {
-                    toggleButton.innerHTML = '<i class="ri-add-line"></i> Autre instruction';
-                    toggleButton.classList.remove('btn-secondary');
-                    toggleButton.classList.add('btn-primary');
-                }
-            });
+if (isCreatingNew) {
+toggleButton.innerHTML = '<i class="ri-arrow-left-line"></i> Revenir aux instructions existantes';
+toggleButton.classList.remove('btn-primary');
+toggleButton.classList.add('btn-secondary');
+} else {
+toggleButton.innerHTML = '<i class="ri-add-line"></i> Autre instruction';
+toggleButton.classList.remove('btn-secondary');
+toggleButton.classList.add('btn-primary');
+}
+});
 
-            form.addEventListener('submit', function(e) {
-                if (instructionSelect.disabled) {
-                    // Mode nouvelle instruction
-                    if (!nouvelleInstructionInput.value || !delaiNouvelleInstructionInput.value) {
-                        e.preventDefault();
-                        alert('Veuillez remplir tous les champs pour la nouvelle instruction.');
-                    }
-                } else {
-                    // Mode instruction existante
-                    if (!instructionSelect.value) {
-                        e.preventDefault();
-                        alert('Veuillez sélectionner une instruction.');
-                    }
-                }
-            });
-        });
-    </script>
+form.addEventListener('submit', function (e) {
+if (instructionSelect.disabled) { // Mode nouvelle instruction
+if (! nouvelleInstructionInput.value || ! delaiNouvelleInstructionInput.value) {
+e.preventDefault();
+alert('Veuillez remplir tous les champs pour la nouvelle instruction.');
+}
+} else { // Mode instruction existante
+if (! instructionSelect.value) {
+e.preventDefault();
+alert('Veuillez sélectionner une instruction.');
+}
+}
+});
+});
+	</script>
 {% endblock %}

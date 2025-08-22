@@ -97,7 +97,6 @@ class ConseillerRapporteurController extends AbstractController
             $mesureInstruction->setDossier($dossier);
             $mesureInstruction->setCreatedAt(new \DateTime());
             $mesureInstruction->setTermineAt((clone $mesureInstruction->getCreatedAt())->modify("+{$delai} days"));
-
             if ($this->isGranted('ROLE_CONSEILLER')) {
                 $mesureInstruction->setConseillerRapporteur($this->getUser());
             }
