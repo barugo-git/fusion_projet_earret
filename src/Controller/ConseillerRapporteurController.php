@@ -108,7 +108,7 @@ class ConseillerRapporteurController extends AbstractController
             if ($observations) {
                 $mesureInstruction->setObservations($observations);
             }
-
+            $mesureInstruction->setEtat('EN COURS');
             $entityManager->persist($mesureInstruction);
             $entityManager->flush();
 

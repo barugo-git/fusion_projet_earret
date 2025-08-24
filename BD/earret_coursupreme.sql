@@ -989,7 +989,7 @@ CREATE TABLE `mesures_instructions` (
   `date` datetime DEFAULT NULL,
   `parties_concernes` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nature` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `termine` tinyint(1) DEFAULT NULL,
+  `etat` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `termine_at` datetime NOT NULL,
   `alerte_envoyee` tinyint(1) DEFAULT NULL,
   `instruction_id` binary(16) DEFAULT NULL COMMENT '(DC2Type:uuid)',

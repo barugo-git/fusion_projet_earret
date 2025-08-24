@@ -41,7 +41,7 @@ class PaiementConsignationController extends AbstractController
 
     public function __construct(
         EntityManagerInterface $em,
-        MailerInterface $mailer, 
+        MailerInterface $mailer,
         LoggerInterface $logger,
         ParameterBagInterface $params,
         PaiementConsignationRepository $paiementConsignationRepository,
@@ -68,19 +68,19 @@ class PaiementConsignationController extends AbstractController
         ParameterBagInterface $params
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_GREFFIER_EN_CHEF');
-        
+
         $filters = $request->query->all();
         $paiements = $paiementRepo->findWithFilters($filters);
-        
+
         // Solution 1 : Chemin relatif (recommandé)
         $logoRelativePath = 'uploads/logo.jpg';
-        $absolutePath = $this->getParameter('kernel.project_dir').'/public/'.$logoRelativePath;
+        $absolutePath = $this->getParameter('kernel.project_dir') . '/public/' . $logoRelativePath;
 
         // Solution 2 : Encodage base64 (garanti)
         $logoBase64 = null;
         if (file_exists($absolutePath)) {
             $imageData = file_get_contents($absolutePath);
-            $logoBase64 = 'data:image/jpeg;base64,'.base64_encode($imageData);
+            $logoBase64 = 'data:image/jpeg;base64,' . base64_encode($imageData);
         } else {
             // Debug : vérifiez le chemin dans les logs
             $this->logger->error("Logo introuvable", ['path' => $absolutePath]);
@@ -89,31 +89,31 @@ class PaiementConsignationController extends AbstractController
         $html = $this->renderView('paiement_consignation/admin/export_pdf.html.twig', [
             'paiements' => $paiements,
             'filters' => $filters,
-            'logo_url' => $request->getSchemeAndHttpHost().'/uploads/logo.jpg',
+            'logo_url' => $request->getSchemeAndHttpHost() . '/uploads/logo.jpg',
             'logo_base64' => $logoBase64,
             'title' => 'Relevé des Paiements de Consignation',
             'period' => $this->getPeriodText($filters),
             'total_amount' => array_reduce($paiements, fn($carry, $p) => $carry + $p->getMontant(), 0)
         ]);
-        
+
         $options = new Options();
         $options->set('isRemoteEnabled', true);
         $options->set('defaultFont', 'Helvetica');
-        $options->set('tempDir', $this->getParameter('kernel.project_dir').'/var/tmp');
-        
+        $options->set('tempDir', $this->getParameter('kernel.project_dir') . '/var/tmp');
+
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html);
         $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
-        
+
         $filename = sprintf('paiements-consignation-%s.pdf', date('Y-m-d'));
-        
+
         return new Response(
             $dompdf->output(),
             200,
             [
                 'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="'.$filename.'"'
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"'
             ]
         );
     }
@@ -124,7 +124,7 @@ class PaiementConsignationController extends AbstractController
         $dateFrom = $filters['date_from'] ?? null;
         $dateTo = $filters['date_to'] ?? null;
         $dateFilter = $filters['date_filter'] ?? null;
-    
+
         if ($dateFrom) {
             $toText = $dateTo ? (new \DateTime($dateTo))->format('d/m/Y') : 'à aujourd\'hui';
             return sprintf(
@@ -133,19 +133,19 @@ class PaiementConsignationController extends AbstractController
                 $toText
             );
         }
-    
+
         if ($dateFilter) {
             $texts = [
                 '1h' => 'Dernière heure',
                 '24h' => '24 dernières heures',
                 '7d' => '7 derniers jours',
-                '14d' => '14 derniers jours', 
+                '14d' => '14 derniers jours',
                 '30d' => '30 derniers jours',
                 '90d' => '90 derniers jours'
             ];
             return $texts[$dateFilter] ?? 'Toutes périodes';
         }
-    
+
         return 'Toutes périodes';
     }
 
@@ -210,7 +210,7 @@ class PaiementConsignationController extends AbstractController
         FedaPay::setEnvironment($_ENV['FEDAPAY_ENV']);
 
         $callbackUrl = $this->generateUrl(
-            'paiement_consignation_callback', 
+            'paiement_consignation_callback',
             ['dossierId' => $dossier->getId()],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
@@ -240,8 +240,8 @@ class PaiementConsignationController extends AbstractController
 
     #[Route('/callback/{dossierId}', name: 'paiement_consignation_callback', methods: ['GET'])]
     public function callback(
-        string $dossierId, 
-        Request $request, 
+        string $dossierId,
+        Request $request,
         DossierConverter $dossierConverter,
         FileUploader $fileUploader
     ): Response {
@@ -256,7 +256,7 @@ class PaiementConsignationController extends AbstractController
         try {
             FedaPay::setApiKey($_ENV['FEDAPAY_API_KEY']);
             FedaPay::setEnvironment($_ENV['FEDAPAY_ENV']);
-            
+
             $isSandbox = (FedaPay::getEnvironment() === 'sandbox');
             $dossier = $dossierConverter->convert($dossierId);
 
@@ -273,7 +273,7 @@ class PaiementConsignationController extends AbstractController
                 $transaction->created_at = new \DateTime();
             } else {
                 $transaction = Transaction::retrieve($transactionId);
-                
+
                 if (!$transaction instanceof \FedaPay\Transaction) {
                     throw new \RuntimeException("Type de transaction invalide");
                 }
@@ -287,13 +287,12 @@ class PaiementConsignationController extends AbstractController
             }
 
             return $this->processPayment($dossier, $transaction, $fileUploader);
-
         } catch (\Exception $e) {
             $this->logger->error('Erreur callback', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            return $this->renderError('Erreur technique. Référence: '.$transactionId);
+            return $this->renderError('Erreur technique. Référence: ' . $transactionId);
         }
     }
 
@@ -302,9 +301,9 @@ class PaiementConsignationController extends AbstractController
     {
         $form = $this->createForm(ConsignationDossierType::class, $dossier);
         $form->handleRequest($request);
-    
+
         if ($form->isSubmitted() && $form->isValid()) {
-    
+
             if ($form->get('document')->getData()) {
                 $image = $form->get('document')->getData();
                 $fmane = $dossier->getReferenceDossier();
@@ -312,9 +311,8 @@ class PaiementConsignationController extends AbstractController
                 $dossier->setPreuveConsignationRequerant($fichier);
                 $dossier->setDatePreuveConsignationRequerant(new \DateTimeImmutable());
                 $dossier->setRecuConsignation(true);
-
             }
-    
+
             $dossierRepository->add($dossier, true);
             $user = $this->getUser();
             if ($user && in_array('ROLE_GREFFIER', $user->getRoles())) {
@@ -326,7 +324,7 @@ class PaiementConsignationController extends AbstractController
         }
 
         $templateParent = $this->getUser() ? 'base.html.twig' : 'front/status_base.html.twig';
-    
+
         return $this->render('greffe/paiementConsignation.html.twig', [
             'dossier' => $dossier,
             'form' => $form->createView(),
@@ -341,9 +339,9 @@ class PaiementConsignationController extends AbstractController
         PaiementConsignationRepository $paiementRepo
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_GREFFIER_EN_CHEF');
-        
+
         $dateFilter = $request->query->get('date_filter', 'all');
-        
+
         try {
             // Récupération des paiements filtrés
             $qb = $paiementRepo->createQueryBuilder('p')
@@ -355,15 +353,27 @@ class PaiementConsignationController extends AbstractController
             if ($dateFilter !== 'all') {
                 $date = new \DateTime();
                 switch ($dateFilter) {
-                    case '1h': $date->modify('-1 hour'); break;
-                    case '24h': $date->modify('-1 day'); break;
-                    case '7d': $date->modify('-7 days'); break;
-                    case '14d': $date->modify('-14 days'); break;
-                    case '30d': $date->modify('-30 days'); break;
-                    case '90d': $date->modify('-90 days'); break;
+                    case '1h':
+                        $date->modify('-1 hour');
+                        break;
+                    case '24h':
+                        $date->modify('-1 day');
+                        break;
+                    case '7d':
+                        $date->modify('-7 days');
+                        break;
+                    case '14d':
+                        $date->modify('-14 days');
+                        break;
+                    case '30d':
+                        $date->modify('-30 days');
+                        break;
+                    case '90d':
+                        $date->modify('-90 days');
+                        break;
                 }
                 $qb->andWhere('p.datePaiement >= :date')
-                ->setParameter('date', $date);
+                    ->setParameter('date', $date);
             }
 
             $paiements = $qb->getQuery()->getResult();
@@ -386,14 +396,13 @@ class PaiementConsignationController extends AbstractController
                 'is_greffier' => true,
                 ...$stats
             ]);
-
         } catch (\Exception $e) {
             $this->addFlash('error', 'Une erreur technique est survenue');
             $this->logger->error('Erreur liste paiements', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return $this->render('paiement_consignation/admin/list.html.twig', [
                 'paiements' => [],
                 'current_filter' => $dateFilter,
@@ -416,14 +425,14 @@ class PaiementConsignationController extends AbstractController
         EntityManagerInterface $em
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_GREFFIER_EN_CHEF');
-        
+
         // Version basique sans vérification complexe
         return $this->render('paiement_consignation/admin/show.html.twig', [
             'paiement' => $paiement,
         ]);
     }
 
-    
+
     // PRIVATE METHODS
     private function processPayment(Dossier $dossier, $transaction, FileUploader $fileUploader): Response
     {
@@ -440,7 +449,6 @@ class PaiementConsignationController extends AbstractController
 
             $this->em->commit();
             return $this->renderSuccess($dossier);
-
         } catch (\Exception $e) {
             $this->em->rollback();
             throw $e;
@@ -472,7 +480,7 @@ class PaiementConsignationController extends AbstractController
             $options = new Options();
             $options->set('isRemoteEnabled', true);
             $options->set('chroot', $this->projectDir);
-            $options->set('tempDir', $this->projectDir.'/var/tmp');
+            $options->set('tempDir', $this->projectDir . '/var/tmp');
             $options->set('defaultFont', 'DejaVu Sans');
 
             $dompdf = new Dompdf($options);
@@ -481,19 +489,18 @@ class PaiementConsignationController extends AbstractController
             $dompdf->render();
 
             return $dompdf->output();
-
         } catch (\Exception $e) {
             $this->logger->error("Erreur génération PDF", [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            throw new \RuntimeException("Échec de génération du PDF: ".$e->getMessage());
+            throw new \RuntimeException("Échec de génération du PDF: " . $e->getMessage());
         }
     }
 
     private function saveTempFile(string $content, string $transactionId): string
     {
-        $tempPath = sys_get_temp_dir().'/preuve_'.$transactionId.'_'.time().'.pdf';
+        $tempPath = sys_get_temp_dir() . '/preuve_' . $transactionId . '_' . time() . '.pdf';
         if (file_put_contents($tempPath, $content) === false) {
             throw new \RuntimeException("Échec création fichier temporaire");
         }
@@ -504,7 +511,7 @@ class PaiementConsignationController extends AbstractController
     {
         $pdfFile = new UploadedFile(
             $filePath,
-            'preuve_consignation_'.$dossierId.'.pdf',
+            'preuve_consignation_' . $dossierId . '.pdf',
             'application/pdf',
             null,
             true
@@ -517,7 +524,7 @@ class PaiementConsignationController extends AbstractController
         return $path;
     }
 
-    private function registerPayment(Dossier $dossier, $transaction, string $pdfPath): void
+    private function registerPayment(Dossier $dossier, $transaction, string $pdfPath, MesuresInstructionsRepository $mesure): void
     {
         $paiement = new PaiementConsignation();
         $paiement->setDossier($dossier);
@@ -531,6 +538,8 @@ class PaiementConsignationController extends AbstractController
         $dossier->setConsignation(true);
         $dossier->setDateConsignation(new \DateTimeImmutable());
         $dossier->setPreuveConsignation($pdfPath);
+        $mesure_instruction = $mesure->findOneBy(['dossier' => $dossier]);
+        $mesure_instruction->setEtat('EXECUTE');
 
         $this->em->persist($paiement);
         $this->em->flush();

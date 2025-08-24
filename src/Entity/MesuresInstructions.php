@@ -44,8 +44,10 @@ class MesuresInstructions
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $nature;
 
-    #[ORM\Column(nullable: true)]
-    private ?bool $termine = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $etat = null;
+
 
     #[ORM\Column(type: 'datetime')]
     private  \DateTimeInterface $termineAt;
@@ -174,14 +176,14 @@ class MesuresInstructions
         return $this;
     }
 
-    public function isTermine(): ?bool
+    public function getEtat(): ?string
     {
-        return $this->termine;
+        return $this->etat;
     }
 
-    public function setTermine(?bool $termine): static
+    public function setEtat(?string $etat): self
     {
-        $this->termine = $termine;
+        $this->etat = $etat;
         return $this;
     }
 

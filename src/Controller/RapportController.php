@@ -29,16 +29,16 @@ class RapportController extends AbstractController
     private $logger;
     private $uploadDirectory;
     private $rapportsDirectory;
-    
+
     public function __construct(
-        LoggerInterface $logger, 
+        LoggerInterface $logger,
         string $uploadDirectory,
         string $rapportsDirectory
     ) {
         $this->logger = $logger;
         $this->uploadDirectory = rtrim($uploadDirectory, '/\\');
         $this->rapportsDirectory = rtrim($rapportsDirectory, '/\\');
-        
+
         if (!file_exists($this->uploadDirectory)) {
             mkdir($this->uploadDirectory, 0777, true);
         }
@@ -66,7 +66,7 @@ class RapportController extends AbstractController
         $periodLabels = [
             '1h' => '1 heure',
             '24h' => '24 heures',
-            '7j' => '7 jours', 
+            '7j' => '7 jours',
             '14j' => '14 jours',
             '30j' => '30 jours',
             '3m' => '3 mois',
@@ -78,7 +78,7 @@ class RapportController extends AbstractController
 
         // Construction des filtres
         $filters = [];
-        
+
         if ($typeFilter !== 'all') {
             $filters['type'] = $typeFilter;
         }
@@ -104,7 +104,7 @@ class RapportController extends AbstractController
         // Détermination du type de graphique et des données
         $chartData = [];
         $chartType = 'bar'; // Par défaut
-        
+
         if ($typeFilter === 'all' && $dateFilter === 'all') {
             // Cas 1: Tous types + Toutes périodes - Pie chart des types
             $typesDistribution = $rapportRepository->getTypesDistribution($filters);
@@ -125,17 +125,17 @@ class RapportController extends AbstractController
         } elseif ($typeFilter !== 'all' && $dateFilter !== 'all') {
             // Cas 4: Type spécifique + Période spécifique - Bar chart des rapports par sous-périodes
             $periodStats = [];
-            
+
             foreach ($periodLabels as $periodKey => $label) {
                 if ($periodKey === 'all') continue;
-                
+
                 $periodStartDate = $this->getStartDate($periodKey);
                 $periodStats[$periodKey] = $rapportRepository->countByFilters(
                     array_merge($filters, ['type' => $typeFilter]),
                     $periodStartDate
                 );
             }
-            
+
             $chartData = [
                 'labels' => array_values(array_slice($periodLabels, 0, -1)), // Exclure 'all'
                 'data' => array_values($periodStats),
@@ -182,7 +182,7 @@ class RapportController extends AbstractController
         $periods = [
             '1h' => '-1 hour',
             '24h' => '-1 day',
-            '7j' => '-7 days', 
+            '7j' => '-7 days',
             '14j' => '-14 days',
             '30j' => '-30 days',
             '3m' => '-3 months',
@@ -215,13 +215,13 @@ class RapportController extends AbstractController
         ];
 
         if (!isset($intervals[$filter])) {
-            throw new \InvalidArgumentException('Période invalide: '.$filter);
+            throw new \InvalidArgumentException('Période invalide: ' . $filter);
         }
 
         return new \DateTime($intervals[$filter]);
     }
-    
-   #[Route('/{id}', name: 'rapport_show', methods: ['GET'])]
+
+    #[Route('/{id}', name: 'rapport_show', methods: ['GET'])]
     public function show(Rapport $rapport): Response
     {
         $moyens = [];
@@ -239,14 +239,14 @@ class RapportController extends AbstractController
     public function convertToPdf(string $referenceDossier, EntityManagerInterface $em): Response
     {
         $dossier = $em->getRepository(Dossier::class)->findOneBy(['referenceDossier' => $referenceDossier]);
-        
+
         if (!$dossier) {
             $this->addFlash('error', 'Aucun dossier trouvé avec cette référence.');
             return $this->redirectToRoute('rapport_index');
         }
 
         $rapport = $em->getRepository(Rapport::class)->findOneBy(['dossier' => $dossier]);
-        
+
         if (!$rapport) {
             $this->addFlash('error', 'Aucun rapport trouvé pour ce dossier.');
             return $this->redirectToRoute('rapport_index');
@@ -373,31 +373,33 @@ class RapportController extends AbstractController
 
             return $moyens;
         } catch (\Exception $e) {
-            $this->logger->error("Échec de l'extraction des moyens: ".$e->getMessage());
+            $this->logger->error("Échec de l'extraction des moyens: " . $e->getMessage());
             throw new \Exception("! Les moyens n'ont pas pu être extraits automatiquement du mémoire ampliatif");
         }
     }
-    
+
 
     #[Route('/generer/{dossierId}', name: 'rapport_generer', methods: ['GET', 'POST'])]
     public function genererRapport(Request $request, string $dossierId, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
         $dossier = $em->getRepository(Dossier::class)->find($dossierId);
-        
+
         if (!$user || !$dossier) {
             throw $this->createNotFoundException('Ressource non trouvée');
         }
-    
+
         $typeRapport = $this->determinerTypeRapport($dossier);
+
+
         if (!$typeRapport) {
             throw new \RuntimeException('Impossible de déterminer le type de rapport');
         }
-    
+
         $session = $request->getSession();
         $fromPreview = $request->query->get('from_preview');
         $previewData = $session->get('rapport_preview_data');
-    
+
         if ($fromPreview && $previewData && $previewData['dossier_id'] === $dossierId) {
             $modeleRapport = $em->getRepository(ModeleRapport::class)->find($previewData['modele_id']);
             $formData = $previewData['form_data'];
@@ -408,10 +410,10 @@ class RapportController extends AbstractController
             }
             $formData = null;
         }
-    
+
         $rapport = $em->getRepository(Rapport::class)->findOneBy(['dossier' => $dossier]);
         $isNew = !$rapport;
-        
+
         if ($isNew) {
             $rapport = (new Rapport())
                 ->setDossier($dossier)
@@ -422,13 +424,13 @@ class RapportController extends AbstractController
         } elseif (!$rapport->getTypeRapport()) {
             $rapport->setTypeRapport($typeRapport);
         }
-    
+
         if (!$rapport->getTypeRapport()) {
             throw new \RuntimeException('Le type de rapport n\'a pas été défini');
         }
-    
+
         $rapport->setModeleRapport($modeleRapport);
-    
+
         $placeholders = $this->extrairePlaceholders($modeleRapport);
         $requiredFields = $this->determinerChampsObligatoires($modeleRapport);
         $initialData = $this->prepareInitialData($rapport, $dossier, $placeholders);
@@ -460,12 +462,12 @@ class RapportController extends AbstractController
             'required_fields' => $requiredFields,
             'type_rapport' => $rapport->getTypeRapport()
         ]);
-    
+
         $form->handleRequest($request);
-    
+
         if ($form->isSubmitted()) {
             $action = $request->request->get('action');
-            
+
             // Validation des champs obligatoires
             $isValid = true;
             foreach ($requiredFields as $field) {
@@ -474,7 +476,7 @@ class RapportController extends AbstractController
                     $isValid = false;
                 }
             }
-    
+
             // Validation des moyens pour les rapports Fond
             if ($rapport->getTypeRapport() === Rapport::TYPE_FOND) {
                 $moyens = $form->has('moyens') ? $form->get('moyens')->getData() : [];
@@ -483,16 +485,16 @@ class RapportController extends AbstractController
                     $isValid = false;
                 }
             }
-    
+
             if ($isValid && $form->isValid()) {
                 $donnees = $this->filterPlaceholderData($form->getData(), $placeholders);
-                
+
                 if ($rapport->getTypeRapport() === Rapport::TYPE_FOND && $form->has('moyens')) {
                     $donnees['moyens'] = $form->get('moyens')->getData();
                 }
-                
+
                 $rapport->setDonnees($donnees);
-    
+
                 if ($action === 'preview') {
                     $session->set('rapport_preview_data', [
                         'donnees' => $donnees,
@@ -506,28 +508,28 @@ class RapportController extends AbstractController
                     ]);
                     return $this->redirectToRoute('rapport_preview', ['dossierId' => $dossierId]);
                 }
-                
+
                 if ($action === 'save') {
                     try {
                         $this->validateXmlData($donnees);
                         $this->genererFichierRapport($rapport, $modeleRapport, $dossierId);
-                        
+
                         $rapport->setStatut(Rapport::STATUT_FINALISE)
                             ->setUpdateAt(new DateTimeImmutable());
-                        
+
                         $em->persist($rapport);
                         $em->flush();
-                        
+
                         $this->addFlash('success', 'Rapport généré et enregistré avec succès');
                         return $this->redirectToRoute('rapport_show', ['id' => $rapport->getId()]);
                     } catch (\Exception $e) {
-                        $this->addFlash('error', 'Erreur lors de la génération du rapport: '.$e->getMessage());
-                        $this->logger->error('Erreur génération rapport: '.$e->getMessage());
+                        $this->addFlash('error', 'Erreur lors de la génération du rapport: ' . $e->getMessage());
+                        $this->logger->error('Erreur génération rapport: ' . $e->getMessage());
                     }
                 }
             }
         }
-    
+
         return $this->render('rapport/generer.html.twig', [
             'form' => $form->createView(),
             'dossier' => $dossier,
@@ -542,7 +544,7 @@ class RapportController extends AbstractController
     {
         $session = $request->getSession();
         $previewData = $session->get('rapport_preview_data');
-        
+
         if (!$previewData || $previewData['dossier_id'] !== $dossierId) {
             $this->addFlash('error', 'Données de prévisualisation non trouvées');
             return $this->redirectToRoute('rapport_generer', ['dossierId' => $dossierId]);
@@ -575,17 +577,17 @@ class RapportController extends AbstractController
     {
         $session = $request->getSession();
         $previewData = $session->get('rapport_preview_data');
-        
+
         if (!$previewData || $previewData['dossier_id'] !== $dossierId) {
             $this->addFlash('error', 'Session expirée, veuillez recommencer');
             return $this->redirectToRoute('rapport_generer', ['dossierId' => $dossierId]);
         }
 
         try {
-            $rapport = $previewData['is_new'] 
-                ? new Rapport() 
+            $rapport = $previewData['is_new']
+                ? new Rapport()
                 : $em->getRepository(Rapport::class)->find($previewData['rapport_id']);
-            
+
             $modeleRapport = $em->getRepository(ModeleRapport::class)->find($previewData['modele_id']);
             $dossier = $em->getRepository(Dossier::class)->find($dossierId);
             $typeRapport = $this->determinerTypeRapport($dossier);
@@ -604,7 +606,7 @@ class RapportController extends AbstractController
                 ->setCreatedBy($user)
                 ->setTypeRapport($typeRapport)
                 ->setStatut(Rapport::STATUT_FINALISE);
-                
+
             if ($previewData['is_new']) {
                 $rapport->setCreatedAt(new DateTimeImmutable());
             } else {
@@ -618,12 +620,11 @@ class RapportController extends AbstractController
 
             $session->remove('rapport_preview_data');
             $this->addFlash('success', 'Rapport enregistré avec succès');
-            
-            return $this->redirectToRoute('rapport_show', ['id' => $rapport->getId()]);
 
+            return $this->redirectToRoute('rapport_show', ['id' => $rapport->getId()]);
         } catch (\Exception $e) {
-            $this->addFlash('error', 'Erreur lors de l\'enregistrement: '.$e->getMessage());
-            $this->logger->error('Erreur sauvegarde rapport: '.$e->getMessage());
+            $this->addFlash('error', 'Erreur lors de l\'enregistrement: ' . $e->getMessage());
+            $this->logger->error('Erreur sauvegarde rapport: ' . $e->getMessage());
             return $this->redirectToRoute('rapport_preview', ['dossierId' => $dossierId]);
         }
     }
@@ -651,7 +652,7 @@ class RapportController extends AbstractController
 
             // Traitement spécial pour les moyens
             if ($rapport->getTypeRapport() === Rapport::TYPE_FOND && isset($donnees['moyens'])) {
-                $moyensFormatted = array_map(function($moyen, $index) {
+                $moyensFormatted = array_map(function ($moyen, $index) {
                     return sprintf("%d. %s", $index + 1, $this->cleanValueForWord($moyen));
                 }, $donnees['moyens'], array_keys($donnees['moyens']));
 
@@ -666,7 +667,6 @@ class RapportController extends AbstractController
 
             $templateProcessor->saveAs($outputPath);
             $rapport->setFichier($outputFilename);
-
         } catch (\Exception $e) {
             if (file_exists($outputPath)) {
                 unlink($outputPath);
@@ -677,44 +677,44 @@ class RapportController extends AbstractController
 
     private function prepareMoyensForDisplay(array $donnees): array
     {
-        if (!isset($donnees['moyens']))  {
+        if (!isset($donnees['moyens'])) {
             return [];
         }
 
-        return array_map(function($moyen, $index) {
+        return array_map(function ($moyen, $index) {
             return [
                 'numero' => $index + 1,
                 'texte' => $this->cleanValueForWord($moyen)
             ];
         }, $donnees['moyens'], array_keys($donnees['moyens']));
     }
-    
+
     private function prepareTemplateData(array $data): array
     {
         $preparedData = [];
-        
+
         foreach ($data as $key => $value) {
             // Traitement spécial pour les moyens
             if ($key === 'moyens' && is_array($value)) {
                 // Formatte les moyens numérotés
-                $preparedData['moyens'] = array_map(function($moyen, $index) {
+                $preparedData['moyens'] = array_map(function ($moyen, $index) {
                     return sprintf("%d. %s", $index + 1, $this->cleanValueForWord($moyen));
                 }, $value, array_keys($value));
                 continue;
             }
-            
+
             $preparedData[$key] = $this->cleanValueForWord($value);
         }
-        
+
         return $preparedData;
     }
-    
+
     private function cleanValueForWord($value): string
     {
         if ($value === null) {
             return '';
         }
-        
+
         if ($value instanceof \DateTimeInterface) {
             $formatter = new \IntlDateFormatter(
                 'fr_FR',
@@ -726,15 +726,15 @@ class RapportController extends AbstractController
             );
             return $formatter->format($value);
         }
-        
+
         if (is_bool($value)) {
             return $value ? 'Oui' : 'Non';
         }
-        
+
         if (is_array($value)) {
             return implode(', ', array_map([$this, 'cleanValueForWord'], $value));
         }
-        
+
         $value = (string)$value;
         $value = htmlspecialchars($value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
         return str_replace(["\x00", "\x0B"], '', $value);
@@ -777,7 +777,7 @@ class RapportController extends AbstractController
             $formData = $previewData['form_data'];
         } else {
             $formData = $this->prepareInitialData($rapport, $dossier, $placeholders);
-            
+
             if ($rapport->getTypeRapport() === Rapport::TYPE_FOND) {
                 $donnees = $rapport->getDonnees();
                 if (isset($donnees['moyens'])) {
@@ -855,10 +855,10 @@ class RapportController extends AbstractController
                         }
 
                         $this->genererFichierRapport($rapport, $rapport->getModeleRapport(), $dossier->getId());
-                        
+
                         $rapport->setUpdateAt(new DateTimeImmutable());
                         $em->flush();
-                        
+
                         $session->remove('rapport_preview_data');
                         $this->addFlash('success', 'Modifications enregistrées avec succès');
                         return $this->redirectToRoute('rapport_show', ['id' => $rapport->getId()]);
@@ -882,47 +882,47 @@ class RapportController extends AbstractController
             'is_fond' => $rapport->getTypeRapport() === Rapport::TYPE_FOND
         ]);
     }
-    
+
     #[Route('/preview-modifier/{id}', name: 'rapport_preview_modifier', methods: ['GET', 'POST'])]
     public function previewModifier(Request $request, Rapport $rapport, EntityManagerInterface $em): Response
     {
         $session = $request->getSession();
         $previewData = $session->get('rapport_preview_data');
-        
+
         if (!$previewData || $previewData['rapport_id'] !== $rapport->getId()) {
             $this->addFlash('error', 'Données de prévisualisation non trouvées');
             return $this->redirectToRoute('rapport_modifier', ['id' => $rapport->getId()]);
         }
-    
+
         // Préparation des données pour l'affichage
         $preparedData = $this->prepareTemplateData($previewData['donnees']);
         $hasMoyens = ($previewData['type_rapport'] === 'Fond' && !empty($previewData['donnees']['moyens']));
-         $moyens = [];
+        $moyens = [];
         if ($rapport->getTypeRapport() === Rapport::TYPE_FOND && isset($previewData['donnees']['moyens'])) {
             $moyens = $this->prepareMoyensForDisplay($previewData['donnees']);
         }
-    
+
         if ($request->isMethod('POST')) {
             try {
                 // Récupération des données depuis la session
                 $donnees = $previewData['donnees'];
                 $modeleRapport = $em->getRepository(ModeleRapport::class)->find($previewData['modele_id']);
                 $dossier = $rapport->getDossier();
-    
+
                 // Suppression de l'ancien fichier
                 $ancienFichier = $rapport->getFichier();
                 if ($ancienFichier && file_exists($this->rapportsDirectory . '/' . $ancienFichier)) {
                     unlink($this->rapportsDirectory . '/' . $ancienFichier);
                 }
-    
+
                 // Mise à jour et génération du rapport
                 $rapport->setDonnees($donnees);
                 $this->genererFichierRapport($rapport, $modeleRapport, $dossier->getId());
                 $rapport->setUpdateAt(new DateTimeImmutable());
-    
+
                 $em->flush();
                 $session->remove('rapport_preview_data');
-    
+
                 $this->addFlash('success', 'Les modifications ont été enregistrées avec succès');
                 return $this->redirectToRoute('rapport_show', ['id' => $rapport->getId()]);
             } catch (\Exception $e) {
@@ -933,7 +933,7 @@ class RapportController extends AbstractController
                 ]);
             }
         }
-    
+
         return $this->render('rapport/preview_modifier.html.twig', [
             'moyens' => $moyens,
             'donnees' => $preparedData,
@@ -943,7 +943,7 @@ class RapportController extends AbstractController
             'has_moyens' => $hasMoyens
         ]);
     }
-    
+
     private function trouverModeleRapport(Dossier $dossier, EntityManagerInterface $em): ?ModeleRapport
     {
         $section = $dossier->getAffecterSection() ? $dossier->getAffecterSection()->getSection() : null;
@@ -960,17 +960,17 @@ class RapportController extends AbstractController
     private function prepareMoyensData(array $donnees): array
     {
         $preparedData = [];
-        
+
         foreach ($donnees as $key => $value) {
             if ($key === 'moyens' && is_array($value)) {
-                $preparedData['moyens'] = array_map(function($moyen) {
+                $preparedData['moyens'] = array_map(function ($moyen) {
                     return $this->cleanValueForWord($moyen);
                 }, $value);
             } else {
                 $preparedData[$key] = $this->cleanValueForWord($value);
             }
         }
-        
+
         return $preparedData;
     }
 
@@ -979,20 +979,20 @@ class RapportController extends AbstractController
         if (!$dossier->isConsignation()) {
             return Rapport::TYPE_DECHEANCE;
         }
-        
+
         if (!$dossier->isMemoireAmpliatif()) {
             return Rapport::TYPE_FORCLUSION;
         }
-        
+
         return Rapport::TYPE_FOND;
     }
 
     private function extrairePlaceholders(ModeleRapport $modeleRapport): array
     {
-        $cheminFichier = $this->uploadDirectory.'/'.$modeleRapport->getFichier();
+        $cheminFichier = $this->uploadDirectory . '/' . $modeleRapport->getFichier();
 
         if (!file_exists($cheminFichier)) {
-            throw new \RuntimeException('Le fichier modèle n\'existe pas : '.$cheminFichier);
+            throw new \RuntimeException('Le fichier modèle n\'existe pas : ' . $cheminFichier);
         }
 
         $templateProcessor = new TemplateProcessor($cheminFichier);
@@ -1003,34 +1003,40 @@ class RapportController extends AbstractController
     {
         $types = [];
         $placeholders = $this->extrairePlaceholders($modeleRapport);
-        
+
         foreach ($placeholders as $placeholder) {
             if ($placeholder === 'moyen') {
                 continue;
             }
-            
+
             if ($this->isDateField($placeholder) || $placeholder === 'GenereLe') {
                 $types[$placeholder] = 'date';
-            } elseif (strpos($placeholder, 'annotation') !== false || 
-                    strpos($placeholder, 'description') !== false ||
-                    strpos($placeholder, 'motifs') !== false ||
-                    strpos($placeholder, 'motivation') !== false) {
+            } elseif (
+                strpos($placeholder, 'annotation') !== false ||
+                strpos($placeholder, 'description') !== false ||
+                strpos($placeholder, 'motifs') !== false ||
+                strpos($placeholder, 'motivation') !== false
+            ) {
                 $types[$placeholder] = 'textarea';
-            } elseif (strpos($placeholder, 'statut') !== false ||
-                    strpos($placeholder, 'juridiction_origine') !== false ||
-                    strpos($placeholder, 'type') !== false) {
+            } elseif (
+                strpos($placeholder, 'statut') !== false ||
+                strpos($placeholder, 'juridiction_origine') !== false ||
+                strpos($placeholder, 'type') !== false
+            ) {
                 $types[$placeholder] = [
                     'type' => 'select',
                     'options' => $this->getOptionsForField($placeholder)
                 ];
-            } elseif (strpos($placeholder, 'montant') !== false ||
-                    strpos($placeholder, 'somme') !== false) {
+            } elseif (
+                strpos($placeholder, 'montant') !== false ||
+                strpos($placeholder, 'somme') !== false
+            ) {
                 $types[$placeholder] = 'number';
             } else {
                 $types[$placeholder] = 'text';
             }
         }
-        
+
         return $types;
     }
 
@@ -1056,7 +1062,7 @@ class RapportController extends AbstractController
                     'criet' => 'CRIET',
                     'cour speciale des affaires fonciers' => 'COUR SPÉCIALE DES AFFAIRES FONCIÈRES',
                     'cour d\'appel de cotonou' => 'COUR D\'APPEL DE COTONOU',
-                    'cour d\'appel Abomey' => 'COUR D\'APPEL D\'ABOMEY', 
+                    'cour d\'appel Abomey' => 'COUR D\'APPEL D\'ABOMEY',
                     'cour d\'appel de parakou' => 'COUR D\'APPEL DE PARAKOU'
                 ];
             case 'typedossier':
@@ -1077,10 +1083,10 @@ class RapportController extends AbstractController
     private function prepareInitialData(?Rapport $rapport = null, ?Dossier $dossier = null, ?array $placeholders = null): array
     {
         $initialData = [];
-        
+
         if ($rapport !== null) {
             $donnees = $rapport->getDonnees() ?? [];
-            
+
             foreach ($donnees as $key => $value) {
                 if ($placeholders === null || in_array($key, $placeholders)) {
                     if ($this->isDateField($key)) {
@@ -1090,15 +1096,15 @@ class RapportController extends AbstractController
                     }
                 }
             }
-            
+
             // Gestion des moyens
             if (isset($donnees['moyens'])) {
                 $initialData['moyens'] = $donnees['moyens'];
             }
-            
+
             $dossier = $rapport->getDossier();
         }
-        
+
         if ($dossier !== null && $placeholders !== null) {
             $dossierData = [
                 'dateEnregistrement' => $this->normalizeDateValue($dossier->getDateEnregistrement()),
@@ -1114,18 +1120,18 @@ class RapportController extends AbstractController
                 'chambre_decision' => $dossier->getAffecterSection()->getSection(),
                 'GenereLe' => new \DateTimeImmutable(),
             ];
-            
+
             if ($dossier->getAffecterSection()) {
                 $dossierData['section'] = $dossier->getAffecterSection()->getSection()->getName();
             }
-            
+
             foreach ($dossierData as $key => $value) {
                 if (in_array($key, $placeholders)) {
                     $initialData[$key] = $value;
                 }
             }
         }
-        
+
         return $initialData;
     }
     private function normalizeFormValue($value)
@@ -1133,11 +1139,11 @@ class RapportController extends AbstractController
         if ($value instanceof \DateTimeInterface) {
             return $value;
         }
-        
+
         if (is_string($value) && preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $value)) {
             return \DateTimeImmutable::createFromFormat('d/m/Y', $value);
         }
-        
+
         return $value;
     }
 
@@ -1181,14 +1187,14 @@ class RapportController extends AbstractController
 
     private function filterPlaceholderData(array $data, array $placeholders): array
     {
-        return array_filter($data, function($key) use ($placeholders) {
+        return array_filter($data, function ($key) use ($placeholders) {
             // Exclure 'moyen' et 'moyens' du filtrage standard
             if ($key === 'moyen' || $key === 'moyens') {
                 return false;
             }
-            
-            return in_array($key, $placeholders) || 
-                str_starts_with($key, 'reference') || 
+
+            return in_array($key, $placeholders) ||
+                str_starts_with($key, 'reference') ||
                 str_starts_with($key, 'date');
         }, ARRAY_FILTER_USE_KEY);
     }

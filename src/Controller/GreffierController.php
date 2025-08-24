@@ -142,7 +142,7 @@ class GreffierController extends AbstractController
                 return $this->redirectToRoute('app_index_front');
             }
         }
-        
+
         $templateParent = $this->getUser() ? 'base.html.twig' : 'front/status_base.html.twig';
 
         return $this->render('greffe/paiementConsignation.html.twig', [
@@ -217,7 +217,8 @@ class GreffierController extends AbstractController
         Request $request,
         DossierRepository $dossierRepository,
         MesuresInstructions $mesuresInstructions,
-        ReponseMesuresInstructionsRepository $reponseMesuresInstructionsRepository
+        ReponseMesuresInstructionsRepository $reponseMesuresInstructionsRepository,
+        EntityManagerInterface $entityManager,
     ): Response {
         $reponse = new ReponseMesuresInstructions();
         $form = $this->createForm(ReponseMesureType::class, $reponse);
@@ -226,6 +227,14 @@ class GreffierController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $reponse->setMesure($mesuresInstructions);
             $reponseMesuresInstructionsRepository->add($reponse, true);
+            if ($form->get('reponsePartie')) {
+                $mesuresInstructions->setEtat('CONTACTE');
+            } else {
+                $mesuresInstructions->setEtat('NON CONTACTE');
+            }
+            $entityManager->persist($mesuresInstructions);
+            $entityManager->flush();
+
             return $this->redirectToRoute('greffier_mesures_instructions_dossier_list', ['id' => $mesuresInstructions->getDossier()->getId()]);
         }
         return $this->render('conseiller_rapporteur/reponses_mesures_instructins.html.twig', [
@@ -549,9 +558,15 @@ class GreffierController extends AbstractController
     }
 
     #[Route(path: '/arret/{id}', name: 'greffier_arret_new', methods: ['GET', 'POST'])]
-    public function arrets( #[CurrentUser] User    $user,Dossier  $dossier, Request $request, ArretsRepository $arretsRepository,
-        FileUploader $fileUploader, MailerInterface $mailer, DossierRepository $dossierRepository): Response
-    {
+    public function arrets(
+        #[CurrentUser] User    $user,
+        Dossier  $dossier,
+        Request $request,
+        ArretsRepository $arretsRepository,
+        FileUploader $fileUploader,
+        MailerInterface $mailer,
+        DossierRepository $dossierRepository
+    ): Response {
         $arret = new Arrets();
         $form = $this->createForm(ArretResumeType::class, $arret);
         $form->handleRequest($request);
@@ -566,7 +581,7 @@ class GreffierController extends AbstractController
             $arretsRepository->add($arret, true);
             // $audienceRepository->add($audience, true);
             //     $smsMessage = "L'audience du  dossier : " . $dossier->getReferenceDossier() . " a été programmé le : " . $audience->getDateAudience()->format("Y-m-d H:i:s");
-//            dd($smsMessage);
+            //            dd($smsMessage);
             $requerant_mail = $dossier->getRequerant()->getEmail();
             $request_telephone = $dossier->getRequerant()->getTelephone();
             $defendeur_mail = $dossier->getDefendeur()->getEmail();
@@ -574,28 +589,28 @@ class GreffierController extends AbstractController
 
 
 
-              $email = (new TemplatedEmail())
-                   ->from(new Address('moussabaka@openkanz.com', 'Cour Suprême'))
-                   ->to(new Address($requerant_mail))
-                   // ->priority(Email::PRIORITY_HIGH)
-                   ->subject('Arrêt du dossier : ' . $dossier->getReferenceDossier())
-                   ->priority(Email::PRIORITY_HIGH)
+            $email = (new TemplatedEmail())
+                ->from(new Address('moussabaka@openkanz.com', 'Cour Suprême'))
+                ->to(new Address($requerant_mail))
+                // ->priority(Email::PRIORITY_HIGH)
+                ->subject('Arrêt du dossier : ' . $dossier->getReferenceDossier())
+                ->priority(Email::PRIORITY_HIGH)
 
-                   // path of the Twig template to render
-                   ->htmlTemplate('mailer/auience_mail_front.html.twig')
+                // path of the Twig template to render
+                ->htmlTemplate('mailer/auience_mail_front.html.twig')
 
-                   // pass variables (name => value) to the template
-                   ->context([
-                       'dossier' => $dossier,
-                       'arret' => $arret->getArret(),
-                       'nom' => $dossier->getRequerant()->getNom()
+                // pass variables (name => value) to the template
+                ->context([
+                    'dossier' => $dossier,
+                    'arret' => $arret->getArret(),
+                    'nom' => $dossier->getRequerant()->getNom()
 
-                   ]);
+                ]);
 
-               $mailer->send($email);
+            $mailer->send($email);
 
 
-           /* if ($defendeuail) {
+            /* if ($defendeuail) {
                 $email = (new TemplatedEmail())
                     ->from('xxxxx@fuprobenin.org')
                     ->to(new Address($defendeur_mail))
@@ -660,6 +675,4 @@ class GreffierController extends AbstractController
             'form' => $form,
         ]);
     }
-
-
 }
