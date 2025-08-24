@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : ven. 22 août 2025 à 14:13
+-- Généré le : dim. 24 août 2025 à 20:52
 -- Version du serveur : 9.3.0
 -- Version de PHP : 8.4.11
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données : `test`
+-- Base de données : `projetamir_db`
 --
 
 -- --------------------------------------------------------
@@ -907,6 +907,13 @@ CREATE TABLE `dossier` (
   `preuve_consignation_requerant` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Déchargement des données de la table `dossier`
+--
+
+INSERT INTO `dossier` (`id`, `objet_id`, `structure_id`, `provenance_id`, `requerant_id`, `defendeur_id`, `created_by_id`, `reference_enregistrement`, `date_enregistrement`, `type_dossier`, `reference_dossier`, `intitule_objet`, `reference_dossier_complet`, `etat_dossier`, `date_ouverture`, `created_at`, `updated_at`, `nature`, `autorisation`, `clos`, `date_cloture`, `motif_cloture`, `arrete_attaquee`, `consignation`, `memoire_ampliatif`, `date_memoire_ampliatif`, `memoire_en_defense`, `date_memoire_en_defense`, `date_consignation`, `preuve_consignation`, `url_memoire_ampliatif`, `url_memoire_en_defense`, `code_suivi`, `externe`, `annotation`, `date_autorisation`, `statut`, `calendrier`, `rapport_cr`, `observation_description_requerante`, `observation_fichier_requerante`, `observation_description_defendeur`, `observation_fichier_defendeur`, `rapport_description_cr`, `fin_mesures_instruction`, `fin_mesures_instruction_at`, `recu_consignation`, `date_preuve_consignation_requerant`, `preuve_consignation_requerant`) VALUES
+(0x0198d277f0337e1bb47e955220a7548e, 0x0191ae5088a371c4b0edef4e0307635c, 0x0191ae4201167fab94810a32b44f2ec4, NULL, 0x0198d277f0337e1bb47e95522178474d, 0x0198d278a0157cb9ad7d1ba3812865fe, 0x019247decd437f328344f05ee9731722, '2025-0001-CA', '2025-08-18 00:00:00', 'ordinaire', 'ref-0001', 'decision-0001', 'ref-complet-0001', 'OUVERT', '2025-08-22 17:52:42', NULL, NULL, NULL, 1, NULL, NULL, NULL, 'Arret 0001', 1, 0, NULL, 0, NULL, '2025-08-22', 'consignations-68a89812c0872.pdf', NULL, NULL, 's4JiJaa', 0, 'annotation-0001', '2025-08-18 00:00:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '1', '2025-08-22', 'ref-0001-68a89845decb4.pdf');
+
 -- --------------------------------------------------------
 
 --
@@ -974,6 +981,29 @@ CREATE TABLE `log` (
   `created_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Déchargement des données de la table `log`
+--
+
+INSERT INTO `log` (`id`, `user_id`, `message`, `context`, `level`, `level_name`, `extra`, `created_at`) VALUES
+(0x0198d276f7207c9391f6cfce2c6f053f, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-22 17:47:48'),
+(0x0198d27aa46073d6a00c49e8be1e868d, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-22 17:51:49'),
+(0x0198d27b27ce74bcaad7b577634e2915, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-22 17:52:23'),
+(0x0198d27b93d578f19a247b8e97691070, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-22 17:52:50'),
+(0x0198d27c5fe374afaba316be569d1178, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-22 17:53:43'),
+(0x0198d28d8867794cb3a4f1b42d1fce9e, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-22 18:12:27'),
+(0x0198d28dc8657165bf8b7fcc5fc9fe0e, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-22 18:12:44'),
+(0x0198d28de83379f7990e18b6b21fb8c1, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-22 18:12:52'),
+(0x0198d2930107799ab9f729e2b01cf063, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-22 18:18:26'),
+(0x0198d29cb19d7827baa6f65c447aff50, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-22 18:29:01'),
+(0x0198d3f1a300755684e85a9dd6a03b6c, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-23 00:41:25'),
+(0x0198d3f2b08c7d85a170d0d0e68052a0, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-23 00:42:34'),
+(0x0198d40b8c1373eaa602d60022c631a2, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-23 01:09:43'),
+(0x0198dbdf6784750ab49d6df5ccd16913, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-24 13:38:28'),
+(0x0198dd1e1d157a76b204de8e21c8066a, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-24 19:26:35'),
+(0x0198dd1f16ba71f2a6ce11cd9f6caff2, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-24 19:27:38'),
+(0x0198dd206dbd71d4839452323d407a9c, NULL, 'Notre premier log', 'a:0:{}', 200, 'Info', 'a:3:{s:8:\"ClientIp\";s:9:\"127.0.0.1\";s:3:\"Url\";s:0:\"\";s:5:\"route\";s:9:\"app_index\";}', '2025-08-24 19:29:06');
+
 -- --------------------------------------------------------
 
 --
@@ -989,7 +1019,7 @@ CREATE TABLE `mesures_instructions` (
   `date` datetime DEFAULT NULL,
   `parties_concernes` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nature` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `etat` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `etat` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `termine_at` datetime NOT NULL,
   `alerte_envoyee` tinyint(1) DEFAULT NULL,
   `instruction_id` binary(16) DEFAULT NULL COMMENT '(DC2Type:uuid)',
@@ -1117,6 +1147,14 @@ CREATE TABLE `partie` (
   `intitule` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `partie`
+--
+
+INSERT INTO `partie` (`id`, `localite_id`, `nom`, `prenoms`, `sexe`, `telephone`, `email`, `adresse`, `type`, `intitule`, `status`) VALUES
+(0x0198d277f0337e1bb47e95522178474d, 443, 'Quae', 'Nemo', 'f', '286-926-6438', 'your.email+fakedata95275@gmail.com', '6301 Casper Greens', 'physique', 'Regional Accounts Analyst', 'REQUERANT'),
+(0x0198d278a0157cb9ad7d1ba3812865fe, 137, 'Eno', 'Architecto', 'm', '922-190-0209', 'your.email+fakedata46081@gmail.com', '8446 Nikolaus Pike', 'physique', NULL, 'DEFENDEUR');
 
 -- --------------------------------------------------------
 
@@ -1384,7 +1422,6 @@ CREATE TABLE `user_dossier` (
   `delai` int DEFAULT NULL,
   `nature` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 
 -- --------------------------------------------------------
 
