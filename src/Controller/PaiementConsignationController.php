@@ -38,6 +38,7 @@ class PaiementConsignationController extends AbstractController
     private string $projectDir;
     private PaiementConsignationRepository $paiementConsignationRepository;
     private ExportService $exportService;
+    private MesuresInstructionsRepository $mesuresInstructionsRepository;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -45,6 +46,7 @@ class PaiementConsignationController extends AbstractController
         LoggerInterface $logger,
         ParameterBagInterface $params,
         PaiementConsignationRepository $paiementConsignationRepository,
+        MesuresInstructionsRepository $mesuresInstructionsRepository,
         ExportService $exportService
     ) {
         $this->em = $em;
@@ -52,6 +54,7 @@ class PaiementConsignationController extends AbstractController
         $this->logger = $logger;
         $this->projectDir = $params->get('kernel.project_dir');
         $this->paiementConsignationRepository = $paiementConsignationRepository;
+        $this->mesuresInstructionsRepository = $mesuresInstructionsRepository;
         $this->exportService = $exportService;
     }
 
@@ -444,7 +447,7 @@ class PaiementConsignationController extends AbstractController
             $tempPdfPath = $this->saveTempFile($pdfContent, $transaction->id);
             $pdfPath = $this->uploadProofFile($tempPdfPath, $dossier->getId(), $fileUploader);
 
-            $this->registerPayment($dossier, $transaction, $pdfPath);
+            $this->registerPayment($dossier, $transaction, $pdfPath, $this->mesuresInstructionsRepository);
             $this->sendConfirmationEmail($dossier, $tempPdfPath);
 
             $this->em->commit();
@@ -524,7 +527,7 @@ class PaiementConsignationController extends AbstractController
         return $path;
     }
 
-    private function registerPayment(Dossier $dossier, $transaction, string $pdfPath, MesuresInstructionsRepository $mesure): void
+    private function registerPayment(Dossier $dossier, $transaction, string $pdfPath, $mesure): void
     {
         $paiement = new PaiementConsignation();
         $paiement->setDossier($dossier);
