@@ -481,25 +481,47 @@ class DossierController extends AbstractController
     }
 
     #[Route(path: '/details-dossier/{id}', name: 'admin_dossier_details')]
-    public function detailsDossier(#[CurrentUser] User    $user, Request $request, Dossier $dossier, MesuresInstructionsRepository $mesure): Response
-    {
-        $generate_rapport = false;
-        $dossier1 = new Dossier();
+public function detailsDossier(
+    #[CurrentUser] User $user, 
+    Request $request, 
+    Dossier $dossier, 
+    MesuresInstructionsRepository $mesure
+): Response {
+    $generate_rapport = false;
+    $dossier1 = new Dossier();
 
-        $form = $this->createForm(AjoutPieceDossierType::class, $dossier1);
-        $form->handleRequest($request);
-        $lastMesure = $mesure->findOneBy(['dossier' => $dossier], ['createdAt' => 'DESC']);
-        if ($lastMesure->getEtat() == 'ECHOUE' && ($lastMesure->getInstruction()->getLibelle() == 'Paiement de consignation' || $lastMesure->getInstruction()->getLibelle() == 'Production de mémoire ampliatif' || $lastMesure->getInstruction()->getLibelle() == 'Mise en demeure pour production de mémoire ampliantif')) {
+    $form = $this->createForm(AjoutPieceDossierType::class, $dossier1);
+    $form->handleRequest($request);
+
+    // Récupération de la dernière mesure liée au dossier
+    $lastMesure = $mesure->findOneBy(
+        ['dossier' => $dossier],
+        ['createdAt' => 'DESC']
+    );
+
+    // Vérification sécurisée si la mesure existe
+    if ($lastMesure) {
+        $etat = $lastMesure->getEtat();
+        $libelleInstruction = $lastMesure->getInstruction()?->getLibelle();
+
+        $instructionsValides = [
+            'Paiement de consignation',
+            'Production de mémoire ampliatif',
+            'Mise en demeure pour production de mémoire ampliantif'
+        ];
+
+        if ($etat === 'ECHOUE' && in_array($libelleInstruction, $instructionsValides, true)) {
             $generate_rapport = true;
-        } else {
-            $generate_rapport = false;
         }
-        return $this->render('dossier/details_dossier.html.twig', [
-            'dossier' => $dossier,
-            'generate_rapport' => $generate_rapport,
-            'form' => $form->createView(),
-        ]);
     }
+
+    return $this->render('dossier/details_dossier.html.twig', [
+        'dossier' => $dossier,
+        'generate_rapport' => $generate_rapport,
+        'form' => $form->createView(),
+    ]);
+}
+
 
     #[Route(path: '/affectation-dossier/{id}', name: 'admin_dossier_affections')]
     public function detailsDossierAffectation(#[CurrentUser] User    $user, Dossier $dossier): \Symfony\Component\HttpFoundation\Response
