@@ -72,7 +72,8 @@ class DossierPiecesJointes
 
     public function getPath(): ?string
     {
-        return 'https://' . $_SERVER['SERVER_NAME']. '/uploads/piecesJointes/' . $this->url;
+        //return 'https://' . $_SERVER['SERVER_NAME']. '/uploads/piecesJointes/' . $this->url;
+        return 'https://' . $_SERVER['SERVER_NAME'].':'.$_SERVER['SERVER_PORT'] . '/uploads/piecesJointes/' . $this->url;
 
     }
 }
