@@ -227,7 +227,9 @@ class GreffierController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $reponse->setMesure($mesuresInstructions);
             $reponseMesuresInstructionsRepository->add($reponse, true);
-            if ($form->get('reponsePartie')) {
+            $reponsePartieValue = $form->get('reponsePartie')->getData();
+
+            if ($reponsePartieValue) {
                 $mesuresInstructions->setEtat('CONTACTE');
             } else {
                 $mesuresInstructions->setEtat('NON CONTACTE');
@@ -248,14 +250,30 @@ class GreffierController extends AbstractController
     public function reponsemesuresInstructionComplete(
         Request $request,
         DossierRepository $dossierRepository,
+        EntityManagerInterface $entityManager,
         ReponseMesuresInstructions $reponseMesuresInstructions,
         ReponseMesuresInstructionsRepository $reponseMesuresInstructionsRepository
     ): Response {
         $form = $this->createForm(ReponseMesureType::class, $reponseMesuresInstructions);
         $form->handleRequest($request);
         $dossierId = $reponseMesuresInstructions->getMesure()->getDossier()->getId();
+        $mesuresInstructions = $reponseMesuresInstructions->getMesure();
         if ($form->isSubmitted() && $form->isValid()) {
             $reponseMesuresInstructionsRepository->add($reponseMesuresInstructions, true);
+
+            // Récupère la valeur soumise du champ (true/false)
+            $reponsePartieValue = $form->get('reponsePartie')->getData();
+
+            if ($reponsePartieValue) {
+                $mesuresInstructions->setEtat('CONTACTE');
+            } else {
+                $mesuresInstructions->setEtat('NON CONTACTE');
+            }
+            $entityManager->persist($mesuresInstructions);
+            $entityManager->flush();
+
+
+
             return $this->redirectToRoute('greffier_mesures_instructions_dossier_list', ['id' => $dossierId]);
         }
         return $this->render('conseiller_rapporteur/reponses_mesures_instructins.html.twig', [

@@ -483,17 +483,24 @@ class DossierController extends AbstractController
     #[Route(path: '/details-dossier/{id}', name: 'admin_dossier_details')]
     public function detailsDossier(#[CurrentUser] User    $user, Request $request, Dossier $dossier, MesuresInstructionsRepository $mesure): Response
     {
+
         $generate_rapport = false;
         $dossier1 = new Dossier();
 
         $form = $this->createForm(AjoutPieceDossierType::class, $dossier1);
         $form->handleRequest($request);
         $lastMesure = $mesure->findOneBy(['dossier' => $dossier], ['createdAt' => 'DESC']);
-        if ($lastMesure->getEtat() == 'ECHOUE' && ($lastMesure->getInstruction()->getLibelle() == 'Paiement de consignation' || $lastMesure->getInstruction()->getLibelle() == 'Production de mémoire ampliatif' || $lastMesure->getInstruction()->getLibelle() == 'Mise en demeure pour production de mémoire ampliantif')) {
-            $generate_rapport = true;
+        if ($lastMesure) {
+            if ($lastMesure->getEtat() == 'ECHOUE' && ($lastMesure->getInstruction()->getLibelle() == 'Paiement de consignation' || $lastMesure->getInstruction()->getLibelle() == 'Mise en demeure pour production de mémoire ampliantif')) {
+                $generate_rapport = true;
+            } else {
+                $generate_rapport = false;
+            }
         } else {
             $generate_rapport = false;
         }
+
+
         return $this->render('dossier/details_dossier.html.twig', [
             'dossier' => $dossier,
             'generate_rapport' => $generate_rapport,

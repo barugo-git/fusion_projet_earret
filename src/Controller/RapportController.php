@@ -411,6 +411,7 @@ class RapportController extends AbstractController
             $formData = null;
         }
 
+
         $rapport = $em->getRepository(Rapport::class)->findOneBy(['dossier' => $dossier]);
         $isNew = !$rapport;
 
@@ -996,6 +997,7 @@ class RapportController extends AbstractController
         }
 
         $templateProcessor = new TemplateProcessor($cheminFichier);
+        // dd($templateProcessor->getVariables(), $cheminFichier);
         return $templateProcessor->getVariables();
     }
 
@@ -1003,7 +1005,7 @@ class RapportController extends AbstractController
     {
         $types = [];
         $placeholders = $this->extrairePlaceholders($modeleRapport);
-
+        // dd($placeholders);
         foreach ($placeholders as $placeholder) {
             if ($placeholder === 'moyen') {
                 continue;
