@@ -1,0 +1,30 @@
+{# templates/emails/mesure_instruction.html.twig #}
+
+{% apply inline_css(
+    source("@styles/bootstrap.min.css"),
+    source("@styles/icons.min.css"),
+    source("@styles/app.min.css"),
+    source("@styles/custom.min.css")
+) %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-10">
+
+            <p>Bonjour Monsieur/Madame {{ greffier }}.</p>
+
+            <p>
+                Nous vous informons qu’une nouvelle <strong>mesure d’instructions : {{ mesureInstruction }}</strong> a été donnée 
+                dans le cadre du recours numéro <strong>{{ numeroRecours }}</strong> .
+            </p>
+
+            <p>
+                Pour cela, veuillez vous connecter à votre espace greffier pour plus de détails : 
+                <a href="{{ lien }}"><strong style="color:blue;">Consulter la mesure</strong></a>
+            </p>
+
+        </div>
+    </div>
+</div>
+
+{% endapply %}

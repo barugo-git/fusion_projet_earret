@@ -2,30 +2,32 @@
 
 namespace App\Controller;
 
-use App\Entity\AffecterUser;
 use App\Entity\Dossier;
-use App\Entity\MesuresInstructions;
 use App\Entity\Mouvement;
-use App\Entity\ReponseMesuresInstructions;
+use App\Entity\AffecterUser;
 use App\Entity\Instructions;
-use App\Form\MesuresInstructionsConclusionsType;
-use App\Form\MesuresInstructionsType;
-use App\Form\RapportConseillerRapporteurType;
-use App\Form\ReponseMesureType;
-use App\Repository\DossierRepository;
-use App\Repository\MesuresInstructionsRepository;
-use App\Repository\MouvementRepository;
-use App\Repository\StatutRepository;
-use App\Repository\UserDossierRepository;
-use App\Repository\UserRepository;
-use App\Repository\InstructionsRepository;
+use App\Service\MailService;
 use App\Service\FileUploader;
+use App\Form\ReponseMesureType;
+use App\Repository\UserRepository;
+use App\Entity\MesuresInstructions;
+use App\Repository\StatutRepository;
+use App\Form\MesuresInstructionsType;
+use App\Repository\DossierRepository;
+use App\Repository\MouvementRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\UserDossierRepository;
+use App\Entity\ReponseMesuresInstructions;
+use App\Repository\InstructionsRepository;
+use App\Form\RapportConseillerRapporteurType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Form\MesuresInstructionsConclusionsType;
+use App\Repository\MesuresInstructionsRepository;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route(path: '/conseiller-rapporteur')]
 #[IsGranted('ROLE_CONSEILLER')]
@@ -54,7 +56,9 @@ class ConseillerRapporteurController extends AbstractController
         EntityManagerInterface $entityManager,
         UserDossierRepository $userDossierRepository,
         InstructionsRepository $instructionsRepository,
-        MesuresInstructionsRepository $mesuresInstructionsRepository
+        MesuresInstructionsRepository $mesuresInstructionsRepository,
+        MailService $mailService
+
     ): Response {
         $mesureInstruction = new MesuresInstructions();
         $form = $this->createForm(MesuresInstructionsType::class, $mesureInstruction);
@@ -113,8 +117,39 @@ class ConseillerRapporteurController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'La mesure d\'instruction a été créée avec succès.');
+
+            $greffier = null;
+
+            foreach ($dossier->getUserDossiers() as $userDossier) {
+                if ($userDossier->getProfil() === 'GREFFIER') {
+                    $greffier = $userDossier->getUser();
+                    break;
+                }
+            }
+
+            if ($greffier) {
+                $nomGreffier = $greffier->getUserInformations(); // ou getFullName() selon ton entité User
+            } else {
+                $nomGreffier = 'Aucun greffier affecté';
+            }
+
+            $mail = $greffier->getUserIdentifier();
+            $sujet = 'Nouvelle Mesure d\'instruction';
+
+            $context = [
+                'greffier' => $nomGreffier,
+                'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
+                'mesureInstruction' => $nouvelleInstructionLibelle,
+                'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
+
+            ];
+
+            $mailService->sendEmail($mail, $sujet, 'mail_new_instruction.html.twig', $context);
+
             return $this->redirectToRoute('greffier_mesures_instructions_dossier_list', ['id' => $dossier->getId()]);
         }
+
+
 
         return $this->render('conseiller_rapporteur/new_mesures_instructins.html.twig', [
             'dossier' => $dossier,

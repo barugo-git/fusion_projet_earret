@@ -1,0 +1,39 @@
+{# templates/emails/mesure_instruction.html.twig #}
+
+{% apply inline_css(
+    source("@styles/bootstrap.min.css"),
+    source("@styles/icons.min.css"),
+    source("@styles/app.min.css"),
+    source("@styles/custom.min.css")
+) %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-10">
+
+            <p>Bonjour Monsieur/Madame {{ requerent }}.</p>
+
+            <p>
+                Nous vous informons qu’une <strong>mesure d’instructions</strong> a été donnée 
+                dans le cadre de votre recours enregistré auprès de la Cour suprême du Bénin.
+            </p>
+
+            <p>
+                Votre numéro de suivi est :
+                <span class="badge bg-success-subtle text-success">{{ codeSuivi }}</span>
+            </p>
+
+            <p>
+                Veuillez conserver ce numéro pour suivre l’évolution de votre dossier ultérieurement.
+            </p>
+
+            <p>
+                Pour consulter le détail de la mesure, cliquez sur ce lien :  
+                <a href="{{ lien }}"><strong style="color:blue;">Consulter la mesure</strong></a>
+            </p>
+
+        </div>
+    </div>
+</div>
+
+{% endapply %}

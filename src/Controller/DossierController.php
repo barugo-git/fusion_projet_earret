@@ -491,7 +491,7 @@ class DossierController extends AbstractController
         $form->handleRequest($request);
         $lastMesure = $mesure->findOneBy(['dossier' => $dossier], ['createdAt' => 'DESC']);
         if ($lastMesure) {
-            if ($lastMesure->getEtat() == 'ECHOUE' && ($lastMesure->getInstruction()->getLibelle() == 'Paiement de consignation' || $lastMesure->getInstruction()->getLibelle() == 'Mise en demeure pour production de mémoire ampliantif')) {
+            if ($lastMesure->getEtat() == 'ECHOUE' && ($lastMesure->getInstruction()->getLibelle() == 'Paiement de consignation' || $lastMesure->getInstruction()->getLibelle() == 'Mise en demeure pour production de mémoire ampliantif') || $lastMesure->getInstruction()->getLibelle() == 'Production de mémoire ampliatif' || $lastMesure->getInstruction()->getLibelle() == 'Production de mémoire ampliatif') {
                 $generate_rapport = true;
             } else {
                 $generate_rapport = false;
