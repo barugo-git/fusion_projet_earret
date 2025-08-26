@@ -113,8 +113,40 @@ class ConseillerRapporteurController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'La mesure d\'instruction a été créée avec succès.');
-            return $this->redirectToRoute('greffier_mesures_instructions_dossier_list', ['id' => $dossier->getId()]);
+
+                    $greffier = null;
+
+                foreach ($dossier->getUserDossier() as $userDossier) {
+                    if ($userDossier->getProfil() === 'GREFFIER') {
+                        $greffier = $userDossier->getUser();
+                        break;
+                    }
+                }
+
+                if ($greffier) {
+                    $nomGreffier = $greffier->getNom(); // ou getFullName() selon ton entité User
+                } else {
+                    $nomGreffier = 'Aucun greffier affecté';
+                }
+
+
+             $sujet = 'Nouvelle Mesure d\'instruction';
+
+                    $context = [
+                        'greffier' => $nomGreffier
+                        'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
+                        'mesureInstruction'=> $nouvelleInstructionLibelle ,
+                        'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
+
+                    ];
+
+                    $mailService->sendEmail($mail, $sujet, 'resume.html.twig', $context);
+
+                    return $this->redirectToRoute('greffier_mesures_instructions_dossier_list', ['id' => $dossier->getId()]);
+
         }
+
+        
 
         return $this->render('conseiller_rapporteur/new_mesures_instructins.html.twig', [
             'dossier' => $dossier,
