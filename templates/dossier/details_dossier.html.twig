@@ -108,6 +108,11 @@
                     <td>
                       {% if dossier.consignation == true %}
                         <span class="badge rounded-pill border border-success text-success">Payee</span>
+                        {% if dossier.preuveConsignation is not empty %}
+                          <a href="{{ asset(dossier.pathPreuveConsignation) }}" target="_blank"><span class="badge rounded-pill border border-success text-success">Voir</span></a>
+                        {% else %}
+                          <span class="badge rounded-pill border border-warning text-warning">La preuve de paiement n'y est pas</span>
+                        {% endif %}
                       {% else %}
                         <span class="badge rounded-pill border border-danger text-danger">Non payee</span>
                       {% endif %}

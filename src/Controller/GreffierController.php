@@ -211,7 +211,6 @@ class GreffierController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
     #[Route(path: '/reposnse-mesures-instruction/instruction/{id}', name: 'greffier_rapporteur_mesures_instructions_reponse')]
     public function reponsemesuresInstruction(
         Request $request,
@@ -219,6 +218,7 @@ class GreffierController extends AbstractController
         MesuresInstructions $mesuresInstructions,
         ReponseMesuresInstructionsRepository $reponseMesuresInstructionsRepository,
         EntityManagerInterface $entityManager,
+        MailService $mailService,
     ): Response {
         $reponse = new ReponseMesuresInstructions();
         $form = $this->createForm(ReponseMesureType::class, $reponse);
@@ -228,15 +228,87 @@ class GreffierController extends AbstractController
             $reponse->setMesure($mesuresInstructions);
             $reponseMesuresInstructionsRepository->add($reponse, true);
             $reponsePartieValue = $form->get('reponsePartie')->getData();
-
+            dd($reponsePartieValue);
             if ($reponsePartieValue) {
                 $mesuresInstructions->setEtat('CONTACTE');
+
+                // --- 1. Envoi aux rapporteurs (UserDossiers) ---
+                foreach ($dossier->getUserDossiers() as $userDossier) {
+                    $mail = $userDossier->getUser()->getUserIdentifier();
+                    $sujet = "Information mesure d'instruction du dossier";
+
+                    $context = [
+                        'destinataire' => $userDossier->getUser()->getUserInformations(),
+                        'profile' => $userDossier->getProfil(),
+                        'mesureInstruction' => $mesuresInstructions,
+                        'dossier_objet' => $dossier->getObjet()->getName(),
+                        'ResponsemesureInstruction' => new DateTimeImmutable(),
+                        'nomRequerant' => $dossier->getRequerant()->getNomComplet(),
+                        'infoConseille' => $dossier->getRequerant()->getConseiller(),
+                        'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
+                        'mesureInstructionLibelle' => $mesuresInstructions->getInstruction()->getLibelle(),
+                        'delais' => $mesuresInstructions->getInstruction()->getDelais(),
+                        'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
+                        'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
+                        'nombre_jour_restant' => date_diff(
+                            new DateTimeImmutable(),
+                            $mesuresInstructions->getTermineAt()
+                        )->days,
+                        'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
+                    ];
+
+                    $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/rapporteurs/first-mail-user-instruction.html.twig', $context);
+                }
+
+                /* 
+                // --- 2. Envoi au requérant ---
+                $mail = $dossier->getRequerant()->getEmail();
+                $sujet = "Information mesure d'instruction du dossier";
+
+                $context = [
+                    'destinataire' => $dossier->getRequerant()->getNomComplet(),
+                    'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
+                    'mesureInstruction' => $mesuresInstructions->getInstruction()->getLibelle(),
+                    'delais' => $mesuresInstructions->getInstruction()->getDelais(),
+                    'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
+                    'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
+                    'nombre_jour_restant' => date_diff(
+                        new DateTimeImmutable(),
+                        $mesuresInstructions->getTermineAt()
+                    )->days,
+                    'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
+                ];
+
+                $mailService->sendEmail($mail, $sujet, 'mail_new_instruction.html.twig', $context);
+
+
+                // --- 3. Envoi aux conseillers du requérant ---
+                foreach ($dossier->getRequerant()->getConseiller() as $conseiller) {
+                    $mail = $conseiller->getEmail(); // ⚠️ il faut un champ "email" sur Conseiller
+                    $sujet = "Information mesure d'instruction du dossier";
+
+                    $context = [
+                        'destinataire' => $conseiller->fullName(),
+                        'cabinet' => $conseiller->getNomCabinet(),
+                        'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
+                        'mesureInstruction' => $mesuresInstructions->getInstruction()->getLibelle(),
+                        'delais' => $mesuresInstructions->getInstruction()->getDelais(),
+                        'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
+                        'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
+                        'nombre_jour_restant' => date_diff(
+                            new DateTimeImmutable(),
+                            $mesuresInstructions->getTermineAt()
+                        )->days,
+                        'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
+                    ];
+
+                    $mailService->sendEmail($mail, $sujet, 'mail_new_instruction.html.twig', $context);
+                } */
             } else {
                 $mesuresInstructions->setEtat('NON CONTACTE');
             }
             $entityManager->persist($mesuresInstructions);
             $entityManager->flush();
-
             return $this->redirectToRoute('greffier_mesures_instructions_dossier_list', ['id' => $mesuresInstructions->getDossier()->getId()]);
         }
         return $this->render('conseiller_rapporteur/reponses_mesures_instructins.html.twig', [
@@ -263,7 +335,6 @@ class GreffierController extends AbstractController
 
             // Récupère la valeur soumise du champ (true/false)
             $reponsePartieValue = $form->get('reponsePartie')->getData();
-
             if ($reponsePartieValue) {
                 $mesuresInstructions->setEtat('CONTACTE');
             } else {

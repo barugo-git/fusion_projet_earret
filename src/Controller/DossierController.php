@@ -483,7 +483,6 @@ class DossierController extends AbstractController
     #[Route(path: '/details-dossier/{id}', name: 'admin_dossier_details')]
     public function detailsDossier(#[CurrentUser] User    $user, Request $request, Dossier $dossier, MesuresInstructionsRepository $mesure): Response
     {
-
         $generate_rapport = false;
         $dossier1 = new Dossier();
 
