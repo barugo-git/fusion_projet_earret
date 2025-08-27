@@ -233,80 +233,42 @@ class GreffierController extends AbstractController
 
                 // --- 1. Envoi aux rapporteurs (UserDossiers) ---
                 foreach ($dossier->getUserDossiers() as $userDossier) {
-                    $mail = $userDossier->getUser()->getUserIdentifier();
-                    $sujet = "Information mesure d'instruction du dossier";
-
-                    $context = [
-                        'destinataire' => $userDossier->getUser()->getUserInformations(),
-                        'profile' => $userDossier->getProfil(),
-                        'mesureInstruction' => $mesuresInstructions,
-                        'dossier_objet' => $dossier->getObjet()->getName(),
-                        'ResponsemesureInstruction' => new DateTimeImmutable(),
-                        'nomRequerant' => $dossier->getRequerant()->getNomComplet(),
-                        'infoConseille' => $dossier->getRequerant()->getConseiller(),
-                        'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
-                        'mesureInstructionLibelle' => $mesuresInstructions->getInstruction()->getLibelle(),
-                        'delais' => $mesuresInstructions->getInstruction()->getDelais(),
-                        'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
-                        'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
-                        'nombre_jour_restant' => date_diff(
-                            new DateTimeImmutable(),
-                            $mesuresInstructions->getTermineAt()
-                        )->days,
-                        'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
-                    ];
-
-                    $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/rapporteurs/first-mail-user-instruction.html.twig', $context);
+                    $this->sendMailToRapporteur($userDossier, $mesuresInstructions, $dossier, $mailService);
                 }
 
-                
-              // --- 2. Envoi au requérant ---
-                $mail = $dossier->getRequerant()->getEmail();
-                $sujet = "Information mesure d'instruction du dossier";
+                if ($mesuresInstructions->getPartiesConcernes() == 'Requérant') {
+                    // --- 2. Envoi au requérant ---
+                    $this->sendMailToR_D($dossier, $mesuresInstructions, $mailService, 'Requérant');
 
-                $context = [
-                    'destinataire' => $dossier->getRequerant()->getNomComplet(),
-                    'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
-                    'mesureInstruction' => $mesuresInstructions->getInstruction()->getLibelle(),
-                    'delais' => $mesuresInstructions->getInstruction()->getDelais(),
-                    'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
-                    'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
-                    'nombre_jour_restant' => date_diff(
-                        new DateTimeImmutable(),
-                        $mesuresInstructions->getTermineAt()
-                    )->days,
-                    'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
-                ];
+                    // --- 3. Envoi aux conseillers du requérant ---
+                    foreach ($dossier->getRequerant()->getConseiller() as $conseiller) {
+                        $this->sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService);
+                    }
+                } elseif ($mesuresInstructions->getPartiesConcernes() == 'Défendeur') {
+                    // --- 2. Envoi au défendeur ---
+                    $this->sendMailToR_D($dossier, $mesuresInstructions, $mailService, 'Défendeur');
 
-                $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/requerants_defendeurs/first-mail-user-instruction.html.twig', $context);
+                    // --- 3. Envoi aux conseillers du défendeur ---
+                    foreach ($dossier->getDefendeur()->getConseiller() as $conseiller) {
+                        $this->sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService);
+                    }
+                } else {
+                    // --- 2. Envoi au requérant ---
+                    $this->sendMailToR_D($dossier, $mesuresInstructions, $mailService, 'Requérant');
 
+                    // --- 3. Envoi aux conseillers du requérant ---
+                    foreach ($dossier->getRequerant()->getConseiller() as $conseiller) {
+                        $this->sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService);
+                    }
+                    // --- 2. Envoi au défendeur ---
+                    $this->sendMailToR_D($dossier, $mesuresInstructions, $mailService, 'Défendeur');
 
-                // --- 3. Envoi aux conseillers du requérant ---
-                foreach ($dossier->getRequerant()->getConseiller() as $conseiller) {
-                    $mail = $conseiller->getEmail(); // ⚠️ il faut un champ "email" sur Conseiller
-                    $sujet = "Information mesure d'instruction du dossier";
-
-                    $context = [
-                        'destinataire' => $conseiller->fullName(),
-                        'cabinet' => $conseiller->getNomCabinet(),
-                        'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
-                        'mesureInstruction' => $mesuresInstructions->getInstruction()->getLibelle(),
-                        'delais' => $mesuresInstructions->getInstruction()->getDelais(),
-                        'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
-                        'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
-                        'nombre_jour_restant' => date_diff(
-                            new DateTimeImmutable(),
-                            $mesuresInstructions->getTermineAt()
-                        )->days,
-                        'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
-                    ];
-
-                    $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/conseille_requerants_defendeurs/first-mail-user-instruction.html.twig', $context);
-
+                    // --- 3. Envoi aux conseillers du défendeur ---
+                    foreach ($dossier->getDefendeur()->getConseiller() as $conseiller) {
+                        $this->sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService);
+                    }
                 }
-
-            } 
-            else {
+            } else {
                 $mesuresInstructions->setEtat('NON CONTACTE');
             }
             $entityManager->persist($mesuresInstructions);
@@ -328,7 +290,7 @@ class GreffierController extends AbstractController
         ReponseMesuresInstructions $reponseMesuresInstructions,
         MailService $mailService,
         ReponseMesuresInstructionsRepository $reponseMesuresInstructionsRepository
-        
+
     ): Response {
         $form = $this->createForm(ReponseMesureType::class, $reponseMesuresInstructions);
         $form->handleRequest($request);
@@ -344,81 +306,43 @@ class GreffierController extends AbstractController
             if ($reponsePartieValue) {
                 $mesuresInstructions->setEtat('CONTACTE');
 
-                                // --- 1. Envoi aux rapporteurs (UserDossiers) ---
+                // --- 1. Envoi aux rapporteurs (UserDossiers) ---
                 foreach ($dossier->getUserDossiers() as $userDossier) {
-                    $mail = $userDossier->getUser()->getUserIdentifier();
-                    $sujet = "Information mesure d'instruction du dossier";
-
-                    $context = [
-                        'destinataire' => $userDossier->getUser()->getUserInformations(),
-                        'profile' => $userDossier->getProfil(),
-                        'mesureInstruction' => $mesuresInstructions,
-                        'dossier_objet' => $dossier->getObjet()->getName(),
-                        'ResponsemesureInstruction' => new DateTimeImmutable(),
-                        'nomRequerant' => $dossier->getRequerant()->getNomComplet(),
-                        'infoConseille' => $dossier->getRequerant()->getConseiller(),
-                        'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
-                        'mesureInstructionLibelle' => $mesuresInstructions->getInstruction()->getLibelle(),
-                        'delais' => $mesuresInstructions->getInstruction()->getDelais(),
-                        'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
-                        'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
-                        'nombre_jour_restant' => date_diff(
-                            new DateTimeImmutable(),
-                            $mesuresInstructions->getTermineAt()
-                        )->days,
-                        'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
-                    ];
-
-                    $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/rapporteurs/first-mail-user-instruction.html.twig', $context);
+                    $this->sendMailToRapporteur($userDossier, $mesuresInstructions, $dossier, $mailService);
                 }
 
-                // --- 2. Envoi au requérant ---
-                $mail = $dossier->getRequerant()->getEmail();
-                $sujet = "Information mesure d'instruction du dossier";
+                if ($mesuresInstructions->getPartiesConcernes() == 'Requérant') {
+                    // --- 2. Envoi au requérant ---
+                    $this->sendMailToR_D($dossier, $mesuresInstructions, $mailService, 'Requérant');
 
-                $context = [
-                    'destinataire' => $dossier->getRequerant()->getNomComplet(),
-                    'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
-                    'mesureInstruction' => $mesuresInstructions->getInstruction()->getLibelle(),
-                    'delais' => $mesuresInstructions->getInstruction()->getDelais(),
-                    'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
-                    'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
-                    'nombre_jour_restant' => date_diff(
-                        new DateTimeImmutable(),
-                        $mesuresInstructions->getTermineAt()
-                    )->days,
-                    'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
-                ];
+                    // --- 3. Envoi aux conseillers du requérant ---
+                    foreach ($dossier->getRequerant()->getConseiller() as $conseiller) {
+                        $this->sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService);
+                    }
+                } elseif ($mesuresInstructions->getPartiesConcernes() == 'Défendeur') {
+                    // --- 2. Envoi au défendeur ---
+                    $this->sendMailToR_D($dossier, $mesuresInstructions, $mailService, 'Défendeur');
 
-                $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/requerants_defendeurs/first-mail-user-instruction.html.twig', $context);
+                    // --- 3. Envoi aux conseillers du défendeur ---
+                    foreach ($dossier->getDefendeur()->getConseiller() as $conseiller) {
+                        $this->sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService);
+                    }
+                } else {
+                    // --- 2. Envoi au requérant ---
+                    $this->sendMailToR_D($dossier, $mesuresInstructions, $mailService, 'Requérant');
 
+                    // --- 3. Envoi aux conseillers du requérant ---
+                    foreach ($dossier->getRequerant()->getConseiller() as $conseiller) {
+                        $this->sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService);
+                    }
+                    // --- 2. Envoi au défendeur ---
+                    $this->sendMailToR_D($dossier, $mesuresInstructions, $mailService, 'Défendeur');
 
-                // --- 3. Envoi aux conseillers du requérant ---
-                foreach ($dossier->getRequerant()->getConseiller() as $conseiller) {
-                    $mail = $conseiller->getEmail(); // ⚠️ il faut un champ "email" sur Conseiller
-                    $sujet = "Information mesure d'instruction du dossier";
-
-                    $context = [
-                        'destinataire' => $conseiller->fullName(),
-                        'cabinet' => $conseiller->getNomCabinet(),
-                        'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
-                        'mesureInstruction' => $mesuresInstructions->getInstruction()->getLibelle(),
-                        'delais' => $mesuresInstructions->getInstruction()->getDelais(),
-                        'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
-                        'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
-                        'nombre_jour_restant' => date_diff(
-                            new DateTimeImmutable(),
-                            $mesuresInstructions->getTermineAt()
-                        )->days,
-                        'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
-                    ];
-
-                     $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/conseille_requerants_defendeurs/first-mail-user-instruction.html.twig', $context);
-
+                    // --- 3. Envoi aux conseillers du défendeur ---
+                    foreach ($dossier->getDefendeur()->getConseiller() as $conseiller) {
+                        $this->sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService);
+                    }
                 }
-
-
-
             } else {
                 $mesuresInstructions->setEtat('NON CONTACTE');
             }
@@ -845,5 +769,85 @@ class GreffierController extends AbstractController
             'dossier' => $dossier,
             'form' => $form,
         ]);
+    }
+
+    private function sendMailToRapporteur($userDossier, $mesuresInstructions, $dossier, $mailService)
+    {
+        $mail = $userDossier->getUser()->getUserIdentifier();
+        $sujet = "Information mesure d'instruction du dossier";
+
+        $context = [
+            'destinataire' => $userDossier->getUser()->getUserInformations(),
+            'profile' => $userDossier->getProfil(),
+            'mesureInstruction' => $mesuresInstructions,
+            'dossier_objet' => $dossier->getObjet()->getName(),
+            'ResponsemesureInstruction' => new DateTimeImmutable(),
+            'nomRequerant' => $dossier->getRequerant()->getNomComplet(),
+            'infoConseille' => $dossier->getRequerant()->getConseiller(),
+            'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
+            'mesureInstructionLibelle' => $mesuresInstructions->getInstruction()->getLibelle(),
+            'delais' => $mesuresInstructions->getInstruction()->getDelais(),
+            'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
+            'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
+            'nombre_jour_restant' => date_diff(
+                new DateTimeImmutable(),
+                $mesuresInstructions->getTermineAt()
+            )->days,
+            'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        ];
+
+        $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/rapporteurs/first-mail-user-instruction.html.twig', $context);
+    }
+
+    private function sendMailToR_D($dossier, $mesuresInstructions, $mailService, $type)
+    {
+        if ($type == 'Requérant') {
+            $mail = $dossier->getRequerant()->getEmail();
+            $destinataire = $dossier->getRequerant()->getNomComplet();
+        } elseif ($type == 'Défendeur') {
+            $mail = $dossier->getDefendeur()->getEmail();
+            $destinataire = $dossier->getDefendeur()->getNomComplet();
+        }
+
+        $sujet = "Information mesure d'instruction du dossier";
+
+        $context = [
+            'destinataire' => $destinataire,
+            'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
+            'mesureInstruction' => $mesuresInstructions->getInstruction()->getLibelle(),
+            'delais' => $mesuresInstructions->getInstruction()->getDelais(),
+            'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
+            'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
+            'nombre_jour_restant' => date_diff(
+                new DateTimeImmutable(),
+                $mesuresInstructions->getTermineAt()
+            )->days,
+            'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        ];
+
+        $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/requerants_defendeurs/first-mail-user-instruction.html.twig', $context);
+    }
+
+    private function sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService)
+    {
+        $mail = $conseiller->getEmail();
+        $sujet = "Information mesure d'instruction du dossier";
+
+        $context = [
+            'destinataire' => $conseiller->fullName(),
+            'cabinet' => $conseiller->getNomCabinet(),
+            'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
+            'mesureInstruction' => $mesuresInstructions->getInstruction()->getLibelle(),
+            'delais' => $mesuresInstructions->getInstruction()->getDelais(),
+            'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
+            'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
+            'nombre_jour_restant' => date_diff(
+                new DateTimeImmutable(),
+                $mesuresInstructions->getTermineAt()
+            )->days,
+            'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        ];
+
+        $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/conseille_requerants_defendeurs/first-mail-user-instruction.html.twig', $context);
     }
 }
