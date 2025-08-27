@@ -1,3 +1,4 @@
+{# templates/mail/mail_new_instruction.html.twig #}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
   <head>
@@ -165,90 +166,69 @@
       }
     </style>
   </head>
-  <body style="font-family: Helvetica, Arial, sans-serif; line-height: 24px; font-size: 16px; color: #000000; margin: 0; padding: 0; background-color: #fff;">
-    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto;">
+ 
+  <body style="background-color:#fff; margin:0; padding:0; font-size:16px; line-height:24px; color:#000;">
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="max-width:600px; margin:0 auto;">
       <tr>
-        <td style="padding: 20px;">
-          <!-- Espacement -->
-          <table width="100%" border="0" cellpadding="0" cellspacing="0">
-            <tr>
-              <td height="24" style="font-size: 24px; line-height: 24px;">&nbsp;</td>
-            </tr>
-          </table>
+        <td style="padding:20px;">
 
           <!-- Logo -->
-          <img src="https://i.ibb.co/ycDpW37Y/logo.png" alt="Logo" style="display: block; width: 64px; height: auto;" />
-
-          <!-- Espacement -->
-          <table width="100%" border="0" cellpadding="0" cellspacing="0">
-            <tr>
-              <td height="24" style="font-size: 24px; line-height: 24px;">&nbsp;</td>
-            </tr>
-          </table>
+          <img src="https://i.ibb.co/ycDpW37Y/logo.png" alt="Logo" style="display:block; width:64px; height:auto; margin-bottom:20px;" />
 
           <!-- Titre -->
-          <h1 style="font-size: 36px; line-height: 43.2px; font-weight: 800; margin: 0 0 16px 0;">Bonjour {{ destinataire }}, {{ profile }}</h1>
+          <h1 style="font-size:28px; font-weight:700; margin:0 0 16px 0;">Bonjour {{ destinataire }},</h1>
 
-          <!-- Contenu -->
-          <p style="margin: 0 0 16px 0;">
-            {% if mesureInstruction.etat == 'CONTACTE' %}
-              Nous vous informons que la mesure : {{ mesureInstructionLibelle }}
-              a été initiée le <strong>{{ mesureInstruction.createdAt|date('d/m/Y') }}</strong>. Le requerant {{ nomRequerant }} a été notifié le
-              <strong>{{ ResponsemesureInstruction|date('d/m/Y') }}</strong> et elle prendra donc fin le
-              <strong>{{ mesureInstruction.termineAt|date('d/m/Y') }}</strong>.
-            {% endif %}
+          <!-- Contenu principal -->
+          <p style="margin:0 0 16px 0;">
+            Nous vous informons que la mesure d'instruction du dossier <strong>{{ numeroRecours }}</strong> a été initiée le
+            <strong>{{ date_debut_mesure|date('d/m/Y') }}</strong> et prendra fin le
+            <strong>{{ date_fin_mesure|date('d/m/Y') }}</strong>.
           </p>
 
-          <!-- Carte avec détails -->
-          <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border: 1px solid #e2e8f0; border-radius: 24px; background-color: #ffffff;">
-            <tr>
-              <td style="padding: 40px; border-radius: 24px;">
-                <h3 style="font-size: 28px; line-height: 33.6px; font-weight: 500; text-align: center; margin: 0 0 24px 0;">Détails de l'instruction</h3>
+          <p style="margin:0 0 16px 0;">
+            Délai de la mesure : <strong>{{ delais }} jours</strong>.<br />
+            Nombre de jours restants : <strong>{{ nombre_jour_restant }}</strong>.
+          </p>
 
+          <p style="margin:0 0 24px 0;">
+            Pour suivre l'état de votre dossier, cliquez sur le lien suivant :<br />
+            <a href="{{ lien }}" style="color:#1a73e8;">Suivre mon dossier</a>
+          </p>
+
+          <!-- Carte avec détails de la mesure -->
+          <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border:1px solid #e2e8f0; border-radius:12px; background-color:#ffffff; padding:20px; margin-bottom:24px;">
+            <tr>
+              <td>
+                <h3 style="font-size:20px; font-weight:500; margin:0 0 12px 0;">Détails de la mesure</h3>
                 <table width="100%" border="0" cellpadding="0" cellspacing="0">
                   <tr>
-                    <td width="50%" style="padding: 8px;">Numéro dossier :</td>
-                    <td width="50%" style="padding: 8px; text-align: right;">{{ numeroRecours }}</td>
+                    <td style="padding:4px;">Numéro dossier :</td>
+                    <td style="padding:4px; text-align:right;">{{ numeroRecours }}</td>
                   </tr>
                   <tr>
-                    <td style="padding: 8px;">Instance :</td>
-                    <td style="padding: 8px; text-align: right;">
-                      Requérant : {{ nomRequerant }}<br />
-                      Nom Cabinet :{% for info in infoConseille %}
-                        {% if info.nomCabinet %}
-                          <br />
-                          {{ info.nomCabinet }} Representant : {{ info.prenomAvocat }} {{ info.nomAvocat }}
-                        {% else %}
-                          {{ info.prenomAvocat }} {{ info.nomAvocat }}
-                        {% endif %}
-                      {% endfor %}
-                    </td>
+                    <td style="padding:4px;">Mesure :</td>
+                    <td style="padding:4px; text-align:right;">{{ mesureInstruction }}</td>
                   </tr>
                   <tr>
-                    <td style="padding: 8px;">Objet :</td>
-                    <td style="padding: 8px; text-align: right;">{{ dossier_objet }}</td>
+                    <td style="padding:4px;">Date de début :</td>
+                    <td style="padding:4px; text-align:right;">{{ date_debut_mesure|date('d/m/Y') }}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:4px;">Date de fin :</td>
+                    <td style="padding:4px; text-align:right;">{{ date_fin_mesure|date('d/m/Y') }}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:4px;">Il vous reste :</td>
+                    <td style="padding:4px; text-align:right;">{{ nombre_jour_restant }} jours</td>
                   </tr>
                 </table>
-
-                <!-- Séparateur -->
-                <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin: 24px 0;">
-                  <tr>
-                    <td style="border-top: 1px solid #e2e8f0; height: 1px;"></td>
-                  </tr>
-                </table>
-
-                <p style="margin: 0;">Merci pour votre collaboration.</p>
               </td>
             </tr>
-            
           </table>
 
-          <!-- Espacement final -->
-          <table width="100%" border="0" cellpadding="0" cellspacing="0">
-            <tr>
-              <td height="24" style="font-size: 24px; line-height: 24px;">&nbsp;</td>
-            </tr>
-          </table>
+          <!-- Footer -->
+          <p style="margin:0;">Merci pour votre collaboration.</p>
+
         </td>
       </tr>
     </table>

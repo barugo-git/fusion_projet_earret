@@ -228,7 +228,6 @@ class GreffierController extends AbstractController
             $reponse->setMesure($mesuresInstructions);
             $reponseMesuresInstructionsRepository->add($reponse, true);
             $reponsePartieValue = $form->get('reponsePartie')->getData();
-            dd($reponsePartieValue);
             if ($reponsePartieValue) {
                 $mesuresInstructions->setEtat('CONTACTE');
 
@@ -260,8 +259,8 @@ class GreffierController extends AbstractController
                     $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/rapporteurs/first-mail-user-instruction.html.twig', $context);
                 }
 
-                /* 
-                // --- 2. Envoi au requérant ---
+                
+              // --- 2. Envoi au requérant ---
                 $mail = $dossier->getRequerant()->getEmail();
                 $sujet = "Information mesure d'instruction du dossier";
 
@@ -279,7 +278,7 @@ class GreffierController extends AbstractController
                     'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
                 ];
 
-                $mailService->sendEmail($mail, $sujet, 'mail_new_instruction.html.twig', $context);
+                $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/requerants_defendeurs/first-mail-user-instruction.html.twig', $context);
 
 
                 // --- 3. Envoi aux conseillers du requérant ---
@@ -302,9 +301,12 @@ class GreffierController extends AbstractController
                         'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
                     ];
 
-                    $mailService->sendEmail($mail, $sujet, 'mail_new_instruction.html.twig', $context);
-                } */
-            } else {
+                    $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/conseille_requerants_defendeurs/first-mail-user-instruction.html.twig', $context);
+
+                }
+
+            } 
+            else {
                 $mesuresInstructions->setEtat('NON CONTACTE');
             }
             $entityManager->persist($mesuresInstructions);
@@ -324,7 +326,9 @@ class GreffierController extends AbstractController
         DossierRepository $dossierRepository,
         EntityManagerInterface $entityManager,
         ReponseMesuresInstructions $reponseMesuresInstructions,
+        MailService $mailService,
         ReponseMesuresInstructionsRepository $reponseMesuresInstructionsRepository
+        
     ): Response {
         $form = $this->createForm(ReponseMesureType::class, $reponseMesuresInstructions);
         $form->handleRequest($request);
@@ -332,11 +336,89 @@ class GreffierController extends AbstractController
         $mesuresInstructions = $reponseMesuresInstructions->getMesure();
         if ($form->isSubmitted() && $form->isValid()) {
             $reponseMesuresInstructionsRepository->add($reponseMesuresInstructions, true);
+            $dossier = $mesuresInstructions->getDossier();
+
 
             // Récupère la valeur soumise du champ (true/false)
             $reponsePartieValue = $form->get('reponsePartie')->getData();
             if ($reponsePartieValue) {
                 $mesuresInstructions->setEtat('CONTACTE');
+
+                                // --- 1. Envoi aux rapporteurs (UserDossiers) ---
+                foreach ($dossier->getUserDossiers() as $userDossier) {
+                    $mail = $userDossier->getUser()->getUserIdentifier();
+                    $sujet = "Information mesure d'instruction du dossier";
+
+                    $context = [
+                        'destinataire' => $userDossier->getUser()->getUserInformations(),
+                        'profile' => $userDossier->getProfil(),
+                        'mesureInstruction' => $mesuresInstructions,
+                        'dossier_objet' => $dossier->getObjet()->getName(),
+                        'ResponsemesureInstruction' => new DateTimeImmutable(),
+                        'nomRequerant' => $dossier->getRequerant()->getNomComplet(),
+                        'infoConseille' => $dossier->getRequerant()->getConseiller(),
+                        'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
+                        'mesureInstructionLibelle' => $mesuresInstructions->getInstruction()->getLibelle(),
+                        'delais' => $mesuresInstructions->getInstruction()->getDelais(),
+                        'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
+                        'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
+                        'nombre_jour_restant' => date_diff(
+                            new DateTimeImmutable(),
+                            $mesuresInstructions->getTermineAt()
+                        )->days,
+                        'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
+                    ];
+
+                    $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/rapporteurs/first-mail-user-instruction.html.twig', $context);
+                }
+
+                // --- 2. Envoi au requérant ---
+                $mail = $dossier->getRequerant()->getEmail();
+                $sujet = "Information mesure d'instruction du dossier";
+
+                $context = [
+                    'destinataire' => $dossier->getRequerant()->getNomComplet(),
+                    'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
+                    'mesureInstruction' => $mesuresInstructions->getInstruction()->getLibelle(),
+                    'delais' => $mesuresInstructions->getInstruction()->getDelais(),
+                    'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
+                    'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
+                    'nombre_jour_restant' => date_diff(
+                        new DateTimeImmutable(),
+                        $mesuresInstructions->getTermineAt()
+                    )->days,
+                    'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
+                ];
+
+                $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/requerants_defendeurs/first-mail-user-instruction.html.twig', $context);
+
+
+                // --- 3. Envoi aux conseillers du requérant ---
+                foreach ($dossier->getRequerant()->getConseiller() as $conseiller) {
+                    $mail = $conseiller->getEmail(); // ⚠️ il faut un champ "email" sur Conseiller
+                    $sujet = "Information mesure d'instruction du dossier";
+
+                    $context = [
+                        'destinataire' => $conseiller->fullName(),
+                        'cabinet' => $conseiller->getNomCabinet(),
+                        'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
+                        'mesureInstruction' => $mesuresInstructions->getInstruction()->getLibelle(),
+                        'delais' => $mesuresInstructions->getInstruction()->getDelais(),
+                        'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
+                        'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
+                        'nombre_jour_restant' => date_diff(
+                            new DateTimeImmutable(),
+                            $mesuresInstructions->getTermineAt()
+                        )->days,
+                        'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
+                    ];
+
+                     $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/conseille_requerants_defendeurs/first-mail-user-instruction.html.twig', $context);
+
+                }
+
+
+
             } else {
                 $mesuresInstructions->setEtat('NON CONTACTE');
             }

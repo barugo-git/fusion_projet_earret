@@ -6,7 +6,8 @@ use App\Entity\ReponseMesuresInstructions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType; 
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -21,12 +22,16 @@ class ReponseMesureType extends  ApplicationType
                     'widget' => 'single_text',
                 ]))
             ->add('reponse',TextareaType::class,$this->getConfiguration('Actions menées','Saisisser les différentes actions menées dans le cadre de l\'execution  de la mesure',['required'=>false]))
+                ->add('dateNotification', DateTimeType::class, $this->getConfiguration(
+                    'Date de notification :',
+                    'Saisissez la date de notification',
+                    [
+                        'widget'   => 'single_text',
+                        'required' => false,
+                        'input'    => 'datetime_immutable', // IMPORTANT : correspond à ton entité
+                    ]
+                ))
 
-            ->add('DateNotification',DateType::class,$this->getConfiguration('Date de notification:','Saissez le téléphone du réquerant',
-                [
-                    'widget' => 'single_text',
-                    'required'=>false
-                ]))
             ->add('reponsePartie',CheckboxType::class,$this->getConfiguration('La partie concernée a-t-elle repondu favorablement a l\'instruction:','Saissez le téléphone du réquerant'
                 ,['required'=>false]))
             ->add('termine',CheckboxType::class,$this->getConfiguration('Fin de la mesure d\'instruction??','mesure'))
