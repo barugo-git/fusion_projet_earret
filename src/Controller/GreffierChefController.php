@@ -2,25 +2,26 @@
 
 namespace App\Controller;
 
-use App\Entity\AffecterStructure;
 use App\Entity\Dossier;
 use App\Entity\UserDossier;
+use App\Form\UserDossierType;
+use App\Form\DossierSpecialType;
+use App\Entity\AffecterStructure;
 use App\Form\AffectationUserType;
 use App\Form\AffecterStructureType;
-use App\Form\DossierSpecialType;
-use App\Form\UserDossierType;
-use App\Repository\AffecterSectionRepository;
-use App\Repository\AffecterStructureRepository;
-use App\Repository\ArrondissementRepository;
-use App\Repository\DefendeurRepository;
+use App\Repository\PartieRepository;
 use App\Repository\DossierRepository;
+use App\Repository\DefendeurRepository;
 use App\Repository\UserDossierRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Repository\ArrondissementRepository;
+use App\Repository\AffecterSectionRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Repository\AffecterStructureRepository;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route(path: '/greffier-en-chef')]
 #[IsGranted('ROLE_GREFFIER_EN_CHEF')]

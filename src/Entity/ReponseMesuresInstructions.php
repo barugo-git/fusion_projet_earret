@@ -24,7 +24,7 @@ class ReponseMesuresInstructions
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $DateMiseDirective;
 
-    #[ORM\Column(type: 'datetime_immutable')]
+    #[ORM\Column(type: 'datetime_immutable' , nullable: true)]
     private ?\DateTimeImmutable $dateNotification = null;
 
     #[ORM\Column(type: 'boolean', nullable: true)]
@@ -79,7 +79,7 @@ class ReponseMesuresInstructions
         return $this->dateNotification;
     }
 
-    public function setDateNotification(\DateTimeImmutable $dateNotification): self
+    public function setDateNotification(?\DateTimeImmutable $dateNotification): self
     {
         $this->dateNotification = $dateNotification;
         return $this;

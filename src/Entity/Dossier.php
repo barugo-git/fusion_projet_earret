@@ -1027,28 +1027,27 @@ class Dossier
 
     public function getIntitule()
     {
-      $intitule = '';
-        if ($this->requerant->getType() =='moral'){
+        $intitule = '';
+        if ($this->requerant->getType() == 'moral') {
             $intitule = $this->requerant->getIntitule();
-        } else{
-            $intitule = $this->requerant->getNom() .' '. $this->requerant->getPrenoms();
+        } else {
+            $intitule = $this->requerant->getNom() . ' ' . $this->requerant->getPrenoms();
         }
 
-        if ($this->defendeur->getType() =='moral'){
-            $intitule .= ' contre '.$this->defendeur->getIntitule();
-        } else{
-            $intitule .= ' contre '. $this->defendeur->getNom() .' '. $this->defendeur->getPrenoms();
+        if ($this->defendeur->getType() == 'moral') {
+            $intitule .= ' contre ' . $this->defendeur->getIntitule();
+        } else {
+            $intitule .= ' contre ' . $this->defendeur->getNom() . ' ' . $this->defendeur->getPrenoms();
         }
-        if ($this->referenceDossier){
-            $intitule .= ' ( '.$this->referenceDossier.')';
+        if ($this->referenceDossier) {
+            $intitule .= ' ( ' . $this->referenceDossier . ')';
         }
         return $intitule;
     }
 
     public function getPathCalendrier(): ?string
     {
-        return 'https://' . $_SERVER['SERVER_NAME']. '/uploads/calendrier/' . $this->calendrier;
-
+        return 'https://' . $_SERVER['SERVER_NAME'] . '/uploads/calendrier/' . $this->calendrier;
     }
 
     public function getRapportCR(): ?string
@@ -1058,7 +1057,7 @@ class Dossier
 
     public function getRapportCRFichier(): ?string
     {
-        return 'https://' . $_SERVER['SERVER_NAME']. '/uploads/piecesJointes/' . $this->rapportCR;
+        return 'https://' . $_SERVER['SERVER_NAME'] . '/uploads/piecesJointes/' . $this->rapportCR;
     }
 
     public function setRapportCR(?string $rapportCR): static
@@ -1234,8 +1233,9 @@ class Dossier
 
         return $this;
     }
-    
+
+    public function getPathPreuveConsignation(): ?string
+    {
+        return 'https://' . $_SERVER['SERVER_NAME'] . '/uploads/consignations/' . $this->PreuveConsignationRequerant;
+    }
 }
-
-
-

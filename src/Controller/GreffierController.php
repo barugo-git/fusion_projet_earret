@@ -211,7 +211,6 @@ class GreffierController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
     #[Route(path: '/reposnse-mesures-instruction/instruction/{id}', name: 'greffier_rapporteur_mesures_instructions_reponse')]
     public function reponsemesuresInstruction(
         Request $request,
@@ -219,6 +218,7 @@ class GreffierController extends AbstractController
         MesuresInstructions $mesuresInstructions,
         ReponseMesuresInstructionsRepository $reponseMesuresInstructionsRepository,
         EntityManagerInterface $entityManager,
+        MailService $mailService,
     ): Response {
         $reponse = new ReponseMesuresInstructions();
         $form = $this->createForm(ReponseMesureType::class, $reponse);
@@ -228,15 +228,51 @@ class GreffierController extends AbstractController
             $reponse->setMesure($mesuresInstructions);
             $reponseMesuresInstructionsRepository->add($reponse, true);
             $reponsePartieValue = $form->get('reponsePartie')->getData();
-
             if ($reponsePartieValue) {
                 $mesuresInstructions->setEtat('CONTACTE');
+
+                // --- 1. Envoi aux rapporteurs (UserDossiers) ---
+                foreach ($dossier->getUserDossiers() as $userDossier) {
+                    $this->sendMailToRapporteur($userDossier, $mesuresInstructions, $dossier, $mailService);
+                }
+
+                if ($mesuresInstructions->getPartiesConcernes() == 'Requérant') {
+                    // --- 2. Envoi au requérant ---
+                    $this->sendMailToR_D($dossier, $mesuresInstructions, $mailService, 'Requérant');
+
+                    // --- 3. Envoi aux conseillers du requérant ---
+                    foreach ($dossier->getRequerant()->getConseiller() as $conseiller) {
+                        $this->sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService);
+                    }
+                } elseif ($mesuresInstructions->getPartiesConcernes() == 'Défendeur') {
+                    // --- 2. Envoi au défendeur ---
+                    $this->sendMailToR_D($dossier, $mesuresInstructions, $mailService, 'Défendeur');
+
+                    // --- 3. Envoi aux conseillers du défendeur ---
+                    foreach ($dossier->getDefendeur()->getConseiller() as $conseiller) {
+                        $this->sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService);
+                    }
+                } else {
+                    // --- 2. Envoi au requérant ---
+                    $this->sendMailToR_D($dossier, $mesuresInstructions, $mailService, 'Requérant');
+
+                    // --- 3. Envoi aux conseillers du requérant ---
+                    foreach ($dossier->getRequerant()->getConseiller() as $conseiller) {
+                        $this->sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService);
+                    }
+                    // --- 2. Envoi au défendeur ---
+                    $this->sendMailToR_D($dossier, $mesuresInstructions, $mailService, 'Défendeur');
+
+                    // --- 3. Envoi aux conseillers du défendeur ---
+                    foreach ($dossier->getDefendeur()->getConseiller() as $conseiller) {
+                        $this->sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService);
+                    }
+                }
             } else {
                 $mesuresInstructions->setEtat('NON CONTACTE');
             }
             $entityManager->persist($mesuresInstructions);
             $entityManager->flush();
-
             return $this->redirectToRoute('greffier_mesures_instructions_dossier_list', ['id' => $mesuresInstructions->getDossier()->getId()]);
         }
         return $this->render('conseiller_rapporteur/reponses_mesures_instructins.html.twig', [
@@ -252,7 +288,9 @@ class GreffierController extends AbstractController
         DossierRepository $dossierRepository,
         EntityManagerInterface $entityManager,
         ReponseMesuresInstructions $reponseMesuresInstructions,
+        MailService $mailService,
         ReponseMesuresInstructionsRepository $reponseMesuresInstructionsRepository
+
     ): Response {
         $form = $this->createForm(ReponseMesureType::class, $reponseMesuresInstructions);
         $form->handleRequest($request);
@@ -260,12 +298,51 @@ class GreffierController extends AbstractController
         $mesuresInstructions = $reponseMesuresInstructions->getMesure();
         if ($form->isSubmitted() && $form->isValid()) {
             $reponseMesuresInstructionsRepository->add($reponseMesuresInstructions, true);
+            $dossier = $mesuresInstructions->getDossier();
+
 
             // Récupère la valeur soumise du champ (true/false)
             $reponsePartieValue = $form->get('reponsePartie')->getData();
-
             if ($reponsePartieValue) {
                 $mesuresInstructions->setEtat('CONTACTE');
+
+                // --- 1. Envoi aux rapporteurs (UserDossiers) ---
+                foreach ($dossier->getUserDossiers() as $userDossier) {
+                    $this->sendMailToRapporteur($userDossier, $mesuresInstructions, $dossier, $mailService);
+                }
+
+                if ($mesuresInstructions->getPartiesConcernes() == 'Requérant') {
+                    // --- 2. Envoi au requérant ---
+                    $this->sendMailToR_D($dossier, $mesuresInstructions, $mailService, 'Requérant');
+
+                    // --- 3. Envoi aux conseillers du requérant ---
+                    foreach ($dossier->getRequerant()->getConseiller() as $conseiller) {
+                        $this->sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService);
+                    }
+                } elseif ($mesuresInstructions->getPartiesConcernes() == 'Défendeur') {
+                    // --- 2. Envoi au défendeur ---
+                    $this->sendMailToR_D($dossier, $mesuresInstructions, $mailService, 'Défendeur');
+
+                    // --- 3. Envoi aux conseillers du défendeur ---
+                    foreach ($dossier->getDefendeur()->getConseiller() as $conseiller) {
+                        $this->sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService);
+                    }
+                } else {
+                    // --- 2. Envoi au requérant ---
+                    $this->sendMailToR_D($dossier, $mesuresInstructions, $mailService, 'Requérant');
+
+                    // --- 3. Envoi aux conseillers du requérant ---
+                    foreach ($dossier->getRequerant()->getConseiller() as $conseiller) {
+                        $this->sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService);
+                    }
+                    // --- 2. Envoi au défendeur ---
+                    $this->sendMailToR_D($dossier, $mesuresInstructions, $mailService, 'Défendeur');
+
+                    // --- 3. Envoi aux conseillers du défendeur ---
+                    foreach ($dossier->getDefendeur()->getConseiller() as $conseiller) {
+                        $this->sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService);
+                    }
+                }
             } else {
                 $mesuresInstructions->setEtat('NON CONTACTE');
             }
@@ -692,5 +769,85 @@ class GreffierController extends AbstractController
             'dossier' => $dossier,
             'form' => $form,
         ]);
+    }
+
+    private function sendMailToRapporteur($userDossier, $mesuresInstructions, $dossier, $mailService)
+    {
+        $mail = $userDossier->getUser()->getUserIdentifier();
+        $sujet = "Information mesure d'instruction du dossier";
+
+        $context = [
+            'destinataire' => $userDossier->getUser()->getUserInformations(),
+            'profile' => $userDossier->getProfil(),
+            'mesureInstruction' => $mesuresInstructions,
+            'dossier_objet' => $dossier->getObjet()->getName(),
+            'ResponsemesureInstruction' => new DateTimeImmutable(),
+            'nomRequerant' => $dossier->getRequerant()->getNomComplet(),
+            'infoConseille' => $dossier->getRequerant()->getConseiller(),
+            'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
+            'mesureInstructionLibelle' => $mesuresInstructions->getInstruction()->getLibelle(),
+            'delais' => $mesuresInstructions->getInstruction()->getDelais(),
+            'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
+            'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
+            'nombre_jour_restant' => date_diff(
+                new DateTimeImmutable(),
+                $mesuresInstructions->getTermineAt()
+            )->days,
+            'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        ];
+
+        $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/rapporteurs/first-mail-user-instruction.html.twig', $context);
+    }
+
+    private function sendMailToR_D($dossier, $mesuresInstructions, $mailService, $type)
+    {
+        if ($type == 'Requérant') {
+            $mail = $dossier->getRequerant()->getEmail();
+            $destinataire = $dossier->getRequerant()->getNomComplet();
+        } elseif ($type == 'Défendeur') {
+            $mail = $dossier->getDefendeur()->getEmail();
+            $destinataire = $dossier->getDefendeur()->getNomComplet();
+        }
+
+        $sujet = "Information mesure d'instruction du dossier";
+
+        $context = [
+            'destinataire' => $destinataire,
+            'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
+            'mesureInstruction' => $mesuresInstructions->getInstruction()->getLibelle(),
+            'delais' => $mesuresInstructions->getInstruction()->getDelais(),
+            'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
+            'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
+            'nombre_jour_restant' => date_diff(
+                new DateTimeImmutable(),
+                $mesuresInstructions->getTermineAt()
+            )->days,
+            'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        ];
+
+        $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/requerants_defendeurs/first-mail-user-instruction.html.twig', $context);
+    }
+
+    private function sendMailToConseillerR_D($conseiller, $dossier, $mesuresInstructions, $mailService)
+    {
+        $mail = $conseiller->getEmail();
+        $sujet = "Information mesure d'instruction du dossier";
+
+        $context = [
+            'destinataire' => $conseiller->fullName(),
+            'cabinet' => $conseiller->getNomCabinet(),
+            'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
+            'mesureInstruction' => $mesuresInstructions->getInstruction()->getLibelle(),
+            'delais' => $mesuresInstructions->getInstruction()->getDelais(),
+            'date_debut_mesure' => $mesuresInstructions->getCreatedAt(),
+            'date_fin_mesure' => $mesuresInstructions->getTermineAt(),
+            'nombre_jour_restant' => date_diff(
+                new DateTimeImmutable(),
+                $mesuresInstructions->getTermineAt()
+            )->days,
+            'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        ];
+
+        $mailService->sendEmail($mail, $sujet, 'premiere_notification_mesure/conseille_requerants_defendeurs/first-mail-user-instruction.html.twig', $context);
     }
 }
