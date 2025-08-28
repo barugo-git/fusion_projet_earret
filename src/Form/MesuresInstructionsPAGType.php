@@ -16,7 +16,7 @@ class MesuresInstructionsPAGType extends ApplicationType
         $builder
             ->add('instruction')
 
-            ->add('delais',NumberType::class,$this->getConfiguration('Délais',"Saisir le nombre de jours ",["required"=>false]))
+         //   ->add('delais',NumberType::class,$this->getConfiguration('Délais',"Saisir le nombre de jours ",["required"=>false]))
 //            ->add('createdAt')
 //            ->add('date')
 //            ->add('dossier')

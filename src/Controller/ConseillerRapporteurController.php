@@ -182,12 +182,13 @@ class ConseillerRapporteurController extends AbstractController
 
             $mouvement = new Mouvement();
             $mouvement->setDateMouvement(new \DateTime());
-            $statut = $statutRepository->findOneBy(['libelle' => 'Dossier au Rôle']);
+            $statut = $statutRepository->findOneBy(['libelle' => 'Dossier audiencé']);
             $mouvement->setStatut($statut);
 
             $greffier = $userDossierRepository->findOneBy(['dossier' => $dossier, 'profil' => ['GREFFIER', 'GREFFIER EN CHEF']]);
             $mouvement->setUser($greffier->getUser());
             $mouvement->setDossier($dossier);
+            //dd($dossier);
             $dossier->setStatut($mouvement->getStatut()->getLibelle());
 
             $em->persist($mouvement);

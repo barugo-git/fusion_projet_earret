@@ -50,11 +50,11 @@
                                        <td>
                                            <span class="badge bg-info-subtle text-info badge-borde text-uppercase">{{ user.structure }}</span>
                                        </td>
-                                       <td class="profil">
-                                            <img src="{{ user.photo ? asset('uploads/profile_photos/' ~ user.photo) : asset('images/default-profile.png') }}"
+                                       {#<td class="profil">
+                                           <img src="{{ user.photo ? asset('uploads/profile_photos/' ~ user.photo) : asset('images/default-profile.png') }}"
                                                 alt="Photo de profil"
                                                 style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
-                                        </td>
+                                       </td>#}
                                        <td>{% if user.actif==false %}
                                                <span class="badge bg-danger-subtle text-danger badge-borde">{{ 'Inactif' }}</span>
                                            {% else %}

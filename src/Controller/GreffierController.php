@@ -556,7 +556,7 @@ class GreffierController extends AbstractController
             }
 
             foreach ($form->get('dossiers')->getData() as $dossier) {
-                $dossier->setStatut('Dossier au Rôle');
+                $dossier->setStatut('Dossier audiencé');
                 $dossier->setCalendrier($fichier);
                 $dossierRepository->add($dossier, true);
             }
@@ -567,7 +567,7 @@ class GreffierController extends AbstractController
             $defendeur_telephone = $dossier->getDefendeur()->getTelephone();
 
             $email = (new TemplatedEmail())
-                ->from(new Address('juridiction@coursupreme.bj', 'Cour Suprême'));
+                ->from(new Address('spprtcrsprm@gmail.com', 'Cour Suprême'));
         }
 
         return $this->render('greffe/publiercalendrier.html.twig', [

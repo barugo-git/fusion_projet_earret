@@ -85,7 +85,7 @@ class PaquetGeneralController extends AbstractController
 
             $mesure->setNature('PG');
 
-            $mesure->setDelais($instructions->getDelais());
+           // $mesure->setDelais($instructions->getDelais());
 
             $mesuresInstructionsRepository->add($mesure,true);
             $this->addFlash('success', 'le dossier a été bien affecté à l\'avocat');

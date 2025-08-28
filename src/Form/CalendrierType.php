@@ -28,7 +28,7 @@ class CalendrierType extends ApplicationType
                             ->andWhere('d.calendrier is null')
                             ->andWhere('u.greffier = :greffer')
                             ->setParameter('greffer', $user->getId()->toBinary())
-                            ->setParameter('etat',"Dossier au Rôle")
+                            ->setParameter('etat',"Dossier audiencé")
                             ;
                     } else {
                         // Gérer le cas où l'utilisateur est null (peut-être une authentification requise)

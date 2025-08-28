@@ -150,7 +150,7 @@ class PresidentChambreController extends AbstractController
     public function affectationsPG(#[CurrentUser] User $user, DossierRepository $dossierRepository): Response
     {
         return $this->render('president/liste_affectation_PG.html.twig', [
-            'dossiers' => $dossierRepository->findBy(['statut' => 'Dossier au Rôle']),
+            'dossiers' => $dossierRepository->findBy(['statut' => 'Dossier audiencé']),
         ]);
     }
 
