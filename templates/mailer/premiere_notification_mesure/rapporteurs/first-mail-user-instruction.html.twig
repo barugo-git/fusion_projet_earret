@@ -6,9 +6,8 @@
 		<meta name="x-apple-disable-message-reformatting"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 		<meta name="format-detection" content="telephone=no, date=no, address=no, email=no"/>
-		<style
-			type="text/css">
-			body,
+		<style>
+			type="text/css" body,
 			table,
 			td {
 				font-family: Helvetica, Arial, sans-serif !important;
@@ -179,7 +178,7 @@
 								<img class="w-16" src="https://i.ibb.co/ycDpW37Y/logo.png" style="height: auto; line-height: 100%; outline: none; text-decoration: none; display: block; width: 64px; border-style: none; border-width: 0;" width="64"/>
 
 								<h1 style="margin: 0; font-size: 28px; font-family: 'Segoe UI', Arial, sans-serif;">Cour suprême</h1>
-								<p style="margin: 10px 0 0 0; opacity: 0.9; font-family: 'Segoe UI', Arial, sans-serif;">Nouvelle Mesure d'Instruction</p>
+								<p style="margin: 10px 0 0 0; opacity: 0.9; font-family: 'Segoe UI', Arial, sans-serif;">Alerte Mesure d'Instruction</p>
 							</td>
 						</tr>
 					</table>
@@ -190,10 +189,31 @@
 							<td style="padding: 30px; font-family: 'Segoe UI', Arial, sans-serif;">
 								<p style="margin: 0 0 16px 0;">
 									Bonjour Monsieur/Madame
-									<strong>{{ greffier }}</strong>,
+									<strong>
+										{{ destinataire }},
+										{{ profile }}</strong>,
 								</p>
 
-								<p style="margin: 0 0 16px 0;">Nous vous informons qu'une nouvelle mesure d'instruction a été donnée et nécessite votre intervention.</p>
+
+								<p style="margin: 0 0 16px 0;">
+
+									{% if mesureInstruction.etat == 'CONTACTE' %}
+										Nous vous informons que la mesure :
+										{{ mesureInstructionLibelle }}
+										a été initiée le
+										<strong>{{ mesureInstruction.createdAt|date('d/m/Y') }}</strong>. Le requerant
+										{{ nomRequerant }}
+										a été notifié le
+										<strong>{{ ResponsemesureInstruction|date('d/m/Y') }}</strong>
+										et elle prendra donc fin le
+										<strong>{{ mesureInstruction.termineAt|date('d/m/Y') }}</strong>.
+									{% endif %}
+
+								</p>
+
+
+								<p style="margin: 0 0 16px 0;">Détails de l'instruction</p>
+
 
 								<!-- Encadré d'information -->
 								<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; background-color: #f0f9ff; border-left: 4px solid #0ea5e9; margin: 20px 0;">
@@ -202,17 +222,38 @@
 											<p style="margin: 0 0 10px 0; font-weight: 600; color: #0ea5e9;">Détails de la mesure :</p>
 											<p style="margin: 0 0 8px 0;">
 												<strong>Mesure d'instruction :</strong>
-												{{ mesureInstruction }}
+												{{ mesureInstructionLibelle }}
 											</p>
 											<p style="margin: 0;">
 												<strong>Numéro de recours :</strong>
 												{{ numeroRecours }}
 											</p>
+											<p style="margin: 0;">
+												<strong>Instance:</strong>
+
+												<strong>Requérant :</strong>
+
+												{{ nomRequerant }}<br/>
+												{% for info in infoConseille %}
+													{% if info.nomCabinet %}
+														<strong>Cabinet :</strong>
+														{{ info.nomCabinet }}
+														<strong>Représentant : ME</strong>
+														{{ info.prenomAvocat }}
+														{{ info.nomAvocat }}<br/>
+													{% else %}
+														<strong>Représentant : ME</strong>
+														{{ info.prenomAvocat }}
+														{{ info.nomAvocat }}<br/>
+														<br/>
+													{% endif %}
+												{% endfor %}
+											</p>
+
 										</td>
 									</tr>
 								</table>
 
-								<p style="margin: 0 0 16px 0;">Pour cela, veuillez vous connecter à votre espace greffier pour plus de détails.</p>
 
 								<!-- Bouton d'action -->
 								<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 25px 0;">
@@ -243,4 +284,3 @@
 		</table>
 	</body>
 </html>
-

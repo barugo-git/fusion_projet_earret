@@ -139,7 +139,7 @@ class ConseillerRapporteurController extends AbstractController
             $context = [
                 'greffier' => $nomGreffier,
                 'numeroRecours' => $dossier->getReferenceDossier() ?? $dossier->getCodeSuivi(),
-                'mesureInstruction' => $nouvelleInstructionLibelle,
+                'mesureInstruction' => $mesureInstruction->getInstruction()->getLibelle(),
                 'lien' => $this->generateUrl('front_recours_status', [], UrlGeneratorInterface::ABSOLUTE_URL)
 
             ];

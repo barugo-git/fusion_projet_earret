@@ -157,7 +157,6 @@ class DossierController extends AbstractController
     ) {
 
         $dossier = new Dossier();
-
         $form = $this->createForm(DossierRequerantType::class, $dossier, ['action' => $this->generateUrl('app_dossier_new_requerant')]);
         $form->handleRequest($request);
 
