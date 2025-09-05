@@ -1,39 +1,49 @@
 .vertical-navs-step .nav {
     gap: 16px;
 }
+
 .vertical-navs-step .nav .nav-link.active {
     border-color: #066b5e;
 }
+
 .vertical-navs-step .nav .nav-link {
     text-align: left;
     background-color: #f3f6f966;
-    border: 1px solid  #2a4562;
+    border: 1px solid #2a4562;
     color: #212529;
 }
-.nav-pills :is(.nav-link.active,.show>.nav-link) {
+
+.nav-pills :is(.nav-link.active, .show>.nav-link) {
     -webkit-box-shadow: none;
     box-shadow: none;
 }
+
 .nav-pills .nav-link {
     border-radius: var(--vz-nav-pills-border-radius);
 }
-.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+
+.nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
     color: var(--vz-nav-pills-link-active-color);
     background-color: var(--vz-nav-pills-link-active-bg);
 }
+
 .vertical-navs-step .nav .nav-link .step-title {
-    font-weight:600;
+    font-weight: 600;
 }
+
 .me-2 {
     margin-right: .5rem !important;
 }
+
 .vertical-navs-step .nav .nav-link .step-icon {
     color: #f7666e;
     vertical-align: middle;
     font-weight: var(--vz-font-weight-medium);
     float: left;
 }
+
 /*#f3f6f966*/
-.card{
-    nargin-bottom: 1.5rem
+.card {
+    margin-bottom: 1.5rem
 }

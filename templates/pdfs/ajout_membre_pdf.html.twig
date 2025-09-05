@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Détails du Dossier
+			{{ dossier.referenceDossier }}</title>
+		<style>
+			@page {
+				size: A4;
+				margin: 1.5cm;
+			}
+			body {
+				font-family: 'Segoe UI', Arial, sans-serif;
+				line-height: 1.4;
+				color: #333;
+				background-color: #fff;
+				margin: 0;
+				padding: 0;
+			}
+			.container {
+				max-width: 800px;
+				margin: 0 auto;
+			}
+			.header {
+				text-align: center;
+				margin-bottom: 25px;
+				padding-bottom: 15px;
+				border-bottom: 2px solid #1a3a6e;
+			}
+			.header h1 {
+				color: #1a3a6e;
+				margin-bottom: 5px;
+			}
+			.header .ref {
+				font-size: 18px;
+				font-weight: bold;
+				color: #64748b;
+			}
+			.section {
+				margin-bottom: 25px;
+				page-break-inside: avoid;
+			}
+			.section-title {
+				background-color: #1a3a6e;
+				color: white;
+				padding: 8px 12px;
+				margin-bottom: 15px;
+				border-radius: 4px;
+				font-size: 16px;
+			}
+			.info-table {
+				width: 100%;
+				border-collapse: collapse;
+				margin-bottom: 15px;
+			}
+			.info-table th {
+				background-color: #f1f5f9;
+				text-align: left;
+				padding: 8px;
+				border: 1px solid #ddd;
+				width: 30%;
+			}
+			.info-table td {
+				padding: 8px;
+				border: 1px solid #ddd;
+			}
+			.data-table {
+				width: 100%;
+				border-collapse: collapse;
+				margin-bottom: 15px;
+			}
+			.data-table th {
+				background-color: #f1f5f9;
+				text-align: left;
+				padding: 8px;
+				border: 1px solid #ddd;
+			}
+			.data-table td {
+				padding: 8px;
+				border: 1px solid #ddd;
+			}
+			.footer {
+				margin-top: 30px;
+				padding-top: 15px;
+				border-top: 1px solid #ddd;
+				text-align: center;
+				font-size: 12px;
+				color: #64748b;
+			}
+			.logo {
+				text-align: center;
+				margin-bottom: 20px;
+			}
+			.logo-placeholder {
+				display: inline-block;
+				width: 150px;
+				height: 60px;
+				background-color: #f1f5f9;
+				border: 1px dashed #64748b;
+				line-height: 60px;
+				text-align: center;
+				color: #64748b;
+			}
+			@media print {
+				.section {
+					page-break-inside: avoid;
+				}
+				.header {
+					position: fixed;
+					top: 0;
+				}
+				.footer {
+					position: fixed;
+					bottom: 0;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="logo">
+				<div class="logo-placeholder">
+					<img class="w-16" src="https://i.ibb.co/ycDpW37Y/logo.png" style=" width: 64px;" width="64" alt="Logo"/></div>
+			</div>
+
+			<div class="header">
+				<h1>DOSSIER #{{ dossier.referenceDossier }}</h1>
+				<div class="ref">Référence complète:
+					{{ dossier.referenceDossierComplet }}</div>
+			</div>
+
+			<div class="section">
+				<div class="section-title">DÉTAILS DE LA REQUÊTE</div>
+				<table class="info-table">
+					<tr>
+						<th>N° d'enregistrement</th>
+						<td>{{ dossier.referenceEnregistrement }}</td>
+					</tr>
+					<tr>
+						<th>N° dossier</th>
+						<td>{{ dossier.referenceDossier }}</td>
+					</tr>
+					<tr>
+						<th>Référence complète</th>
+						<td>{{ dossier.referenceDossierComplet }}</td>
+					</tr>
+					<tr>
+						<th>Date d'enregistrement</th>
+						<td>{{ dossier.dateEnregistrement ? dossier.dateEnregistrement|date('Y-m-d H:i:s') : '' }}</td>
+					</tr>
+					<tr>
+						<th>Structure d'affectation</th>
+						<td>{{ dossier.structure.name }}</td>
+					</tr>
+					<tr>
+						<th>Objet</th>
+						<td>{{ dossier.objet.name }}</td>
+					</tr>
+					<tr>
+						<th>Type de dossier</th>
+						<td>{{ dossier.typeDossier }}</td>
+					</tr>
+					<tr>
+						<th>Intitulé de l'objet</th>
+						<td>{{ dossier.intituleObjet }}</td>
+					</tr>
+				</table>
+			</div>
+
+			<div class="section">
+				<div class="section-title">AFFECTATIONS</div>
+				<table class="data-table">
+					<thead>
+						<tr>
+							<th>Date</th>
+							<th>Structure</th>
+							<th>Section</th>
+							<th>Motif</th>
+						</tr>
+					</thead>
+					<tbody>
+
+						{# 						{% for section in affecterSections %}
+																		 #}
+						<tr>
+							<td>{{ affecterSections.dateAffectation ? affecterSections.dateAffectation|date('Y-m-d') :  '' }}</td>
+							<td>{{ affecterSections.section.structure.name }}</td>
+							<td>{{ affecterSections.section.name }}</td>
+							<td>{{ affecterSections.motif }}</td>
+						</tr>
+						{# 						{% endfor %}
+																		 #}
+					</tbody>
+				</table>
+			</div>
+
+			<div class="section">
+				<div class="section-title">RAPPORTEURS DU DOSSIER</div>
+				<table class="data-table">
+					<thead>
+						<tr>
+							<th>Nom & prénoms</th>
+							<th>Profil</th>
+							<th>Email/Contact</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for user in userDossiers %}
+							<tr>
+								<td>{{ user.user.prenoms }}
+									{{ user.user.nom }}</td>
+								<td>{{ user.profil }}</td>
+								<td>{{ user.user.email }}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+
+			<div class="section">
+				<div class="section-title">INFORMATIONS DU REQUÉRANT</div>
+				<table class="info-table">
+					{% if dossier.requerant.type =='moral' %}
+						<tr>
+							<th>Intitulé</th>
+							<td>{{ dossier.requerant.intitule }}</td>
+						</tr>
+					{% else %}
+						<tr>
+							<th>Nom</th>
+							<td>{{ dossier.requerant.nom }}</td>
+						</tr>
+						<tr>
+							<th>Prénoms</th>
+							<td>{{ dossier.requerant.prenoms }}</td>
+						</tr>
+						<tr>
+							<th>Sexe</th>
+							<td>{{ dossier.requerant.sexe }}</td>
+						</tr>
+					{% endif %}
+					<tr>
+						<th>Téléphone</th>
+						<td>{{ dossier.requerant.Telephone }}</td>
+					</tr>
+					<tr>
+						<th>Email</th>
+						<td>{{ dossier.requerant.email }}</td>
+					</tr>
+					<tr>
+						<th>Localité</th>
+						<td>{{ dossier.requerant.localite.libArrond }}</td>
+					</tr>
+					<tr>
+						<th>Adresse</th>
+						<td>{{ dossier.requerant.adresse }}</td>
+					</tr>
+				</table>
+			</div>
+
+			<div class="section">
+				<div class="section-title">INFORMATIONS DU DÉFENDEUR</div>
+				<table class="info-table">
+					{% if dossier.defendeur.type =='moral' %}
+						<tr>
+							<th>Intitulé</th>
+							<td>{{ dossier.defendeur.intitule }}</td>
+						</tr>
+					{% else %}
+						<tr>
+							<th>Nom</th>
+							<td>{{ dossier.defendeur.nom }}</td>
+						</tr>
+						<tr>
+							<th>Prénoms</th>
+							<td>{{ dossier.defendeur.prenoms }}</td>
+						</tr>
+						<tr>
+							<th>Sexe</th>
+							<td>{{ dossier.defendeur.sexe }}</td>
+						</tr>
+					{% endif %}
+					<tr>
+						<th>Téléphone</th>
+						<td>{{ dossier.defendeur.Telephone }}</td>
+					</tr>
+					<tr>
+						<th>Email</th>
+						<td>{{ dossier.defendeur.email }}</td>
+					</tr>
+					<tr>
+						<th>Localité</th>
+						<td>{{ dossier.defendeur.localite.libArrond }}</td>
+					</tr>
+					<tr>
+						<th>Adresse</th>
+						<td>{{ dossier.defendeur.adresse }}</td>
+					</tr>
+				</table>
+			</div>
+
+			<div class="footer">
+				Document généré le
+				{{ "now"|date('Y-m-d H:i:s') }}
+				| Cour suprême<br>
+				Ce document est confidentiel et destiné uniquement à son destinataire.
+			</div>
+		</div>
+	</body>
+</html>

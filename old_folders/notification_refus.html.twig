@@ -165,69 +165,56 @@
       }
     </style>
   </head>
+
   <body style="font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa;">
     <!-- Conteneur principal centré -->
     <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; max-width: 600px;">
       <tr>
         <td align="center" style="padding: 20px;">
-          <!-- En-tête -->
-          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; background: linear-gradient(135deg, #1a3a6e 0%, #2c5292 100%); color: white; border-radius: 8px 8px 0 0;">
+          <!-- Header -->
+          <table width="100%" border="0" cellpadding="0" cellspacing="0" class="header">
             <tr>
-              <td align="center" style="padding: 25px;">
-                <img class="w-16" src="https://i.ibb.co/ycDpW37Y/logo.png" style="height: auto; line-height: 100%; outline: none; text-decoration: none; display: block; width: 64px; border-style: none; border-width: 0;" width="64" alt="Logo"/>
-                <h1 style="margin: 0; font-size: 28px; font-family: 'Segoe UI', Arial, sans-serif;">Cour suprême</h1>
-                <p style="margin: 10px 0 0 0; opacity: 0.9; font-family: 'Segoe UI', Arial, sans-serif;">Notification de Mesure d'Instruction</p>
+              <td>
+                <h1 style="margin: 0; font-size: 28px;">Cour Suprême</h1>
+                <p style="margin: 10px 0 0 0; opacity: 0.9;">Notification de Décision</p>
               </td>
             </tr>
           </table>
 
-          <!-- Contenu -->
-          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; background-color: #ffffff;">
+          <!-- Content -->
+          <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#ffffff">
             <tr>
-              <td style="padding: 30px; font-family: 'Segoe UI', Arial, sans-serif;">
+              <td style="padding: 30px;">
+                <!-- Icône -->
+                <div class="icon">⚠️</div>
+
                 <p style="margin: 0 0 16px 0;">
-                  Bonjour Monsieur/Madame <strong>{{ greffier }}</strong>,
+                  Bonjour Monsieur/Madame <strong>{{ requerent }}</strong>,
                 </p>
 
-                <p style="margin: 0 0 16px 0;">Nous vous informons qu'une nouvelle mesure d'instruction a été donnée et nécessite votre intervention.</p>
+                <div class="info-box">
+                  <p style="margin: 0; color: #dc3545; font-weight: 600;">Nous avons le regret de vous informer que votre recours a été rejeté par la Cour Suprême.</p>
+                </div>
 
-                <!-- Encadré d'information -->
-                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; background-color: #f0f9ff; border-left: 4px solid #0ea5e9; margin: 20px 0;">
-                  <tr>
-                    <td style="padding: 15px; font-family: 'Segoe UI', Arial, sans-serif;">
-                      <p style="margin: 0 0 10px 0; font-weight: 600; color: #0ea5e9;">Détails de la mesure :</p>
-                      <p style="margin: 0 0 8px 0;">
-                        <strong>Mesure d'instruction :</strong> {{ mesureInstruction }}
-                      </p>
-                      <p style="margin: 0;">
-                        <strong>Numéro de recours :</strong> {{ numeroRecours }}
-                      </p>
-                    </td>
-                  </tr>
-                </table>
+                <p style="margin: 0 0 16px 0;">Cette décision a été prise après un examen approfondi de votre dossier par nos magistrats.</p>
 
-                <p style="margin: 0 0 16px 0;">Pour cela, veuillez vous connecter à votre espace greffier pour plus de détails.</p>
+                <div class="contact-info">
+                  <p style="margin: 0 0 10px 0; font-weight: 600;">Pour plus d'informations :</p>
+                  <p style="margin: 0;">Veuillez vous rapprocher du greffe de la Cour Suprême</p>
+                  <p style="margin: 10px 0 0 0; font-style: italic;">Du lundi au vendredi, de 8h à 16h</p>
+                </div>
 
-                <!-- Bouton d'action -->
-                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 25px 0;">
-                  <tr>
-                    <td align="center">
-                      <a href="{{ lien }}" style="display: inline-block; background-color: #1a3a6e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-family: 'Segoe UI', Arial, sans-serif;">Consulter la mesure</a>
-                    </td>
-                  </tr>
-                </table>
-
-                <p style="text-align: center; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; color: #64748b; font-size: 14px;">Ce lien est valable pour une durée limitée.</p>
+                <p style="margin: 20px 0 0 0; font-size: 14px; color: #64748b;">Nous vous remercions de votre compréhension.</p>
               </td>
             </tr>
           </table>
 
-          <!-- Pied de page -->
-          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; background-color: #f1f5f9; border-radius: 0 0 8px 8px;">
+          <!-- Footer -->
+          <table width="100%" border="0" cellpadding="0" cellspacing="0" class="footer">
             <tr>
-              <td align="center" style="padding: 20px; font-family: 'Segoe UI', Arial, sans-serif;">
-                <p style="margin: 0 0 10px 0; color: #64748b; font-size: 14px;">Cour suprême &copy; {{ 'now'|date('Y') }}</p>
-                <p style="margin: 0; color: #64748b; font-size: 12px;">Ceci est un message automatique, merci de ne pas y répondre.</p>
+              <td>
+                <p style="margin: 0 0 10px 0;">Cour Suprême &copy; {{ 'now'|date('Y') }}</p>
+                <p style="margin: 0; font-size: 12px;">Ceci est un message automatique, merci de ne pas y répondre.</p>
               </td>
             </tr>
           </table>

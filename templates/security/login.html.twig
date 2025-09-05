@@ -1,238 +1,242 @@
-
 {{ include('partials/main.html.twig') }}
 
 <head>
 
-    {{ include('partials/title-meta.html.twig', {title: 'Se Connecter'}) }}
+	{{ include('partials/title-meta.html.twig', {title: 'Se Connecter'}) }}
 
-    {{ include('partials/head-css.html.twig') }}
+	{{ include('partials/head-css.html.twig') }}
 
 </head>
 
 <body>
 
-<!-- auth-page wrapper -->
-<div class="auth-page-wrapper auth-bg-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
-    <div class="bg-overlay"></div>
-    <!-- auth-page content -->
-    <div class="auth-page-content overflow-hidden pt-lg-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="card overflow-hidden">
-                        <div class="row g-0">
-                            <div class="col-lg-6">
-                                <div class="p-lg-5 p-4 auth-bg-cover h-100">
-                                    <div class="bg-overlay"></div>
-                                    <div class="position-relative h-100 d-flex flex-column">
-                                        <div class="mb-4">
-                                            <a href="https://www.coursupreme.bj/" target="_blank" class="d-block">
-                                                <img src="{{ asset('images/logo-sitecs2.png') }}" alt="Site web de la Cours Suprême" height="67" style="width: 100%">
-                                            </a>
-                                        </div>
-                                        <div class="mt-auto">
-                                            <div class="mb-3">
-                                                <i class="ri-double-quotes-l display-4 text-success"></i>
-                                            </div>
+	<!-- auth-page wrapper -->
+	<div class="auth-page-wrapper auth-bg-cover py-5 d-flex justify-content-center align-items-center min-vh-100">
+		<div class="bg-overlay"></div>
+		<!-- auth-page content -->
+		<div class="auth-page-content overflow-hidden pt-lg-5">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="card overflow-hidden">
+							<div class="row g-0">
+								<div class="col-lg-6">
+									<div class="p-lg-5 p-4 auth-bg-cover h-100">
+										<div class="bg-overlay"></div>
+										<div class="position-relative h-100 d-flex flex-column">
+											<div class="mb-4">
+												<a href="https://www.coursupreme.bj/" target="_blank" class="d-block">
+													<img src="{{ asset('images/logo-sitecs2.png') }}" alt="Site web de la Cours Suprême" height="67" style="width: 100%">
+												</a>
+											</div>
+											<div class="mt-auto">
+												<div class="mb-3">
+													<i class="ri-double-quotes-l display-4 text-success"></i>
+												</div>
 
-                                            <div id="qoutescarouselIndicators" class="carousel slide" data-bs-ride="carousel">
-                                                <div class="carousel-indicators">
-                                                    <button type="button" data-bs-target="#qoutescarouselIndicators" data-bs-slide-to="0" class="active"
-                                                            aria-current="true" aria-label="Slide 1"></button>
-                                                    <button type="button" data-bs-target="#qoutescarouselIndicators" data-bs-slide-to="1"
-                                                            aria-label="Slide 2"></button>
-                                                    <button type="button" data-bs-target="#qoutescarouselIndicators" data-bs-slide-to="2"
-                                                            aria-label="Slide 3"></button>
-                                                </div>
-                                                <div class="carousel-inner text-center text-white pb-5">
+												<div id="qoutescarouselIndicators" class="carousel slide" data-bs-ride="carousel">
+													<div class="carousel-indicators">
+														<button type="button" data-bs-target="#qoutescarouselIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+														<button type="button" data-bs-target="#qoutescarouselIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+														<button type="button" data-bs-target="#qoutescarouselIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+													</div>
+													<div class="carousel-inner text-center text-white pb-5">
 
-                                                    <div class="carousel-item active">
-                                                        <p class="fs-15 fst-italic">APPLICATION METIER DE DEMATERIALISATION</p>
-                                                    </div>
-                                                    <div class="carousel-item">
-                                                        <p class="fs-15 fst-italic">DU PROCESSUS DE PRODUCTION</p>
-                                                    </div>
-                                                    <div class="carousel-item">
-                                                        <p class="fs-15 fst-italic">DES ARRETS A LA COUR SUPREME</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- end carousel -->
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end col -->
+														<div class="carousel-item active">
+															<p class="fs-15 fst-italic">APPLICATION METIER DE DEMATERIALISATION</p>
+														</div>
+														<div class="carousel-item">
+															<p class="fs-15 fst-italic">DU PROCESSUS DE PRODUCTION</p>
+														</div>
+														<div class="carousel-item">
+															<p class="fs-15 fst-italic">DES ARRETS A LA COUR SUPREME</p>
+														</div>
+													</div>
+												</div>
+												<!-- end carousel -->
+											</div>
+										</div>
+									</div>
+								</div>
+								<!-- end col -->
 
-                            <div class="col-lg-6">
-                                <div class="p-lg-5 p-4">
-                                    <div>
-                                        <h5 class="text-primary">Bienvenue sur la Plateforme !</h5>
-{#                                        <p class="text-muted">Sign in to continue to Velzon.</p>#}
-                                        {{ include('partials/header.html.twig') }}
-                                    </div>
+								<div class="col-lg-6">
+									<div class="p-lg-5 p-4">
+										<div>
+											<h5 class="text-primary">Bienvenue sur la Plateforme !</h5>
+											{#                                        <p class="text-muted">Sign in to continue to Velzon.</p>#}
+											{{ include('partials/header.html.twig') }}
+										</div>
 
-                                    <div class="mt-4">
-                                        <form method="post">
-                                            {% if hasError %}
+										<div class="mt-4">
+											<form method="post">
+												{% if hasError %}
 
 
-                                                {% if user not in users %}
-                                                    <div class=" alert-danger">
-                                                        <p>  <strong>Ce email n'existe pas. Veuillez reessayer!</strong>.
-                                                        </p>
-                                                    </div>
+													{% if user not in users %}
+														<div class=" alert-danger">
+															<p>
+																<strong>Ce email n'existe pas. Veuillez reessayer!</strong>.
+															</p>
+														</div>
 
-                                                {% elseif user.actif == false %}
-                                                    <p class=" alert-danger"><strong>Votre compte n'est pas actif. Veuillez contacter l'Administrateur système de la Cour Suprême!.</strong></p>
+													{% elseif user.actif == false %}
+														<p class=" alert-danger">
+															<strong>Votre compte n'est pas actif. Veuillez contacter l'Administrateur système de la Cour Suprême!.</strong>
+														</p>
 
-                                                {% else %}
+													{% else %}
 
-                                                    <div class=" alert-danger">
-                                                        <p>  <strong>Vos  informations que vous avez fournies ne sont pas bonnes</strong>.
-                                                        </p>
-                                                    </div>
-                                                {% endif %}
+														<div class=" alert-danger">
+															<p>
+																<strong>Vos  informations que vous avez fournies ne sont pas bonnes</strong>.
+															</p>
+														</div>
+													{% endif %}
 
-                                            {% endif %}
-{#                                            {% if error %}#}
-{#                                                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>#}
-{#                                                {% endif %}#}
+												{% endif %}
+												{#                                            {% if error %}#}
+												{#                                                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>#}
+												{#                                                {% endif %}#}
 
-                                            <div class="mb-3">
-                                                <label for="inputEmail" class="form-label">Email</label>
-                                                <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus placeholder="Saisissez votre email">
-                                            </div>
+													<div class="mb-3"> <label for="inputEmail" class="form-label">Email</label>
+													<input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus placeholder="Saisissez votre email">
+												</div>
 
-                                            <div class="mb-3">
-                                                <div class="float-end">
-                                                    <a href="{{ path('app_forgot_password_request') }}" class="text-muted">Mot de passe Oublié?</a>
-                                                </div>
+												<div class="mb-3">
+													<div class="float-end">
+														<a href="{{ path('app_forgot_password_request') }}" class="text-muted">Mot de passe Oublié?</a>
+													</div>
 
-                                                <label class="form-label" for="inputPassword">Mot de Passe</label>
-                                                <div class="position-relative auth-pass-inputgroup mb-3">
-                                                    <input type="password" name="password" class="form-control pe-5" placeholder="Entrez votre mot de  passe" id="inputPassword">
-                                                       <input type="hidden" name="_csrf_token"
-                                                              value="{{ csrf_token('authenticate') }}"
-                                                       >
-                                                    <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted" type="button" id="password-addon"><i class="ri-eye-fill align-middle"></i></button>
-                                                </div>
-                                            </div>
+													<label class="form-label" for="inputPassword">Mot de Passe</label>
+													<div class="position-relative auth-pass-inputgroup mb-3">
+														<input type="password" name="password" class="form-control pe-5" placeholder="Entrez votre mot de  passe" id="inputPassword">
+														<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+														<button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted" type="button" id="password-addon">
+															<i class="ri-eye-fill align-middle"></i>
+														</button>
+													</div>
+												</div>
 
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" value="" id="auth-remember-check">
-                                                <label class="form-check-label" for="auth-remember-check">Se souvenir de moi</label>
-                                            </div>
+												<div class="form-check">
+													<input class="form-check-input" type="checkbox" value="" id="auth-remember-check">
+													<label class="form-check-label" for="auth-remember-check">Se souvenir de moi</label>
+												</div>
 
-                                            <div class="mt-4">
-                                                <button class="btn btn-success w-100" type="submit">Se Connecter</button>
-                                            </div>
-
-
-
-                                        </form>
-                                        <div class="mt-4 text-center">
-{#                                            <div class="signin-other-title">#}
-{#                                                <h5 class="fs-14 mb-4 title">M'envoyer un lien de connexion</h5>#}
-{#                                            </div>#}
-
-                                            <div>
-                                                <a type="button" class="btn btn-success w-100" href="{{ path('magic_link') }}"><i class="ri-mail-send-fill"></i> M'envoyer un lien de connexion</a>
-                                                {#                                                    <button type="button" class="btn btn-danger btn-icon waves-effect waves-light"><i class="ri-google-fill fs-16"></i></button>#}
-                                                {#                                                    <button type="button" class="btn btn-dark btn-icon waves-effect waves-light"><i class="ri-github-fill fs-16"></i></button>#}
-                                                {#                                                    <button type="button" class="btn btn-info btn-icon waves-effect waves-light"><i class="ri-twitter-fill fs-16"></i></button>#}
-                                            </div>
-                                        </div>
-                                    </div>
+												<div class="mt-4">
+													<button class="btn btn-success w-100" type="submit">Se Connecter</button>
+												</div>
 
 
-                                </div>
-                            </div>
-                            <!-- end col -->
-                        </div>
-                        <!-- end row -->
-                    </div>
-                    <!-- end card -->
-                </div>
-                <!-- end col -->
+											</form>
+											<div class="mt-4 text-center">
+												{#                                            <div class="signin-other-title">#}
+												{#                                                <h5 class="fs-14 mb-4 title">M'envoyer un lien de connexion</h5>#}
+												{#                                            </div>#}
 
-            </div>
-            <!-- end row -->
-        </div>
-        <!-- end container -->
-    </div>
-    <!-- end auth page content -->
+													<div>
+														<a type="button" class="btn btn-success w-100" href="{{ path('magic_link') }}"> <i class="ri-mail-send-fill"></i>
+														M'envoyer un lien de connexion</a>
+													{#                                                    <button type="button" class="btn btn-danger btn-icon waves-effect waves-light"><i class="ri-google-fill fs-16"></i></button>#}
+												{#                                                    <button type="button" class="btn btn-dark btn-icon waves-effect waves-light"><i class="ri-github-fill fs-16"></i></button>#}
+													{#                                                    <button type="button" class="btn btn-info btn-icon waves-effect waves-light"><i class="ri-twitter-fill fs-16"></i></button>#}
+												</div>
+											</div>
+										</div>
 
-    <!-- footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="text-center">
-                        <p class="mb-0">&copy; <script>document.write(new Date().getFullYear())</script> Cour Supprême <i class="mdi mdi-heart text-danger"></i> du Bénin </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-    <!-- end Footer -->
-</div>
-<!-- end auth-page-wrapper -->
 
-{{ include('partials/vendor-scripts.html.twig') }}
+									</div>
+								</div>
+								<!-- end col -->
+							</div>
+							<!-- end row -->
+						</div>
+						<!-- end card -->
+					</div>
+					<!-- end col -->
 
-<!-- password-addon init -->
-<script src="{{ asset('js/pages/password-addon.init.js') }}/"></script>
+				</div>
+				<!-- end row -->
+			</div>
+			<!-- end container -->
+		</div>
+		<!-- end auth page content -->
+
+		<!-- footer -->
+		<footer class="footer">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="text-center">
+							<p class="mb-0">&copy;
+								<script>
+									document.write(new Date().getFullYear())
+								</script>
+								Cour Supprême
+								<i class="mdi mdi-heart text-danger"></i>
+								du Bénin
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</footer>
+		<!-- end Footer -->
+	</div>
+	<!-- end auth-page-wrapper -->
+
+	{{ include('partials/vendor-scripts.html.twig') }}
+
+	<!-- password-addon init -->
+	<script src="{{ asset('js/pages/password-addon.init.js') }}"></script>
 </body>
-
-</html>
-
-
 {#
-{% extends 'base.html.twig' %}
-
-{% block title %}Log in!{% endblock %}
-
-{% block body %}
-<form method="post">
-    {% if error %}
-        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
-
-    {% if app.user %}
-        <div class="mb-3">
-            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
-        </div>
-    {% endif %}
-
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-    <label for="inputEmail">Email</label>
-    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-    <label for="inputPassword">Password</label>
-    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
-
-    <input type="hidden" name="_csrf_token"
-           value="{{ csrf_token('authenticate') }}"
-    >
-
-
-#}
-{#        Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.#}{#
-
-#}
-{#        See https://symfony.com/doc/current/security/remember_me.html#}{#
-
-
-        <div class="checkbox mb-3">
-            <label>
-                <input type="checkbox" name="_remember_me"> Remember me
-            </label>
-        </div>
-
-
-    <button class="btn btn-lg btn-primary" type="submit">
-        Sign in
-    </button>
-</form>
-{% endblock %}
-#}
+					{% extends 'base.html.twig' %}
+					
+					{% block title %}Log in!{% endblock %}
+					
+					{% block body %}
+					<form method="post">
+					    {% if error %}
+					        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+					    {% endif %}
+					
+					    {% if app.user %}
+					        <div class="mb-3">
+					            You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+					        </div>
+					    {% endif %}
+					
+					    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+					    <label for="inputEmail">Email</label>
+					    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+					    <label for="inputPassword">Password</label>
+					    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+					
+					    <input type="hidden" name="_csrf_token"
+					           value="{{ csrf_token('authenticate') }}"
+					    >
+					
+					
+					#}
+{#        Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.#}
+{#
+				
+				#}
+{#        See https://symfony.com/doc/current/security/remember_me.html#}
+{#
+				
+				
+				        <div class="checkbox mb-3">
+				            <label>
+				                <input type="checkbox" name="_remember_me"> Remember me
+				            </label>
+				        </div>
+				
+				
+				    <button class="btn btn-lg btn-primary" type="submit">
+				        Sign in
+				    </button>
+				</form>
+				{% endblock %}
+				#}

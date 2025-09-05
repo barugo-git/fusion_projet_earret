@@ -1,0 +1,249 @@
+{% apply inline_css(source("@styles/bootstrap.min.css"),source("@styles/icons.min.css")
+    ,source("@styles/app.min.css"),source("@styles/custom.min.css")) %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-10">
+            <p>Bonjour Monsieur/Madame {{ destinataire.fullname }}.</p>
+            <p>Vous avez étes ajouté en tant que membre sur le dossier : {{ dossier.referenceDossier }} en tant que {{ destinataire.profil }}.</p>
+            <h5> Details du dossier </h5>
+            <div class="row">
+                <div class="col-lg-5">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title mb-0">Détails de la réquete </h4>
+                        </div><!-- end card header -->
+                        <div class="card-body">
+                            <table class="table">
+                                <tbody>
+                                <tr>
+                                    <th>N°enregistrement</th>
+                                    <td>{{ dossier.referenceEnregistrement }}</td>
+                                </tr>
+                                <tr>
+                                    <th>N° dossier</th>
+                                    <td>{{ dossier.referenceDossier }}</td>
+                                </tr>
+                                <tr>
+                                    <th>N° reference dossier</th>
+                                    <td>{{ dossier.referenceDossierComplet }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Date d'enregistrement</th>
+                                    <td>{{ dossier.dateEnregistrement ? dossier.dateEnregistrement|date('Y-m-d H:i:s') : '' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Structure d'affectation</th>
+                                    <td>{{ dossier.structure.name }}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>Objet</th>
+                                    <td>{{ dossier.objet.name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Type de dossier</th>
+                                    <td>{{ dossier.typeDossier }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Intitule de l'Objet</th>
+                                    <td>{{ dossier.intituleObjet }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title mb-0">Les affectations </h4>
+                        </div><!-- end card header -->
+                        <div class="card-body">
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th> Date</th>
+                                    <th> Structure</th>
+                                    <th> Section</th>
+                                    <th> Motif</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                {% for structure in dossier.structures %}
+                                    <tr>
+                                        <td> {{ structure.dateAffection ? structure.dateAffection|date('Y-m-d') : '' }}</td>
+                                        <td> {{ structure.structure.name }} </td>
+                                        <td> -</td>
+                                        <td> {{ structure.motif }}</td>
+                                    </tr>
+                                {% endfor %}
+
+
+
+                                {% for section in dossier.affecterSections %}
+                                    <tr>
+                                        <td> {{ section.dateAffectation ? section.dateAffectation|date('Y-m-d') : '' }}</td>
+                                        <td>  {{ section.section.structure.name }}</td>
+                                        <td>{{ section.section.name }}</td>
+                                        <td> {{ section.motif }}</td>
+                                    </tr>
+                                {% endfor %}
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% if dossier.userDossiers %}
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title mb-0">Les rapporteurs du dossier</h4>
+                            </div><!-- end card header -->
+                            <div class="card-body">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th> Nom & prénoms</th>
+                                        <th> Profil</th>
+                                        <th> Contact</th>
+
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {% for user in dossier.userDossiers %}
+                                        <tr>
+
+                                            <td> {{ user.user.UserIdentifier }} </td>
+
+                                            <td> {{ user.profil }}</td>
+                                            <td> {{ user.user.email }}</td>
+                                        </tr>
+                                    {% endfor %}
+
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title mb-0">Informations du réquérant </h4>
+                        </div><!-- end card header -->
+                        <div class="card-body">
+                            <table class="table">
+                                <tbody>
+                                {% if dossier.requerant.type =='moral' %}
+
+                                    <tr>
+                                        <th>Intitule</th>
+                                        <td>{{ dossier.requerant.intitule }}</td>
+                                    </tr>
+
+
+                                {% else %}
+
+                                    <tr>
+                                        <th>Nom</th>
+                                        <td>{{ dossier.requerant.nom }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Prénoms</th>
+                                        <td>{{ dossier.requerant.prenoms }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Sexe</th>
+                                        <td>{{ dossier.requerant.sexe }}</td>
+                                    </tr>
+                                {% endif %}
+
+                                <tr>
+                                    <th>Téléphone</th>
+                                    <td>{{ dossier.requerant.Telephone }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Email</th>
+                                    <td>{{ dossier.requerant.email }}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>localite</th>
+                                    <td>{{ dossier.requerant.localite.libArrond }}</td>
+                                </tr>
+                                <tr>
+                                    <th>adresse</th>
+                                    <td>{{ dossier.requerant.adresse }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title mb-0">Informations du défendeur </h4>
+                        </div><!-- end card header -->
+                        <div class="card-body">
+                            <table class="table">
+                                <tbody>
+                                {% if dossier.defendeur.type =='moral' %}
+                                    <tr>
+                                        <th>Intitule</th>
+                                        <td>{{ dossier.defendeur.intitule }}</td>
+                                    </tr>
+
+                                {% else %}
+
+                                    <tr>
+                                        <th>Nom</th>
+                                        <td>{{ dossier.defendeur.nom }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Prénoms</th>
+                                        <td>{{ dossier.defendeur.prenoms }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Sexe</th>
+                                        <td>{{ dossier.defendeur.sexe }}</td>
+                                    </tr>
+                                {% endif %}
+
+                                <tr>
+                                    <th>Téléphone</th>
+                                    <td>{{ dossier.defendeur.Telephone }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Email</th>
+                                    <td>{{ dossier.defendeur.email }}</td>
+                                </tr>
+
+                                <tr>
+                                    <th>localite</th>
+                                    <td>{{ dossier.defendeur.localite.libArrond }}</td>
+                                </tr>
+                                <tr>
+                                    <th>adresse</th>
+                                    <td>{{ dossier.defendeur.adresse }}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endapply %}

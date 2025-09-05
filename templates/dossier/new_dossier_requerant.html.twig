@@ -1,325 +1,290 @@
 {% extends 'base.html.twig' %}
 
-        {% block stylesheets %}
-            <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+{% block stylesheets %}
+	<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
 
 
-        {% endblock %}
+{% endblock %}
 {# {% form_theme form _self %} #}
 
 
 {% form_theme form 'form_theme/_form_collection_representant_requerent.html.twig' %}
 {% form_theme form 'form_theme/_form_collection_conseil_requerent.html.twig' %}
 {% block body %}
-    <div class="row">
-        {{ form_start(form, { attr: { id: 'dossier_requerant' } }) }}
-        <div class="col-lg-12">
-            <div class="col-xl-12">
-                <div class="card">
-                    {% if app.request.attributes.get('_route') == 'greffier_demande_edit_requerant' %}
-                        {% include 'partials/_intitule_dossier.html.twig' %}
-                    {% else %}
-                        <h4 class="card-title mb-0">Enregistrement d'un recours - Informations du requérant</h4>
-                    {% endif %}
-
-                    <div class="card-body">
-                        <div>
-                            <div class="container">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        {{ form_row(form.requerant.type) }}
-                                    </div>
-                                    <div class="col-md-6 physique">
-                                        {{ form_row(form.requerant.nom) }}
-                                    </div>
-                                    <div class="col-md-6 physique">
-                                        {{ form_row(form.requerant.prenoms) }}
-                                    </div>
-                                    <div class="col-md-12 morale">
-                                        {{ form_row(form.requerant.intitule) }}
-                                    </div>
-                                    <div class="col-md-6">
-                                        {{ form_row(form.requerant.Telephone) }}
-                                    </div>
-                                    <div class="col-md-6">
-                                        {{ form_row(form.requerant.email) }}
-                                    </div>
-
-
-                                    <div class="col-md-4">
-                                        {{ form_row(form.requerant.departement) }}
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <label class="form-label required" for="dossier_requerant_departement">Commune</label>
-                                            <select id="commune" class="form-control linked-select"
-                                                    data-target="#arrondissement"
-                                                    data-source="/ajax/localite/arrondissement/id">
-                                                <option value="0">Sélectionnez votre commune</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <label class="form-label required" for="dossier_requerant_departement">Arrondissement</label>
-                                            <select id="arrondissement" name="localite_requerent" class="form-control">
-                                                <option value="0">Sélectionnez votre arrondissement</option>
-                                            </select>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-6  physique">
-                                        {{ form_row(form.requerant.sexe) }}
-                                    </div>
-                                    <div class="col-md-6">
-                                        {{ form_row(form.requerant.adresse) }}
-                                    </div>
-
-                                    <div class="row" id="representant-subform" style="display: none;">
-                                        {#                                        {{ form_row(form.requerant.representants) }} #}
-                                        {% if form.requerant.representants1 is defined %}
-                                            <div class="col-md-6">
-                                                {{ form_row(form.requerant.representants1.nom) }}
-                                            </div>
-                                            <div class="col-md-6">
-                                                {{ form_row(form.requerant.representants1.prenom) }}
-                                            </div>
-                                            <div class="col-md-6">
-                                                {{ form_row(form.requerant.representants1.email) }}
-                                            </div>
-                                            <div class="col-md-6">
-                                                {{ form_row(form.requerant.representants1.telephone) }}
-                                            </div>
-                                            <div class="col-md-6">
-                                                {{ form_row(form.requerant.representants1.adresse) }}
-                                            </div>
-{#                                            {{ form_row(form.requerant.representants1.) }}#}
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-md-12">
-                                        {{ form_row(form.requerant.conseiller) }}
-                                    </div>
-                                </div>
-                            </div>
-                            {#                            {{ form_widget(form.requerant) }} #}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="text-end">
-                <button type="submit" class="btn btn-success btn-label right "><i
-                            class="ri-arrow-right-line label-icon align-middle fs-16 ms-2"></i>Information
-                    du défendeur
-                </button>
-            </div>
-            {{ form_end(form) }}
-
-            {#            {{ include('dossier/_form.html.twig') }} #}
-
-        </div>
-    </div>
+	<div class="row">
+		{{ form_start(form, { attr: { id: 'dossier_requerant' } }) }}
+		<div class="col-lg-12">
+			<div class="card">
+				<div class="card-header">
+					{% if app.request.attributes.get('_route') == 'greffier_demande_edit_requerant' %}
+						{% include 'partials/_intitule_dossier.html.twig' %}
+					{% else %}
+						<h4 class="card-title mb-0">Enregistrement d'un recours - Informations du requérant</h4>
+					{% endif %}
+				</div>
+				<div class="card-body">
+					<div>
+						<div class="container">
+							<div class="row">
+								<div class="col-md-12">
+									{{ form_row(form.requerant.type) }}
+								</div>
+								<div class="col-md-6 physique">
+									{{ form_row(form.requerant.nom) }}
+								</div>
+								<div class="col-md-6 physique">
+									{{ form_row(form.requerant.prenoms) }}
+								</div>
+								<div class="col-md-12 morale">
+									{{ form_row(form.requerant.intitule) }}
+								</div>
+								<div class="col-md-6">
+									{{ form_row(form.requerant.Telephone) }}
+								</div>
+								<div class="col-md-6">
+									{{ form_row(form.requerant.email) }}
+								</div>
 
 
-    {#    <a href="{{ path('app_dossier_index') }}">back to list</a> #}
+								<div class="col-md-4">
+									{{ form_row(form.requerant.departement) }}
+								</div>
+								<div class="col-md-4">
+									<div class="mb-3">
+										<label class="form-label required" for="dossier_requerant_departement">Commune</label>
+										<select id="commune" class="form-control linked-select" data-target="#arrondissement" data-source="/ajax/localite/arrondissement/id">
+											<option value="0">Sélectionnez votre commune</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-md-4">
+									<div class="mb-3">
+										<label class="form-label required" for="dossier_requerant_departement">Arrondissement</label>
+										<select id="arrondissement" name="localite_requerent" class="form-control">
+											<option value="0">Sélectionnez votre arrondissement</option>
+										</select>
+									</div>
+
+								</div>
+
+								<div class="col-md-6  physique">
+									{{ form_row(form.requerant.sexe) }}
+								</div>
+								<div class="col-md-6">
+									{{ form_row(form.requerant.adresse) }}
+								</div>
+
+								<div
+									class="row" id="representant-subform" style="display: none;">
+									{#                                        {{ form_row(form.requerant.representants) }} #}
+									{% if form.requerant.representants1 is defined %}
+										<div class="col-md-6">
+											{{ form_row(form.requerant.representants1.nom) }}
+										</div>
+										<div class="col-md-6">
+											{{ form_row(form.requerant.representants1.prenom) }}
+										</div>
+										<div class="col-md-6">
+											{{ form_row(form.requerant.representants1.email) }}
+										</div>
+										<div class="col-md-6">
+											{{ form_row(form.requerant.representants1.telephone) }}
+										</div>
+										<div class="col-md-6">
+											{{ form_row(form.requerant.representants1.adresse) }}
+										</div>
+										{#                                            {{ form_row(form.requerant.representants1.) }}#}
+									{% endif %}
+								</div>
+								<div class="col-md-12">
+									{{ form_row(form.requerant.conseiller) }}
+								</div>
+							</div>
+						</div>
+						{#                            {{ form_widget(form.requerant) }} #}
+					</div>
+				</div>
+
+
+				{#            {{ include('dossier/_form.html.twig') }} #}
+
+			</div>
+		</div>
+		<div class="text-end">
+			<button type="submit" class="btn btn-success btn-label right ">
+				<i class="ri-arrow-right-line label-icon align-middle fs-16 ms-2"></i>Information du défendeur
+			</button>
+		</div>
+		{{ form_end(form) }}
+	</div>
+
+
+	{#    <a href="{{ path('app_dossier_index') }}">back to list</a> #}
 {% endblock %}
 {% block javascripts %}
-    <script src="{{ asset('js/pages/plugins/jquery/jquery.min.js') }}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
-            integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script>
-        const form = document.getElementById('dossier_requerant');
-        const form_select_sport = document.getElementById('dossier_requerant_requerant_type');
-        const form_select_position = document.getElementById('representant-subform');
+	<script src="{{ asset('js/pages/plugins/jquery/jquery.min.js') }}"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-        const updateForm = async (data, url, method) => {
-            const req = await fetch(url, {
-                method: method,
-                body: data,
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'charset': 'utf-8'
-                }
-            });
+	<script>
+		document.addEventListener('DOMContentLoaded', function () { // Initialisation des états
+$('.morale').hide();
+$('.physique').hide();
 
-            const text = await req.text();
+// Gestion du type de requérant
+const $typerequerent = $('#dossier_requerant_requerant_type');
 
-            return text;
-        };
+$typerequerent.change(function () {
+if ($typerequerent.val() == "moral") {
+$('.morale').show();
+$('.physique').hide();
+} else if ($typerequerent.val() == "physique") {
+$('.morale').hide();
+$('.physique').show();
+}
+});
 
-        const parseTextToHtml = (text) => {
-            const parser = new DOMParser();
-            const html = parser.parseFromString(text, 'text/html');
+// Initialisation des selects liés
+let $selects = document.querySelectorAll('.linked-select');
+$selects.forEach(function ($select) {
+new LinkedSelect($select);
+});
 
-            return html;
-        };
+// Gestion des boutons d'ajout/suppression pour les conseillers
+$('#add-conseil-requerent').click(function () {
+const index = + $('#widgets-counter-requerent').val();
+const tmpl = $('#dossier_requerant_requerant_conseiller').data('prototype').replace(/__name__/g, index);
 
-        const changeOptions = async (e) => {
-            const requestBody = e.target.getAttribute('name') + '=' + e.target.value;
-            const updateFormResponse = await updateForm(requestBody, form.getAttribute('action'), form.getAttribute('method'));
-            const html = parseTextToHtml(updateFormResponse);
+$('#dossier_requerant_requerant_conseiller').append(tmpl);
+$('#widgets-counter-requerent').val(index + 1);
 
-            // const new_form_select_position = html.getElementById('meetup_position');
-            // form_select_position.innerHTML = new_form_select_position.innerHTML;
+handleDeleteButtonsRequerent();
+});
 
-            const new_form_select_position = html.getElementById('representant-subform').innerHTML;
-            form_select_position.innerHTML = new_form_select_position;
-            form_select_position.style.display = 'block';
+updateCounterRequerent();
+handleDeleteButtonsRequerent();
+});
 
-        };
+// Gestion du formulaire et des selects dynamiques
+const form = document.getElementById('dossier_requerant');
+const form_select_sport = document.getElementById('dossier_requerant_requerant_type');
+const form_select_position = document.getElementById('representant-subform');
 
+if (form_select_sport) {
+form_select_sport.addEventListener('change', (e) => changeOptions(e));
+}
 
-        form_select_sport.addEventListener('change', (e) => changeOptions(e));
-    </script>
+const updateForm = async (data, url, method) => {
+const req = await fetch(url, {
+method: method,
+body: data,
+headers: {
+'Content-Type': 'application/x-www-form-urlencoded',
+'charset': 'utf-8'
+}
+});
 
-    <script>
+return await req.text();
+};
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const choixSelect = document.querySelector('#dossier_requerant_requerant_type');
-            $('.morale').hide()
-            $('.physique').hide()
+const parseTextToHtml = (text) => {
+const parser = new DOMParser();
+return parser.parseFromString(text, 'text/html');
+};
 
+const changeOptions = async (e) => {
+const requestBody = e.target.getAttribute('name') + '=' + e.target.value;
+const updateFormResponse = await updateForm(requestBody, form.getAttribute('action'), form.getAttribute('method'));
+const html = parseTextToHtml(updateFormResponse);
 
-        });
+const new_form_select_position = html.getElementById('representant-subform').innerHTML;
+form_select_position.innerHTML = new_form_select_position;
+form_select_position.style.display = 'block';
+};
 
-        var $typerequerent = $('#dossier_requerant_requerant_type')
-        $typerequerent.change(function () {
-            console.log($typerequerent.val())
-            if ($typerequerent.val() == "moral") {
-                $('.morale').show()
-                $('.physique').hide()
+// Classe pour gérer les selects liés
+class LinkedSelect {
+constructor($select) {
+this.$select = $select;
+this.$target = document.querySelector(this.$select.dataset.target);
+this.$placeholder = this.$target.firstElementChild;
+this.onChange = this.onChange.bind(this);
+this.$loader = null;
+this.cache = {};
 
-            } else if ($typerequerent.val() == "physique") {
-                $('.morale').hide()
-                $('.physique').show()
-            }
+if (this.$select) {
+this.$select.addEventListener('change', this.onChange);
+}
+}
 
-        })
+onChange(e) {
+if (e.target.value === '0') {
+return;
+}
 
-        class LinkedSelect {
+this.loadOptions(e.target.value, (options) => {
+this.$target.innerHTML = options;
+this.$target.insertBefore(this.$placeholder, this.$target.firstChild);
+this.$target.selectedIndex = 0;
+this.$target.style.display = null;
+});
+}
 
-            /**
-             * @param {HTMLSelectElement} $select
-             */
-            constructor($select) {
-                this.$select = $select
-                this.$target = document.querySelector(this.$select.dataset.target)
-                this.$placeholder = this.$target.firstElementChild
-                //  this.onChange = debounce(this.onChange.bind(this), 500)
-                this.onChange = this.onChange.bind(this)
-                this.$loader = null
-                this.cache = {}
-                this.$select.addEventListener('change', this.onChange)
-            }
+loadOptions(id, callback) {
+if (this.cache[id]) {
+callback(this.cache[id]);
+return;
+}
 
-            /**
-             * Se déclenche au changement de valeur d'un select
-             * @param {Event} e
-             */
-            onChange(e) {
-                if (e.target.value === '0') {
+this.showLoader();
+let request = new XMLHttpRequest();
+request.open('GET', this.$select.dataset.source.replace('id', id), true);
 
-                    return
-                }
+request.onload = () => {
+if (request.status >= 200 && request.status < 400) {
+let data = JSON.parse(request.responseText);
+let options = data.reduce(function (acc, option) {
+return acc + '<option value="' + option.value + '">' + option.label + '</option>';
+}, '');
 
-                this.loadOptions(e.target.value, (options) => {
-                    this.$target.innerHTML = options
-                    this.$target.insertBefore(this.$placeholder, this.$target.firstChild)
-                    this.$target.selectedIndex = 0
-                    this.$target.style.display = null
+this.cache[id] = options;
+this.hideLoader();
+callback(options);
+} else {
+alert('Impossible de charger la liste');
+}
+};
 
-                })
-            }
+request.onerror = function () {
+alert('Impossible de charger la liste');
+};
 
-            /**
-             * Charge les options à partir du serveur (ou du cache)
-             * @param {string} id
-             * @param callback
-             */
-            loadOptions(id, callback) {
-                if (this.cache[id]) {
-                    callback(this.cache[id])
-                    return
-                }
-                this.showLoader()
-                let request = new XMLHttpRequest()
-                request.open('GET', this.$select.dataset.source.replace('id', id), true)
-                request.onload = () => {
-                    if (request.status >= 200 && request.status < 400) {
-                        let data = JSON.parse(request.responseText)
-                        let options = data.reduce(function (acc, option) {
-                            return acc + '<option value="' + option.value + '">' + option.label + '</option>'
-                        }, '')
-                        this.cache[id] = options
-                        this.hideLoader()
-                        callback(options)
-                    } else {
-                        alert('Impossible de charger la liste')
-                    }
-                }
-                request.onerror = function () {
-                    alert('Impossible de charger la liste')
-                }
-                request.send()
-            }
+request.send();
+}
 
-            showLoader() {
-                this.$loader = document.createTextNode('Chargement...')
-                this.$target.parentNode.appendChild(this.$loader)
-            }
+showLoader() {
+this.$loader = document.createTextNode('Chargement...');
+this.$target.parentNode.appendChild(this.$loader);
+}
 
-            hideLoader() {
-                if (this.$loader !== null) {
-                    this.$loader.parentNode.removeChild(this.$loader)
-                    this.$loader = null
-                }
-            }
+hideLoader() {
+if (this.$loader !== null) {
+this.$loader.parentNode.removeChild(this.$loader);
+this.$loader = null;
+}
+}
+}
 
-        }
+// Fonctions pour gérer les conseillers requérants
+function updateCounterRequerent() {
+const count = + $('#dossier_requerant_requerant_conseiller div.form-group').length;
+$('#widgets-counter-requerent').val(count);
+}
 
-        let $selects = document.querySelectorAll('.linked-select')
-        $selects.forEach(function ($select) {
-            new LinkedSelect($select)
-
-        })
-
-        // conseil requerant
-
-        $('#add-conseil-requerent').click(function () {
-            // Je récupère le numéo des futurs champs que je vais créer
-            const index = +$('#widgets-counter-requerent').val();
-
-            console.log(index);
-
-            // Je récupère le prototype des entrées (remplace /__name__/(g veut dire qu'on peut le faire plusieurs fois) par index)
-            const tmpl = $('#dossier_requerant_requerant_conseiller').data('prototype').replace(/__name__/g, index);
-
-            // J'injecte ce code au sein de la div
-            $('#dossier_requerant_requerant_conseiller').append(tmpl);
-
-            $('#widgets-counter-requerent').val(index + 1);
-
-            // Je gère le bouton supprimer
-            handleDeleteButtonsRequerent();
-        })
-
-        function updateCounterRequerent() {
-            const count = +$('#dossier_requerant_requerant_conseiller div.form-group').length;
-
-            $('#widgets-counter-requerent').val(count);
-        }
-
-        function handleDeleteButtonsRequerent() {
-            $('button[data-action="delete"]').click(function () {
-                const target = this.dataset.target;
-
-                $(target).remove();
-            })
-        }
-
-        updateCounterRequerent();
-
-        handleDeleteButtonsRequerent();
-    </script>
+function handleDeleteButtonsRequerent() {
+$('button[data-action="delete"]').click(function () {
+const target = this.dataset.target;
+$(target).remove();
+});
+}
+	</script>
 {% endblock %}

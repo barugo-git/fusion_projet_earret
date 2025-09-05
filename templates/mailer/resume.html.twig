@@ -166,71 +166,100 @@
     </style>
   </head>
   <body style="font-family: Helvetica, Arial, sans-serif; line-height: 24px; font-size: 16px; color: #000000; margin: 0; padding: 0; background-color: #fff;">
-    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto;">
-      <tr>
-        <td style="padding: 20px;">
-          <!-- Espacement -->
-          <table width="100%" border="0" cellpadding="0" cellspacing="0">
-            <tr>
-              <td height="24" style="font-size: 24px; line-height: 24px;">&nbsp;</td>
-            </tr>
-          </table>
 
-          <!-- Logo -->
-          <img src="https://i.ibb.co/ycDpW37Y/logo.png" alt="Logo" style="display: block; width: 64px; height: auto;" />
+    	<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; max-width: 600px;">
+			<tr>
+				<td
+					align="center" style="padding: 20px;">
 
-          <!-- Espacement -->
-          <table width="100%" border="0" cellpadding="0" cellspacing="0">
-            <tr>
-              <td height="24" style="font-size: 24px; line-height: 24px;">&nbsp;</td>
-            </tr>
-          </table>
+					<!-- En-tête -->
+					<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; background: linear-gradient(135deg, #1a3a6e 0%, #2c5292 100%); color: white; border-radius: 8px 8px 0 0;">
+						<tr>
+							<td align="center" style="padding: 25px;">
+								<img class="w-16" src="https://i.ibb.co/ycDpW37Y/logo.png" style="height: auto; line-height: 100%; outline: none; text-decoration: none; display: block; width: 64px; border-style: none; border-width: 0;" width="64" alt="Logo"/>
+								<h1 style="margin: 12px 0 0 0; font-size: 28px; font-family: 'Segoe UI', Arial, sans-serif;">
+									Cour suprême</h1>
+								<p style="margin: 10px 0 0 0; opacity: 0.9; font-family: 'Segoe UI', Arial, sans-serif;">
+									Message de Bienvenue</p>
+							</td>
+						</tr>
+					</table>
 
-          <!-- Titre -->
-          <h1 style="font-size: 36px; line-height: 43.2px; font-weight: 800; margin: 0 0 16px 0;">Bonjour Monsieur/Madame {{ requerent }}</h1>
+					<!-- Contenu -->
+					<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; background-color: #ffffff;">
+						<tr>
+							<td style="padding: 30px; font-family: 'Segoe UI', Arial, sans-serif;">
 
-          <!-- Contenu -->
-          <p style="margin: 0 0 16px 0;">
-            Votre recours a été bien enregistré par la Cour suprême du Bénin avec le numéro de suivi :
-            <span class="badge bg-success-subtle text-success">{{ codeSuivi }}</span>
-          </p>
+								<p style="margin: 0 0 16px 0;">
+								Bonjour Monsieur/Madame 
+									<strong>
+										{{ requerent }}</strong>,
+								</p>
 
-          <!-- Carte avec détails -->
-          <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border: 1px solid #e2e8f0; border-radius: 24px; background-color: #ffffff;">
-            <tr>
-              <td style="padding: 40px; border-radius: 24px;">
-                <h3 style="font-size: 28px; line-height: 33.6px; font-weight: 500; text-align: center; margin: 0 0 24px 0;">Détails de votre recours</h3>
+								<!-- Variante "avertissement" statique -->
+								<p style="margin: 0 0 16px 0;">
+									Votre recours a été bien enregistré par la Cour suprême du Bénin avec le numéro de suivi :
+									<strong>
+{{ codeSuivi }}
+									</strong>.
+								</p>
 
-                <p style="margin: 0 0 16px 0;">Veuillez garder ce numéro afin de l'utiliser pour vérifier l'état de votre recours ultérieurement.</p>
+								<p style="margin: 0 0 16px 0;">
+							Veuillez garder ce numéro afin de l'utiliser pour vérifier l'état de votre recours ultérieurement.
+                                    </p>
 
-                <p style="margin: 0 0 16px 0;">
-                  Cliquez sur ce lien
-                  <a href="{{ lien }}" style="color: blue; font-weight: bold;">Vérifier Statut</a>
-                  en utilisant le code suivi :
-                  <span class="badge bg-success-subtle text-success">{{ codeSuivi }}</span>
-                  de votre recours pour vérifier le statut.
-                </p>
+								<!-- Encadré d'information -->
+								<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; background-color: #f0f9ff; border-left: 4px solid #0ea5e9; margin: 20px 0;">
+									<tr>
+										<td style="padding: 15px; font-family: 'Segoe UI', Arial, sans-serif;">
+											
+											<p style="margin: 0 0 8px 0;">
+												<strong>Code de suivi :</strong>
+												{{ codeSuivi }}
+											</p>
 
-                <!-- Séparateur -->
-                <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin: 24px 0;">
-                  <tr>
-                    <td style="border-top: 1px solid #e2e8f0; height: 1px;"></td>
-                  </tr>
-                </table>
+										</td>
+									</tr>
+								</table>
 
-                <p style="margin: 0; text-align: center;">Merci de votre confiance.</p>
-              </td>
-            </tr>
-          </table>
+								<!-- Bouton d'action (facultatif, lien fictif) -->
+								<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 25px 0;">
+									<tr>
+										<td align="center">
+											<a href="{{ lien }}" style="display: inline-block; background-color: #1a3a6e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-family: 'Segoe UI', Arial, sans-serif;">
+												Voir Statut
+											</a>
+										</td>
+									</tr>
+								</table>
 
-          <!-- Espacement final -->
-          <table width="100%" border="0" cellpadding="0" cellspacing="0">
-            <tr>
-              <td height="24" style="font-size: 24px; line-height: 24px;">&nbsp;</td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
+							</td>
+						</tr>
+					</table>
+
+					<!-- Bandeau d’information bas -->
+					<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; background-color: #f1f5f9; border-radius: 0 0 8px 8px;">
+						<tr>
+							<td align="center" style="padding: 20px; font-family: 'Segoe UI', Arial, sans-serif;">
+								<p style="margin: 0 0 10px 0; color: #64748b; font-size: 14px;">
+							Merci de votre confiance.</p>
+							</td>
+						</tr>
+					</table>
+
+					<!-- Pied de page -->
+					<table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; background-color: #f1f5f9; border-radius: 0 0 8px 8px;">
+						<tr>
+							<td align="center" style="padding: 20px; font-family: 'Segoe UI', Arial, sans-serif;">
+								<p style="margin: 0 0 10px 0; color: #64748b; font-size: 14px;">Cour suprême &copy; 2025</p>
+								<p style="margin: 0; color: #64748b; font-size: 12px;">Ceci est un message automatique,
+																																																																																										                                merci de ne pas y répondre.</p>
+							</td>
+						</tr>
+					</table>
+
+				</td>
+			</tr>
+		</table>
   </body>
 </html>

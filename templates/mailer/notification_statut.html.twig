@@ -174,9 +174,9 @@
           <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; background: linear-gradient(135deg, #1a3a6e 0%, #2c5292 100%); color: white; border-radius: 8px 8px 0 0;">
             <tr>
               <td align="center" style="padding: 25px;">
-                <img class="w-16" src="https://i.ibb.co/ycDpW37Y/logo.png" style="height: auto; line-height: 100%; outline: none; text-decoration: none; display: block; width: 64px; border-style: none; border-width: 0;" width="64" alt="Logo"/>
+              <img class="w-16" src="https://i.ibb.co/ycDpW37Y/logo.png" style="height: auto; line-height: 100%; outline: none; text-decoration: none; display: block; width: 64px; border-style: none; border-width: 0;" width="64" alt="Logo"/>
                 <h1 style="margin: 0; font-size: 28px; font-family: 'Segoe UI', Arial, sans-serif;">Cour suprême</h1>
-                <p style="margin: 10px 0 0 0; opacity: 0.9; font-family: 'Segoe UI', Arial, sans-serif;">Notification de Mesure d'Instruction</p>
+                <p style="margin: 10px 0 0 0; opacity: 0.9; font-family: 'Segoe UI', Arial, sans-serif;">Statut</p>
               </td>
             </tr>
           </table>
@@ -186,36 +186,14 @@
             <tr>
               <td style="padding: 30px; font-family: 'Segoe UI', Arial, sans-serif;">
                 <p style="margin: 0 0 16px 0;">
-                  Bonjour Monsieur/Madame <strong>{{ greffier }}</strong>,
+                  Bonjour Monsieur/Madame <strong>{{ requerent }}</strong>,
                 </p>
 
-                <p style="margin: 0 0 16px 0;">Nous vous informons qu'une nouvelle mesure d'instruction a été donnée et nécessite votre intervention.</p>
+                <p style="margin: 0 0 16px 0;">Le statut actuel de votre recours est  : <strong style="color:red;">{{ statut }}</strong>.</p>
+                <p style="margin: 0 0 16px 0;">
+                    Cliquez sur ce lien <a href="{{ lien }}"><strong style="color:blue;">Vérifier Statut</strong></a> en utilisant le code suivi : <span class="badge bg-success-subtle text-success"> {{ codeSuivi }}</span> de votre recours pour vérifier le statut.
+                </p>
 
-                <!-- Encadré d'information -->
-                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; background-color: #f0f9ff; border-left: 4px solid #0ea5e9; margin: 20px 0;">
-                  <tr>
-                    <td style="padding: 15px; font-family: 'Segoe UI', Arial, sans-serif;">
-                      <p style="margin: 0 0 10px 0; font-weight: 600; color: #0ea5e9;">Détails de la mesure :</p>
-                      <p style="margin: 0 0 8px 0;">
-                        <strong>Mesure d'instruction :</strong> {{ mesureInstruction }}
-                      </p>
-                      <p style="margin: 0;">
-                        <strong>Numéro de recours :</strong> {{ numeroRecours }}
-                      </p>
-                    </td>
-                  </tr>
-                </table>
-
-                <p style="margin: 0 0 16px 0;">Pour cela, veuillez vous connecter à votre espace greffier pour plus de détails.</p>
-
-                <!-- Bouton d'action -->
-                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 25px 0;">
-                  <tr>
-                    <td align="center">
-                      <a href="{{ lien }}" style="display: inline-block; background-color: #1a3a6e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-family: 'Segoe UI', Arial, sans-serif;">Consulter la mesure</a>
-                    </td>
-                  </tr>
-                </table>
 
                 <p style="text-align: center; margin: 0; font-family: 'Segoe UI', Arial, sans-serif; color: #64748b; font-size: 14px;">Ce lien est valable pour une durée limitée.</p>
               </td>

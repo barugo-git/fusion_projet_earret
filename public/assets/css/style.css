@@ -23,13 +23,11 @@ html ::-webkit-scrollbar {
 }
 
 html ::-webkit-scrollbar-thumb {
-    background: linear-gradient(160deg, #3c76ba, #1e428b);
     width: 10px;
     border-radius: 5px;
 }
 
 html ::-webkit-scrollbar-thumb:hover {
-    background: #379dc3;
     cursor: pointer;
 }
 
@@ -212,14 +210,14 @@ p {
 
 /* ==== Data table  = Start ===== */
 
-.data_table{
-   background: #fff;
+.data_table {
+    background: #fff;
     padding: 15px;
     box-shadow: 1px 3px 5px #aaa;
     border-radius: 5px;
 }
 
-.data_table .btn{
+.data_table .btn {
     padding: 5px 10px;
     margin: 10px 3px 10px 0;
 }
@@ -227,26 +225,3 @@ p {
 
 
 /* ==== Data table  = End  ===== */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

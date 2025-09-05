@@ -1,249 +1,197 @@
-{% apply inline_css(source("@styles/bootstrap.min.css"),source("@styles/icons.min.css")
-    ,source("@styles/app.min.css"),source("@styles/custom.min.css")) %}
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Notification d'ajout à un dossier</title>
+		<style>
+			body {
+				font-family: 'Segoe UI', Arial, sans-serif;
+				line-height: 1.6;
+				color: #334155;
+				background-color: #f5f7fa;
+				margin: 0;
+				padding: 20px;
+			}
+			.email-container {
+				max-width: 650px;
+				margin: 0 auto;
+				background-color: #ffffff;
+				border-radius: 8px;
+				overflow: hidden;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+			}
+			.email-header {
+				background-color: #1a3a6e;
+				color: white;
+				padding: 25px 30px;
+				text-align: center;
+			}
+			.email-body {
+				padding: 30px;
+			}
+			.email-footer {
+				background-color: #f1f5f9;
+				padding: 25px 30px;
+				text-align: center;
+				border-radius: 0 0 8px 8px;
+			}
+			.info-box {
+				background-color: #f8fafc;
+				border-left: 4px solid #0ea5e9;
+				border-radius: 6px;
+				margin: 20px 0;
+				overflow: hidden;
+			}
+			.info-box-content {
+				padding: 20px;
+			}
+			.info-box-title {
+				color: #0c4a6e;
+				font-weight: 600;
+				font-size: 16px;
+				margin: 0 0 15px;
+			}
+			.data-table {
+				width: 100%;
+				border-collapse: collapse;
+			}
+			.data-table th,
+			.data-table td {
+				padding: 10px 5px;
+				text-align: left;
+			}
+			.data-table th {
+				color: #64748b;
+				font-weight: 600;
+				border-bottom: 2px solid #e2e8f0;
+			}
+			.data-table td {
+				color: #334155;
+				border-bottom: 1px solid #e2e8f0;
+			}
+			.btn {
+				display: inline-block;
+				background-color: #1a3a6e;
+				color: white;
+				padding: 14px 30px;
+				text-decoration: none;
+				border-radius: 6px;
+				font-weight: 600;
+				font-size: 16px;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+				margin: 10px 5px;
+			}
+			.btn-secondary {
+				background-color: #64748b;
+			}
+			.text-center {
+				text-align: center;
+			}
+			.summary-item {
+				margin-bottom: 10px;
+				padding: 12px;
+				background-color: #f8fafc;
+				border-radius: 6px;
+				border-left: 3px solid #0ea5e9;
+			}
+			@media(max-width: 650px) {
+				.email-body {
+					padding: 20px;
+				}
+				.btn {
+					display: block;
+					margin: 10px 0;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="email-container">
+			<div class="email-header">
+				<img class="w-16" src="https://i.ibb.co/ycDpW37Y/logo.png" style=" width: 64px;" width="64" alt="Logo"/>
+				<h1 style="margin: 12px 0 0 0; font-size: 28px; font-family: 'Segoe UI', Arial, sans-serif;">
+					Cour suprême</h1>
+				<p style="margin: 10px 0 0 0; opacity: 0.9; font-family: 'Segoe UI', Arial, sans-serif;">
+					Ajout membre</p>
+			</div>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-10">
-            <p>Bonjour Monsieur/Madame {{ membre.fullname }}.</p>
-            <p>Vous avez étes ajouté en tant que membre sur le dossier : {{ dossier.referenceDossier }} en tant que {{ user.profil }}.</p>
-            <h5> Details du dossier </h5>
-            <div class="row">
-                <div class="col-lg-5">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title mb-0">Détails de la réquete </h4>
-                        </div><!-- end card header -->
-                        <div class="card-body">
-                            <table class="table">
-                                <tbody>
-                                <tr>
-                                    <th>N°enregistrement</th>
-                                    <td>{{ dossier.referenceEnregistrement }}</td>
-                                </tr>
-                                <tr>
-                                    <th>N° dossier</th>
-                                    <td>{{ dossier.referenceDossier }}</td>
-                                </tr>
-                                <tr>
-                                    <th>N° reference dossier</th>
-                                    <td>{{ dossier.referenceDossierComplet }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Date d'enregistrement</th>
-                                    <td>{{ dossier.dateEnregistrement ? dossier.dateEnregistrement|date('Y-m-d H:i:s') : '' }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Structure d'affectation</th>
-                                    <td>{{ dossier.structure.name }}</td>
-                                </tr>
+			<div class="email-body">
+				<p style="margin: 0 0 20px 0;">
+					Bonjour
+					<strong style="color: #1a3a6e;">{{ destinataire }}</strong>,
+				</p>
 
-                                <tr>
-                                    <th>Objet</th>
-                                    <td>{{ dossier.objet.name }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Type de dossier</th>
-                                    <td>{{ dossier.typeDossier }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Intitule de l'Objet</th>
-                                    <td>{{ dossier.intituleObjet }}</td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-7">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title mb-0">Les affectations </h4>
-                        </div><!-- end card header -->
-                        <div class="card-body">
-                            <table class="table table-striped">
-                                <thead>
-                                <tr>
-                                    <th> Date</th>
-                                    <th> Structure</th>
-                                    <th> Section</th>
-                                    <th> Motif</th>
-                                </tr>
-                                </thead>
-                                <tbody>
+				<p style="margin: 0 0 20px 0;">
+					Vous avez été ajouté en tant que membre sur le dossier :
+					<strong style="color: #1a3a6e;">{{ dossier.referenceDossier }}</strong>
+					en tant que
+					<strong style="color: #1a3a6e;">{{ profile }}</strong>.
+				</p>
 
-                                {% for structure in dossier.structures %}
-                                    <tr>
-                                        <td> {{ structure.dateAffection ? structure.dateAffection|date('Y-m-d') : '' }}</td>
-                                        <td> {{ structure.structure.name }} </td>
-                                        <td> -</td>
-                                        <td> {{ structure.motif }}</td>
-                                    </tr>
-                                {% endfor %}
+				<h2 style="margin: 0 0 15px 0; font-size: 18px; color: #1a3a6e; padding-bottom: 8px; border-bottom: 2px solid #e2e8f0;">Résumé du dossier</h2>
 
+				<div class="summary-item">
+					<strong>Référence:</strong>
+					{{ dossier.referenceDossierComplet }}
+				</div>
+				<div class="summary-item">
+					<strong>Objet:</strong>
+					{{ dossier.objet.name }}
+					-
+					{{ dossier.intituleObjet }}
+				</div>
+				<div class="summary-item">
+					<strong>Requérant:</strong>
+					{% if dossier.requerant.type =='moral' %}
+						{{ dossier.requerant.intitule }}
+					{% else %}
+						{{ dossier.requerant.nom }}
+						{{ dossier.requerant.prenoms }}
+					{% endif %}
+				</div>
+				<div class="summary-item">
+					<strong>Défendeur:</strong>
+					{% if dossier.defendeur.type =='moral' %}
+						{{ dossier.defendeur.intitule }}
+					{% else %}
+						{{ dossier.defendeur.nom }}
+						{{ dossier.defendeur.prenoms }}
+					{% endif %}
+				</div>
 
+				<div class="text-center" style="margin: 30px 0;">
+					<p style="margin-bottom: 20px;">Pour consulter tous les détails du dossier, vous pouvez:</p>
+					<a href="{{lien_login}}" class="btn">Se connecter à l'application</a>
+					{# 					<a href="{{lien_pdf}}" class="btn btn-secondary">Télécharger le PDF complet</a>
+					 #}
+				</div>
 
-                                {% for section in dossier.affecterSections %}
-                                    <tr>
-                                        <td> {{ section.dateAffectation ? section.dateAffectation|date('Y-m-d') : '' }}</td>
-                                        <td>  {{ section.section.structure.name }}</td>
-                                        <td>{{ section.section.name }}</td>
-                                        <td> {{ section.motif }}</td>
-                                    </tr>
-                                {% endfor %}
+				<div class="info-box">
+					<div class="info-box-content">
+						<div class="info-box-title">Prochaines étapes</div>
+						<p>En tant que
+							{{ profile }}, vous serez notifié des actions à mener sur ce dossier. Vous recevrez prochainement:</p>
+						<ul>
+							<li>Un calendrier des échéances</li>
+							<li>Les documents nécessaires</li>
+							<li>Les instructions spécifiques</li>
+						</ul>
+					</div>
+				</div>
+			</div>
 
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    {% if dossier.userDossiers %}
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title mb-0">Les rapporteurs du dossier</h4>
-                            </div><!-- end card header -->
-                            <div class="card-body">
-                                <table class="table table-striped">
-                                    <thead>
-                                    <tr>
-                                        <th> Nom & prénoms</th>
-                                        <th> Profil</th>
-                                        <th> Contact</th>
+			<div class="email-footer">
+				<p style="margin: 0; color: #64748b; font-size: 14px; line-height: 1.5;">
+					Merci pour votre collaboration.<br>
+					<span style="font-size: 12px;">Ceci est un message automatique, merci de ne pas y répondre.</span>
+				</p>
+			</div>
+		</div>
 
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-
-                                    {% for user in dossier.userDossiers %}
-                                        <tr>
-
-                                            <td> {{ user.user.UserIdentifier }} </td>
-
-                                            <td> {{ user.profil }}</td>
-                                            <td> {{ user.user.email }}</td>
-                                        </tr>
-                                    {% endfor %}
-
-
-
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    {% endif %}
-
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title mb-0">Informations du réquérant </h4>
-                        </div><!-- end card header -->
-                        <div class="card-body">
-                            <table class="table">
-                                <tbody>
-                                {% if dossier.requerant.type =='moral' %}
-
-                                    <tr>
-                                        <th>Intitule</th>
-                                        <td>{{ dossier.requerant.intitule }}</td>
-                                    </tr>
-
-
-                                {% else %}
-
-                                    <tr>
-                                        <th>Nom</th>
-                                        <td>{{ dossier.requerant.nom }}</td>
-                                    </tr>
-
-                                    <tr>
-                                        <th>Prénoms</th>
-                                        <td>{{ dossier.requerant.prenoms }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Sexe</th>
-                                        <td>{{ dossier.requerant.sexe }}</td>
-                                    </tr>
-                                {% endif %}
-
-                                <tr>
-                                    <th>Téléphone</th>
-                                    <td>{{ dossier.requerant.Telephone }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Email</th>
-                                    <td>{{ dossier.requerant.email }}</td>
-                                </tr>
-
-                                <tr>
-                                    <th>localite</th>
-                                    <td>{{ dossier.requerant.localite.libArrond }}</td>
-                                </tr>
-                                <tr>
-                                    <th>adresse</th>
-                                    <td>{{ dossier.requerant.adresse }}</td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title mb-0">Informations du défendeur </h4>
-                        </div><!-- end card header -->
-                        <div class="card-body">
-                            <table class="table">
-                                <tbody>
-                                {% if dossier.defendeur.type =='moral' %}
-                                    <tr>
-                                        <th>Intitule</th>
-                                        <td>{{ dossier.defendeur.intitule }}</td>
-                                    </tr>
-
-                                {% else %}
-
-                                    <tr>
-                                        <th>Nom</th>
-                                        <td>{{ dossier.defendeur.nom }}</td>
-                                    </tr>
-
-                                    <tr>
-                                        <th>Prénoms</th>
-                                        <td>{{ dossier.defendeur.prenoms }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Sexe</th>
-                                        <td>{{ dossier.defendeur.sexe }}</td>
-                                    </tr>
-                                {% endif %}
-
-                                <tr>
-                                    <th>Téléphone</th>
-                                    <td>{{ dossier.defendeur.Telephone }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Email</th>
-                                    <td>{{ dossier.defendeur.email }}</td>
-                                </tr>
-
-                                <tr>
-                                    <th>localite</th>
-                                    <td>{{ dossier.defendeur.localite.libArrond }}</td>
-                                </tr>
-                                <tr>
-                                    <th>adresse</th>
-                                    <td>{{ dossier.defendeur.adresse }}</td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
-{% endapply %}
+		<!-- Version complète masquée pour génération PDF -->
+		<div id="pdf-content" style="display: none;"><!-- Ici vous placerez le contenu complet qui sera généré en PDF -->
+			<!-- Vous pouvez réutiliser votre code original ici -->
+		</div>
+	</body>
+</html>

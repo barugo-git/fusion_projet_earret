@@ -1,0 +1,18 @@
+{% apply inline_css(source("@styles/bootstrap.min.css"),source("@styles/icons.min.css")
+    ,source("@styles/app.min.css"),source("@styles/custom.min.css")) %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10">
+                <p>Bonjour Monsieur/Madame.</p>
+                <p> Un nouveau recours a été enregistré sur la plateforme e-arrets par : {{ requerent }}</p>
+
+                <p>
+                    Veuillez vous connecter sur la plateforme pour plus de détails.
+                <p>
+                    Cliquez sur ce lien <a href="{{ lien }}"><strong style="color:blue;">Se connecter</a> pour se connecter à la plateforme.
+                </p>
+                {#                <p>L'audience du  dossier : {{ dossier.intituleObjet }} a été programmé le {{ audience.dateAudience ? audience.dateAudience|date('Y-m-d') : '' }} à {{ audience.dateAudience ? audience.heureAudience|date('H:i') : '' }}.</p>#}
+            </div>
+        </div>
+    </div>
+{% endapply %}

@@ -2,36 +2,43 @@
 
 namespace App\Controller;
 
-use App\Entity\AffecterSection;
-use App\Entity\AffecterStructure;
-use App\Entity\AffecterUser;
-use App\Entity\Dossier;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use App\Entity\User;
+use App\Entity\Dossier;
+use App\Entity\Structure;
 use App\Entity\UserDossier;
-use App\Form\AffecterSectionType;
-use App\Form\AffecterStructurePGType;
-use App\Form\AffecterStructureType;
-use App\Form\AffecterUserCRType;
-use App\Form\AffecterUserType;
-use App\Form\AutorisationOuvertureType;
-use App\Form\OuvertureAffecterSectionType;
+use App\Entity\AffecterUser;
 use App\Form\UserDossierType;
-use App\Repository\AffecterSectionRepository;
-use App\Repository\AffecterStructureRepository;
-use App\Repository\AffecterUserRepository;
+use App\Form\AffecterUserType;
+use App\Entity\AffecterSection;
+use App\Form\AffecterUserCRType;
+use App\Entity\AffecterStructure;
+use App\Form\AffecterSectionType;
+use App\Repository\UserRepository;
+use App\Form\AffecterStructureType;
+use Symfony\Component\Mime\Address;
+use App\Form\AffecterStructurePGType;
 use App\Repository\DossierRepository;
+use App\Repository\SectionRepository;
+use App\Form\AutorisationOuvertureType;
 use App\Repository\StructureRepository;
 use App\Repository\UserDossierRepository;
-use App\Repository\UserRepository;
+use App\Form\OuvertureAffecterSectionType;
+use App\Repository\AffecterUserRepository;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\ExpressionLanguage\Expression;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Repository\AffecterSectionRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use App\Repository\AffecterStructureRepository;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route(path: '/president-chambre/dossiers')]
 #[IsGranted(new Expression('is_granted("ROLE_PCA") or is_granted("ROLE_PCJ") or is_granted("ROLE_PCS")'))]
@@ -40,8 +47,12 @@ class PresidentChambreController extends AbstractController
     #[Route(path: '/liste-recours', name: 'app_president_chambre')]
     public function index(DossierRepository $dossierRepository): Response
     {
-        $structure = $this->getUser()->getStructure();
-        
+        $user = $this->getUser();
+        if (!$user instanceof \App\Entity\User) {
+            throw new \LogicException('User object is not an instance of App\Entity\User.');
+        }
+        $structure = $user->getStructure();
+
         return $this->render('president/recours.html.twig', [
             'dossiers' => $dossierRepository->findBy([
                 'etatDossier' => 'RECOURS',
@@ -56,7 +67,7 @@ class PresidentChambreController extends AbstractController
         $form = $this->createForm(AutorisationOuvertureType::class, $dossier);
         $form->handleRequest($request);
         $greffierEnChef = $userRepository->findOneBy(['titre' => 'GREFFIER EN CHEF'])->getFullName();
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
             $dossier->setEtatDossier("AUTORISATION");
             $dossier->setAutorisation(true);
@@ -74,10 +85,21 @@ class PresidentChambreController extends AbstractController
     }
 
     #[Route(path: '/affectation-dossier/{id}', name: 'autorisation_affectation_dossier', methods: ['GET', 'POST'])]
-    public function affectionDossierCRGR(Request $request, AffecterSectionRepository $affecterSectionRepository, Dossier $dossier, UserDossierRepository $userDossierRepository, UserRepository $userRepository): Response
-    {
+    public function affectionDossierCRGR(
+        Request $request,
+        AffecterSectionRepository $affecterSectionRepository,
+        Dossier $dossier,
+        UserDossierRepository $userDossierRepository,
+        MailerInterface $mailer,
+        UserRepository $userRepository,
+        StructureRepository $structureRepository,
+        SectionRepository $sectionRepository
+    ): Response {
+
+
         $affecterSection = new AffecterSection();
         $affecterSection->setDossier($dossier);
+        
         $structure = $this->getUser()->getStructure();
 
         $form = $this->createForm(OuvertureAffecterSectionType::class, $affecterSection, ['structure' => $structure]);
@@ -100,6 +122,33 @@ class PresidentChambreController extends AbstractController
             $dossier->setAutorisation(true);
             $affecterSectionRepository->add($affecterSection, true);
             $this->addFlash('success', 'L\'autorisation d\'ouverture du recours à été effectuée avec success et affectée à : ' . $form->get('section')->getData()->getName());
+            // --- 1. Envoi aux rapporteurs (UserDossiers) ---
+            $structures = $structureRepository->findAll();
+            $sections = $sectionRepository->findAll();
+
+
+
+            $options = new Options();
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isRemoteEnabled', true);
+
+            $dompdf = new Dompdf($options);
+            $html = $this->renderView('pdfs/ajout_membre_pdf.html.twig', [
+                'dossier' => $dossier,
+                'affecterSections' => $affecterSection,
+                'userDossiers' => $dossier->getUserDossiers(),
+            ]);
+
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->render();
+
+            // Récupérer le PDF en mémoire
+            $pdfOutput = $dompdf->output();
+            foreach ($dossier->getUserDossiers() as $userDossier) {
+                $this->sendMailToRapporteur($userDossier, $dossier, $mailer, $structures, $sections, $pdfOutput);
+            }
+
 
             return $this->redirectToRoute('app_recours_autorisation');
         }
@@ -191,13 +240,13 @@ class PresidentChambreController extends AbstractController
             'dossier' => $dossier,
             'profil' => 'CONSEILLER RAPPORTEUR'
         ]);
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
             $dossier->setEtatDossier('AVIS CR');
             $affecterUser->setExpediteur($this->getUser());
             $affecterUser->setDestinataire($destinataire->getUser());
             $affecterUserRepository->add($affecterUser, true);
-            
+
             $this->addFlash('success', 'Le dossier a été bien transféré au conseiller rapporteur.');
             return $this->redirectToRoute('admin_dossier_affections', ['id' => $dossier->getId()]);
         }
@@ -206,5 +255,28 @@ class PresidentChambreController extends AbstractController
             'dossier' => $dossier,
             'form' => $form->createView(),
         ]);
+    }
+
+    private function sendMailToRapporteur($userDossier, $dossier, $mailer, $structures, $sections, $pdfOutput)
+    {
+        $userEmail = $userDossier->getUser()->getUserIdentifier(); // ex: "user@example.com"
+
+        $email = (new TemplatedEmail())
+            ->from(new Address('juridiction@coursupreme.bj', 'Cour Suprême'))
+            ->to(new Address($userEmail)) // destinataire
+            ->subject('Alerte affectation d\'un nouveau dossier')
+            ->htmlTemplate('mailer/ajout_membre.html.twig')
+            ->context([
+                'destinataire' => $userDossier->getUser()->getUserInformations(),
+                'profile' => $userDossier->getProfil(),
+                'dossier' => $dossier,
+                'structure' => $structures,
+                'section' => $sections,
+                'lien_login' => $this->generateUrl('app_login', [], UrlGeneratorInterface::ABSOLUTE_URL)
+            ])
+            ->attach($pdfOutput, 'AffectationDossier.pdf', 'application/pdf'); // PJ
+
+        // 3️⃣ Envoi
+        $mailer->send($email);
     }
 }
